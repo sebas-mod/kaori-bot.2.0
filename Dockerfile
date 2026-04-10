@@ -2,11 +2,9 @@
 # Sangat disarankan untuk mempermudah pemasangan Sharp dan Canvas tanpa kompilasi manual yang abrok
 FROM node:22-bookworm
 
-# Persiapkan environment
 ENV NODE_ENV=development
 ENV TZ=Asia/Jakarta
 
-# Set working directory di dalam container
 WORKDIR /app
 
 # Update package manager dan instal dependencies fundamental OS:
@@ -25,17 +23,12 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy file dependency dlu biar ke-cache Docker dgn baik
 COPY package.json ./
 
-# Install npm dependencies
 RUN npm install
 
-# Copy seluruh source code ke dalam app
 COPY . .
 
-# Berikan akses penuh untuk execute permissions (berjaga-jaga)
 RUN chmod -R 777 /app
 
-# Jalankan index.js
 CMD ["npm", "start"]
