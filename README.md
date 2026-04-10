@@ -26,10 +26,10 @@ Buat kamu yang sedang mencari script bot WhatsApp yang ringan, punya fitur super
 
 | Layanan            | Deskripsi                                      | Akses |
 |-------------------|-----------------------------------------------|-------|
-| Panel Legal       | Panel resmi & aman                            | [Klik](#) |
-| Custom Script     | Ubah script bot dengan mudah                  | [Klik](#) |
-| Plugin OURIN MD   | Plugin terbaru & update                       | [Klik](#) |
-| Media Hosting     | Hosting gambar, video, audio, file            | [Klik](#) |
+| Panel Legal       | Panel resmi & aman                            | [Klik](https://cc.ourin.xyz) |
+| Custom Script     | Ubah script bot dengan mudah                  | [Klik](https://sc.ourin.xyz/build) |
+| Plugin OURIN MD   | Plugin terbaru & update                       | [Klik](https://pl.ourin.xyz) |
+| Media Hosting     | Hosting gambar, video, audio, file            | [Klik](https://up.ourin.xyz) |
 
 ---
 
