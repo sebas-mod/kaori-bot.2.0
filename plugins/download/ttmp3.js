@@ -1,9 +1,8 @@
 const ttdown = require('../../src/scraper/tiktok')
 const config = require('../../config')
 const axios = require('axios')
-const ffmpeg = require('fluent-ffmpeg')
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg')
-ffmpeg.setFfmpegPath(ffmpegInstaller.path)
+const { getFFmpeg } = require('../../src/lib/ourin-ffmpeg-path')
+const ffmpeg = getFFmpeg()
 
 const pluginConfig = {
     name: ['ttmp3'],

@@ -19,10 +19,8 @@ const fs = require('fs');
 const path = require('path');
 const Crypto = require('crypto');
 
-// FFmpeg setup
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-const ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+const { getFFmpeg } = require('./ourin-ffmpeg-path');
+const ffmpeg = getFFmpeg();
 let webpmux;
 
 /**
