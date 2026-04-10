@@ -6,13 +6,13 @@ R='\033[1;31m'
 Y='\033[1;33m'
 C='\033[1;36m'
 P='\033[1;35m'
-B='\033[1;34m'
 DIM='\033[2m'
 NC='\033[0m'
 CLR='\033[K'
 
 LOGDIR="${TMPDIR:-${PREFIX:-/usr}/tmp}"
 LOGFILE="$LOGDIR/ourin_install.log"
+> "$LOGFILE"
 
 clear
 
@@ -37,7 +37,7 @@ run_task() {
     local pct=0
     local i=0
 
-    eval "$cmd" > "$LOGFILE" 2>&1 &
+    eval "$cmd" >> "$LOGFILE" 2>&1 &
     local pid=$!
 
     while kill -0 $pid 2>/dev/null; do
@@ -70,15 +70,19 @@ if command -v pkg &> /dev/null; then
     echo -e "  ${G}✓${NC}  ${W}Terdeteksi: ${C}Termux (Android)${NC}"
     echo ""
 
-    run_task "Update repository Termux" "pkg update -y"
-    run_task "Upgrade package lama" "pkg upgrade -y"
-    run_task "Instal Node.js" "pkg install nodejs -y"
-    run_task "Instal FFmpeg" "pkg install ffmpeg -y"
-    run_task "Instal Git" "pkg install git -y"
-    run_task "Instal Python" "pkg install python -y"
-    run_task "Instal Compiler C++" "pkg install clang binutils build-essential -y"
-    run_task "Instal libvips" "pkg install libvips -y"
+    export DEBIAN_FRONTEND=noninteractive
 
+    run_task "Update repository Termux" "pkg update -y"
+    run_task "Instal Node.js" "pkg install -y nodejs"
+    run_task "Instal FFmpeg" "pkg install -y ffmpeg"
+    run_task "Instal Git" "pkg install -y git"
+    run_task "Instal Python" "pkg install -y python"
+    run_task "Instal C++ Compiler" "pkg install -y clang binutils build-essential"
+    run_task "Instal libvips" "pkg install -y libvips"
+
+    export CC=clang
+    export CXX=clang++
+    export npm_config_sharp_build_from_source=true
     export npm_config_build_from_source=true
 
 elif command -v apt-get &> /dev/null; then
@@ -129,7 +133,7 @@ if [ $NPM_EXIT -eq 0 ]; then
 else
     echo -e "  ${R}✗${NC}  ${W}npm install gagal. Ini error terakhirnya:${NC}"
     echo ""
-    tail -10 "$LOGFILE" 2>/dev/null
+    tail -15 "$LOGFILE" 2>/dev/null
     echo ""
     echo -e "  ${DIM}Log lengkap: $LOGFILE${NC}"
 fi
