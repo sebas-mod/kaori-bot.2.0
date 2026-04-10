@@ -63,8 +63,8 @@ if command -v pkg &> /dev/null; then
     pkg install ffmpeg -y > /dev/null 2>&1 & 
     show_progress $! "Menginstal FFmpeg"
     
-    pkg install libvips git build-essential python -y > /dev/null 2>&1 & 
-    show_progress $! "Menginstal pendukung (libvipsdll)"
+    pkg install binutils clang libvips git build-essential python -y > /dev/null 2>&1 & 
+    show_progress $! "Menginstal pendukung (C++ Compiler)"
     
 elif command -v apt-get &> /dev/null; then
     echo -e "\n${CYAN}[*] OS Terdeteksi: Ubuntu / Debian / VPS Linux${NC}"
@@ -97,6 +97,19 @@ else
 fi
 
 echo -e "\n${GREEN}[✔] Mantap! Semua module dasar berhasil tersetting.${NC}\n"
+
+echo -e "\n${CYAN}[*] Mengecek versi node...${NC}\n"
+node -v
+
+echo -e "\n${CYAN}[*] Mengecek versi npm...${NC}\n"
+npm -v
+
+echo -e "\n${GREEN}[✔] Mantap! Semua module dasar berhasil tersetting.${NC}\n"
+
+# Perbaikan khusus Termux untuk package "sharp" & "canvas"
+if command -v pkg &> /dev/null; then
+    export npm_config_build_from_source=true
+fi
 
 npm install > /dev/null 2>&1 & 
 show_progress $! "Mengunduh module bot (NPM Local)"
