@@ -126,32 +126,67 @@ else
     exit 1
 fi
 
+IS_TERMUX=false
+if command -v pkg &> /dev/null; then
+    IS_TERMUX=true
+fi
+
 echo ""
 echo -e "  ${W}Mulai npm install, agak lama ya sabar...${NC}"
 echo ""
 
-run_task "Download semua module bot" "npm install --build-from-source"
+run_task "Download semua module bot" "npm install --ignore-scripts"
 NPM_EXIT=$?
 
 if [ $NPM_EXIT -ne 0 ]; then
     echo ""
-    echo -e "  ${Y}!${NC}  ${W}Coba cara kedua...${NC}"
-    run_task "Install tanpa scripts" "npm install --ignore-scripts"
-    run_task "Rebuild sharp" "npm rebuild sharp --build-from-source"
-    echo -e "  ${DIM}     (cpu-features di-skip, opsional)${NC}"
-    NPM_EXIT=0
-fi
-
-echo ""
-
-if [ $NPM_EXIT -eq 0 ]; then
-    echo -e "  ${G}✓${NC}  ${W}Selesai! Edit ${C}config.js${W} dulu, terus ketik ${Y}npm start${NC}"
-else
     echo -e "  ${R}✗${NC}  ${W}npm install gagal. Error terakhir:${NC}"
     echo ""
     tail -15 "$LOGFILE" 2>/dev/null
     echo ""
     echo -e "  ${DIM}Log: $LOGFILE${NC}"
+    echo ""
+    exit 1
+fi
+
+if [ "$IS_TERMUX" = true ]; then
+    run_task "Build sharp (android-arm64)" "npm rebuild sharp --build-from-source"
+else
+    run_task "Build native modules" "npm rebuild --build-from-source"
 fi
 
 echo ""
+echo -e "  ${G}✓${NC}  ${W}Semua module berhasil di-install${NC}"
+
+echo ""
+echo -e "  ╭─────────────────────────────────────╮"
+echo -e "  │  ${W}Mau langsung jalankan bot?${NC}          │"
+echo -e "  │                                     │"
+echo -e "  │  ${C}1${NC}  ${W}Langsung${NC} ${Y}npm start${NC}              │"
+echo -e "  │  ${C}2${NC}  ${W}Edit${NC} ${C}config.js${NC} ${W}dulu${NC}            │"
+echo -e "  │                                     │"
+echo -e "  ╰─────────────────────────────────────╯"
+echo ""
+printf "  ${W}Pilih [${C}1${W}/${C}2${W}]: ${NC}"
+read -r PILIHAN
+
+case "$PILIHAN" in
+    1)
+        echo ""
+        echo -e "  ${G}▶${NC}  ${W}Menjalankan bot...${NC}"
+        echo ""
+        npm start
+        ;;
+    2)
+        echo ""
+        echo -e "  ${G}✓${NC}  ${W}Silahkan edit ${C}config.js${W} dulu${NC}"
+        echo -e "  ${DIM}     Ketik: nano config.js${NC}"
+        echo -e "  ${DIM}     Kalau sudah, jalankan: npm start${NC}"
+        echo ""
+        ;;
+    *)
+        echo ""
+        echo -e "  ${G}✓${NC}  ${W}Silahkan edit ${C}config.js${W} dulu, terus ketik ${Y}npm start${NC}"
+        echo ""
+        ;;
+esac
