@@ -5,9 +5,9 @@ const pluginConfig = {
     name: 'deepseek',
     alias: ['deepseekr1', 'dsr1'],
     category: 'ai',
-    description: 'Chat dengan DeepSeek R1',
-    usage: '.deepseek <pertanyaan>',
-    example: '.deepseek Jelaskan tentang AI',
+    description: 'Chatear con DeepSeek R1',
+    usage: '.deepseek <pregunta>',
+    example: '.deepseek Explica qué es la IA',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -19,14 +19,21 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const text = m.args.join(' ')
+    
     if (!text) {
-        return m.reply(`🧠 *ᴅᴇᴇᴘsᴇᴇᴋ ʀ1*\n\n> Masukkan pertanyaan\n\n\`Contoh: ${m.prefix}deepseek Jelaskan tentang AI\``)
+        return m.reply(
+            `🧠 *ᴅᴇᴇᴘsᴇᴇᴋ ʀ1*\n\n` +
+            `> Escribe una pregunta\n\n` +
+            `\`Ejemplo: ${m.prefix}deepseek Explica qué es la IA\``
+        )
     }
     
     m.react('🧠')
     
     try {
-        const result = await f(`https://api.nexray.web.id/ai/deepseek?text=${encodeURIComponent(text)}`)
+        const result = await f(
+            `https://api.nexray.web.id/ai/deepseek?text=${encodeURIComponent(text)}`
+        )
         
         m.react('✅')
         await m.reply(`${result.result}`)
