@@ -5,8 +5,8 @@ const pluginConfig = {
     name: 'tocartoon',
     alias: ['cartoon', 'cartoonify', 'tooncartoon'],
     category: 'ai',
-    description: 'Ubah foto menjadi gaya kartun',
-    usage: '.tocartoon (reply/kirim gambar)',
+    description: 'Convertir una foto a estilo caricatura',
+    usage: '.tocartoon (responde/envía una imagen)',
     example: '.tocartoon',
     isOwner: false,
     isPremium: true,
@@ -28,7 +28,7 @@ async function handler(m, { sock }) {
     if (!isImage) {
         return m.reply(
             `🎬 *ᴛᴏ ᴄᴀʀᴛᴏᴏɴ*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke gaya kartun\n\n` +
+            `> Envía o responde a una imagen para convertirla en estilo caricatura\n\n` +
             `\`${m.prefix}tocartoon\``
         )
     }
@@ -37,6 +37,7 @@ async function handler(m, { sock }) {
     
     try {
         let buffer
+        
         if (m.quoted && m.quoted.isMedia) {
             buffer = await m.quoted.download()
         } else if (m.isMedia) {
@@ -45,7 +46,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen`)
         }
         
         const result = await nanoBanana(buffer, PROMPT)
