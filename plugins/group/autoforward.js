@@ -4,7 +4,7 @@ const pluginConfig = {
     name: 'autoforward',
     alias: ['autofw', 'autofwd'],
     category: 'group',
-    description: 'Auto forward pesan yang masuk ke grup ke grup ini',
+    description: 'Reenviar automáticamente los mensajes al grupo',
     usage: '.autoforward <on/off>',
     example: '.autoforward on',
     isOwner: false,
@@ -24,14 +24,14 @@ async function handler(m, { sock }) {
     const group = db.getGroup(groupId) || {}
     
     if (!option) {
-        const status = group.autoforward ? '✅ ON' : '❌ OFF'
+        const status = group.autoforward ? '✅ ACTIVADO' : '❌ DESACTIVADO'
         return m.reply(
-            `🔄 *ᴀᴜᴛᴏ ꜰᴏʀᴡᴀʀᴅ*\n\n` +
+            `🔄 *ᴇɴᴠɪᴏ ᴀᴜᴛᴏᴍáᴛɪᴄᴏ*\n\n` +
             `╭┈┈⬡「 📋 *ɪɴꜰᴏ* 」\n` +
-            `┃ ◦ Status: *${status}*\n` +
+            `┃ ◦ Estado: *${status}*\n` +
             `╰┈┈⬡\n\n` +
-            `> Gunakan: \`${m.prefix}autoforward on/off\`\n\n` +
-            `_Fitur ini akan meneruskan semua pesan ke grup ini_`
+            `> Usa: \`${m.prefix}autoforward on/off\`\n\n` +
+            `_Esta función reenviará todos los mensajes al grupo_`
         )
     }
     
@@ -39,11 +39,11 @@ async function handler(m, { sock }) {
         db.setGroup(groupId, { ...group, autoforward: true })
         m.react('✅')
         return m.reply(
-            `🔄 *ᴀᴜᴛᴏ ꜰᴏʀᴡᴀʀᴅ*\n\n` +
-            `╭┈┈⬡「 ✅ *ᴀᴋᴛɪꜰ* 」\n` +
-            `┃ ◦ Status: *ON*\n` +
+            `🔄 *ᴇɴᴠɪᴏ ᴀᴜᴛᴏᴍáᴛɪᴄᴏ*\n\n` +
+            `╭┈┈⬡「 ✅ *ᴀᴄᴛɪᴠᴀᴅᴏ* 」\n` +
+            `┃ ◦ Estado: *ON*\n` +
             `╰┈┈⬡\n\n` +
-            `> _Semua pesan akan di-forward_`
+            `> _Todos los mensajes serán reenviados_`
         )
     }
     
@@ -51,14 +51,14 @@ async function handler(m, { sock }) {
         db.setGroup(groupId, { ...group, autoforward: false })
         m.react('❌')
         return m.reply(
-            `🔄 *ᴀᴜᴛᴏ ꜰᴏʀᴡᴀʀᴅ*\n\n` +
-            `╭┈┈⬡「 ❌ *ɴᴏɴᴀᴋᴛɪꜰ* 」\n` +
-            `┃ ◦ Status: *OFF*\n` +
+            `🔄 *ᴇɴᴠɪᴏ ᴀᴜᴛᴏᴍáᴛɪᴄᴏ*\n\n` +
+            `╭┈┈⬡「 ❌ *ᴅᴇsᴀᴄᴛɪᴠᴀᴅᴏ* 」\n` +
+            `┃ ◦ Estado: *OFF*\n` +
             `╰┈┈⬡`
         )
     }
     
-    return m.reply(`❌ Gunakan: on atau off`)
+    return m.reply(`❌ Usa: on o off`)
 }
 
 module.exports = {
