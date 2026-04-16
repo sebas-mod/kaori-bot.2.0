@@ -2,42 +2,27 @@ const { exec } = require('child_process')
 
 const pluginConfig = {
     name: 'update',
-    alias: ['upd', 'gitpull'],
+    alias: ['upd'],
     category: 'owner',
     description: 'Actualizar bot desde GitHub',
-    usage: '.update',
-    example: '.update',
-    isOwner: true,
-    cooldown: 10,
-    isEnabled: true
+    isOwner: true
 }
 
-async function handler(m, { sock }) {
-    await m.reply('🔄 Buscando actualizaciones en GitHub...')
+async function handler(m) {
+    m.reply('🔄 Ejecutando actualización...')
 
-    exec('git pull', (err, stdout, stderr) => {
+    exec('git fetch origin && git reset --hard origin/main', (err, stdout, stderr) => {
+        console.log('STDOUT:\n', stdout)
+        console.log('STDERR:\n', stderr)
+
         if (err) {
-            console.log('❌ ERROR UPDATE:', err)
-            return m.reply('❌ Error al actualizar:\n' + err.message)
+            console.log('ERROR:\n', err)
+            return m.reply('❌ Error:\n' + err.message)
         }
 
-        if (stdout.includes('Already up to date')) {
-            console.log('✔️ Sin cambios')
-            return m.reply('✔️ El bot ya está actualizado')
-        }
+        m.reply(`📦 Resultado:\n${stdout || 'Sin cambios'}\n\n♻️ Reiniciando...`)
 
-        console.log('📦 CAMBIOS:\n', stdout)
-
-        let cambios = stdout
-            .split('\n')
-            .filter(v => v.includes('|'))
-            .join('\n')
-
-        m.reply(`📦 *Archivos actualizados:*\n\n${cambios || stdout}\n\n♻️ Reiniciando...`)
-
-        setTimeout(() => {
-            process.exit(0)
-        }, 2000)
+        setTimeout(() => process.exit(0), 2000)
     })
 }
 
