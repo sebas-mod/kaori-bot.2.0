@@ -3,7 +3,7 @@ const config = {
 
     info: {
         website: 'https://sc.ourin.my.id',
-        grupwa: 'https://chat.whatsapp.com/C8pzXYhMJMyKbHMdehT9Yt'
+        grupwa: ''
     },
 
     owner: {
@@ -78,7 +78,7 @@ const config = {
     saluran: {
         id: '120363408589011962@newsletter', // ID saluran (contoh: 120363xxx@newsletter)                          // ID saluran (contoh: 120363xxx@newsletter)
         name: 'WHATSAPP BOT MULTI DEVICE',       // Nama saluran
-        link: 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t'                          // Link saluran
+        link: ''                          // Link saluran
     },
 
     groupProtection: {
