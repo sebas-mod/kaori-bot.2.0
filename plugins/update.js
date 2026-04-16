@@ -5,8 +5,13 @@ const fs = require('fs')
 const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
+  const { execSync } = require('child_process')
+const { spawn } = require('child_process')
+const path = require('path')
+const fs = require('fs')
+const pluginConfig = {
     name: 'up',
-    alias: ['update', 'gitpull', 'updatebot'],
+    alias: ['gitpull', 'update'],
     category: 'owner',
     description: 'Actualizar el bot desde GitHub usando git pull',
     usage: '.up',
