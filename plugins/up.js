@@ -1,8 +1,7 @@
-import { exec } from 'child_process'
-import util from 'util'
+import { spawn } from 'child_process'
 
 let handler = async (m, { conn }) => {
-  // 👑 OWNER CHECK (tu sistema)
+  // 👑 Owner check (tu sistema)
   const owners = global.config.owner.map(([n]) =>
     n.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
   )
@@ -11,50 +10,61 @@ let handler = async (m, { conn }) => {
     return m.reply('🚫 *Solo el Owner puede usar este comando.*')
   }
 
-  await m.reply('🔍 *Analizando entorno del bot...*')
+  await m.reply('🔄 *Iniciando actualización real...*')
 
-  // 🔎 PASO 1: DEBUG REAL DEL ENTORNO
-  exec('pwd && ls -a && git remote -v && git branch', (err, debug) => {
-    console.log('📂 DEBUG ENTORNO:\n', debug)
-  })
+  const comandos = [
+    ['git', ['fetch', '--all']],
+    ['git', ['reset', '--hard', 'origin/main']],
+    ['git', ['clean', '-fd']]
+  ]
 
-  await m.reply('🔄 *Forzando actualización desde GitHub...*')
+  let output = ''
+
+  const runCommand = (cmd, args) => {
+    return new Promise((resolve, reject) => {
+      const process = spawn(cmd, args)
+
+      process.stdout.on('data', (data) => {
+        output += data.toString()
+        console.log(data.toString())
+      })
+
+      process.stderr.on('data', (data) => {
+        output += data.toString()
+        console.log(data.toString())
+      })
+
+      process.on('close', (code) => {
+        if (code !== 0) {
+          reject(`Error en ${cmd} ${args.join(' ')}`)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
 
   try {
-    // 🔥 MÉTODO ULTRA SEGURO
-    const cmd = `
-      git fetch --all &&
-      git reset --hard origin/main &&
-      git clean -fd &&
-      git pull origin main
-    `
+    for (let [cmd, args] of comandos) {
+      await runCommand(cmd, args)
+    }
 
-    exec(cmd, (error, stdout, stderr) => {
-      console.log('📦 STDOUT:\n', stdout)
-      console.log('⚠️ STDERR:\n', stderr)
+    if (!output.trim()) {
+      output = '✔️ Sin cambios, ya está actualizado.'
+    }
 
-      if (error) {
-        console.error('❌ ERROR:', error)
+    await m.reply(
+      `📦 *Update aplicado correctamente:*\n\`\`\`\n${output}\n\`\`\`\n\n♻️ Reiniciando...`
+    )
 
-        return m.reply(
-          '❌ *Error real detectado:*\n\n' +
-          util.format(error) +
-          '\n\n📌 Ejecutá en consola:\n```git pull```'
-        )
-      }
+    setTimeout(() => process.exit(0), 2000)
 
-      let resultado = stdout?.trim() || '✔️ Sin cambios detectados.'
+  } catch (err) {
+    console.error('❌ ERROR UPDATE:', err)
 
-      m.reply(
-        `📦 *UPDATE COMPLETADO*\n\n\`\`\`\n${resultado}\n\`\`\`\n\n♻️ Reiniciando...`
-      )
-
-      setTimeout(() => process.exit(0), 2000)
-    })
-
-  } catch (e) {
-    console.error('❌ Error inesperado:', e)
-    m.reply('🚨 *Error inesperado:*\n' + util.format(e))
+    m.reply(
+      `❌ *Error real en actualización:*\n\`\`\`\n${err}\n\`\`\`\n\n📌 Revisá consola del servidor`
+    )
   }
 }
 
