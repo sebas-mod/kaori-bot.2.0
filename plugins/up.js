@@ -1,29 +1,65 @@
-const { exec } = require('child_process')
+import { exec } from 'child_process'
+import util from 'util'
 
-const pluginConfig = {
-    name: 'update',
-    alias: ['upd'],
-    category: 'owner',
-    description: 'Actualizar bot desde GitHub',
-    isOwner: true
-}
+let handler = async (m, { conn }) => {
+  try {
+    // 👑 Detectar owner real
+    const owners = global.config.owner.map(([n]) =>
+      n.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+    )
 
-async function handler(m) {
-    m.reply('🔄 Ejecutando actualización...')
+    const isRealOwner = owners.includes(m.sender)
 
-    exec('git fetch origin && git reset --hard origin/main', (err, stdout, stderr) => {
-        console.log('STDOUT:\n', stdout)
-        console.log('STDERR:\n', stderr)
+    console.log('📱 Remitente:', m.sender)
+    console.log('👑 Owners:', owners)
+    console.log('✅ Es owner?:', isRealOwner)
 
-        if (err) {
-            console.log('ERROR:\n', err)
-            return m.reply('❌ Error:\n' + err.message)
-        }
+    if (!isRealOwner) {
+      return m.reply('🚫 *Solo el Owner puede usar este comando.*')
+    }
 
-        m.reply(`📦 Resultado:\n${stdout || 'Sin cambios'}\n\n♻️ Reiniciando...`)
+    await m.reply('🔄 *Actualizando desde GitHub...*\nEspera unos segundos ⏳')
 
-        setTimeout(() => process.exit(0), 2000)
+    // 🔥 UPDATE FORZADO (el que sí funciona siempre)
+    const cmd = `
+      git fetch origin &&
+      git reset --hard origin/main &&
+      git clean -fd
+    `
+
+    exec(cmd, (error, stdout, stderr) => {
+      console.log('📦 STDOUT:\n', stdout)
+      console.log('⚠️ STDERR:\n', stderr)
+
+      if (error) {
+        console.error('❌ ERROR:', error)
+        return m.reply('❌ *Error al actualizar:*\n' + util.format(error))
+      }
+
+      let resultado = (stdout || '').trim()
+
+      if (!resultado) {
+        resultado = '✔️ Sin cambios, el bot ya está actualizado.'
+      }
+
+      m.reply(
+        `📦 *Resultado del update:*\n\`\`\`\n${resultado}\n\`\`\`\n\n♻️ *Reiniciando bot...*`
+      )
+
+      // 🔁 Reinicio automático
+      setTimeout(() => {
+        process.exit(0)
+      }, 2000)
     })
+
+  } catch (e) {
+    console.error('❌ Error inesperado:', e)
+    m.reply('🚨 *Error inesperado:*\n' + util.format(e))
+  }
 }
 
-module.exports = { pluginConfig, handler }
+handler.help = ['update']
+handler.tags = ['owner']
+handler.command = /^up(date)?$/i
+
+export default handler
