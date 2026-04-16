@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'glm4',
     alias: ['glm', 'glm46v'],
     category: 'ai',
-    description: 'Chat dengan GLM 4.6V',
-    usage: '.glm4 <pertanyaan>',
-    example: '.glm4 Hai apa kabar?',
+    description: 'Chatear con GLM 4.6V',
+    usage: '.glm4 <pregunta>',
+    example: '.glm4 Hola ¿cómo estás?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -20,8 +20,13 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const text = m.text
+    
     if (!text) {
-        return m.reply(`🌐 *ɢʟᴍ 4.6ᴠ*\n\n> Masukkan pertanyaan\n\n\`Contoh: ${m.prefix}glm4 Hai apa kabar?\``)
+        return m.reply(
+            `🌐 *ɢʟᴍ 4.6ᴠ*\n\n` +
+            `> Escribe una pregunta\n\n` +
+            `\`Ejemplo: ${m.prefix}glm4 Hola ¿cómo estás?\``
+        )
     }
     
     m.react('🕕')
