@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'tochibi',
     alias: ['chibi', 'chibistyle'],
     category: 'ai',
-    description: 'Ubah gambar ke style Chibi',
-    usage: '.tochibi (reply gambar)',
+    description: 'Convertir una imagen a estilo Chibi',
+    usage: '.tochibi (responde a una imagen)',
     example: '.tochibi',
     isOwner: false,
     isPremium: false,
@@ -22,13 +22,18 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🎀 *ᴄʜɪʙɪ sᴛʏʟᴇ*\n\n> Kirim/reply gambar untuk diubah ke style Chibi\n\n\`${m.prefix}tochibi\``)
+        return m.reply(
+            `🎀 *ᴇsᴛɪʟᴏ ᴄʜɪʙɪ*\n\n` +
+            `> Envía o responde a una imagen para convertirla a estilo Chibi\n\n` +
+            `\`${m.prefix}tochibi\``
+        )
     }
     
     m.react('🕕')
 
     try {
         let buffer
+        
         if (m.quoted && m.quoted.isMedia) {
             buffer = await m.quoted.download()
         } else if (m.isMedia) {
@@ -37,7 +42,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen`)
         }
         
         const imageUrl = await uploadImage(buffer, 'image.jpg')
