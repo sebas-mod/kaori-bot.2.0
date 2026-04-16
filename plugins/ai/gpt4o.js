@@ -5,9 +5,9 @@ const pluginConfig = {
     name: 'gpt4o',
     alias: ['gpt4'],
     category: 'ai',
-    description: 'Chat dengan GPT-4o',
-    usage: '.gpt4o <pertanyaan>',
-    example: '.gpt4o Hai apa kabar?',
+    description: 'Chatear con GPT-4o',
+    usage: '.gpt4o <pregunta>',
+    example: '.gpt4o Hola ¿cómo estás?',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -19,8 +19,13 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const text = m.args.join(' ')
+    
     if (!text) {
-        return m.reply(`🧠 *ɢᴘᴛ-4ᴏ*\n\n> Masukkan pertanyaan\n\n\`Contoh: ${m.prefix}gpt4o Hai apa kabar?\``)
+        return m.reply(
+            `🧠 *ɢᴘᴛ-4ᴏ*\n\n` +
+            `> Escribe una pregunta\n\n` +
+            `\`Ejemplo: ${m.prefix}gpt4o Hola ¿cómo estás?\``
+        )
     }
     
     m.react('🕕')
