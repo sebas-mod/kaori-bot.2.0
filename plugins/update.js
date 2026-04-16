@@ -5,12 +5,12 @@ const fs = require('fs')
 const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
-    name: 'update',
-    alias: ['gitpull', 'up', 'pullupdate'],
+    name: 'up',
+    alias: ['update', 'gitpull', 'updatebot'],
     category: 'owner',
     description: 'Actualizar el bot desde GitHub usando git pull',
-    usage: '.update',
-    example: '.update',
+    usage: '.up',
+    example: '.up',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -71,7 +71,7 @@ async function handler(m, { sock }) {
             return m.reply(
                 `✅ *ɢɪᴛ ɪɴɪᴄɪᴀʟɪᴢᴀᴅᴏ*\n\n` +
                 `> ¡Repositorio conectado correctamente!\n` +
-                `> Ejecuta \`.update\` de nuevo para actualizar.`
+                `> Ejecuta \`.up\` de nuevo para actualizar.`
             )
         }
 
