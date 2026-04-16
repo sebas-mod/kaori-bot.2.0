@@ -1,3 +1,4 @@
+```js
 const { exec } = require("child_process");
 
 module.exports = {
@@ -5,7 +6,7 @@ module.exports = {
     name: "update",
     alias: ["gitpull", "actualizar"],
     category: "owner",
-    description: "Actualizar bot desde GitHub",
+    description: "Actualiza el bot desde GitHub",
     owner: true,
     isEnabled: true,
     cooldown: 5,
@@ -13,22 +14,34 @@ module.exports = {
   },
 
   handler: async (m, { sock }) => {
-    await m.reply("🔄 Actualizando bot desde Git...");
+    console.log("🔥 UPDATE EJECUTADO"); // DEBUG
 
-    exec("git pull", async (err, stdout, stderr) => {
-      if (err) {
-        console.error(err);
-        return m.reply(`❌ Error:\n${err.message}`);
-      }
+    try {
+      await m.reply("🔄 Actualizando bot desde Git...");
 
-      if (stderr) {
-        return m.reply(`⚠️ Warning:\n${stderr}`);
-      }
+      exec("git pull && npm install", async (err, stdout, stderr) => {
+        if (err) {
+          console.error("❌ ERROR UPDATE:", err);
+          return m.reply(`❌ Error:\n${err.message}`);
+        }
 
-      await m.reply(`✅ Update completo:\n\n${stdout}\n\n♻️ Reiniciando...`);
+        if (stderr) {
+          console.log("⚠️ STDERR:", stderr);
+        }
 
-      process.exit(0);
-    });
+        await m.reply(
+          `✅ *UPDATE COMPLETADO*\n\n${stdout.substring(0, 3000)}\n\n♻️ Reiniciando...`
+        );
+
+        // delay pequeño para enviar mensaje antes de apagar
+        setTimeout(() => {
+          process.exit(0);
+        }, 2000);
+      });
+    } catch (e) {
+      console.error("❌ ERROR GENERAL:", e);
+      m.reply("❌ Error inesperado al actualizar");
+    }
   },
 };
 ```
