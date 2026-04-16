@@ -7,7 +7,7 @@ const pluginConfig = {
     name: 'ai-leaderboard',
     alias: ['aileaderboard', 'aiboard', 'ailb', 'lmarena'],
     category: 'ai',
-    description: 'Lihat leaderboard AI model terbaik dari LMArena',
+    description: 'Ver el ranking de los mejores modelos de IA de LMArena',
     usage: '.ai-leaderboard [category]',
     example: '.ai-leaderboard text',
     isOwner: false,
@@ -70,15 +70,15 @@ async function handler(m, { sock }) {
         
         if (categories.length === 0) {
             await m.react('❌')
-            return m.reply('❌ Gagal mengambil data leaderboard')
+            return m.reply('❌ Error al obtener los datos del ranking')
         }
         
         const saluranId = config.saluran?.id || '120363208449943317@newsletter'
         const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
         
         if (!category) {
-            let text = `🤖 *ᴀɪ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ*\n\n`
-            text += `> Data dari LMArena.ai\n\n`
+            let text = `🤖 *ʀᴀɴᴋɪɴɢ ᴅᴇ ɪᴀ*\n\n`
+            text += `> Datos de LMArena.ai\n\n`
             
             for (const cat of categories) {
                 const topModels = leaderboards[cat].slice(0, 3)
@@ -93,14 +93,14 @@ async function handler(m, { sock }) {
                 for (const m of topModels) {
                     const medal = m.rank === 1 ? '🥇' : m.rank === 2 ? '🥈' : '🥉'
                     text += `┃ ${medal} ${m.model}\n`
-                    text += `┃    Score: ${m.score.toLocaleString()} | Votes: ${m.votes.toLocaleString()}\n`
+                    text += `┃    Puntuación: ${m.score.toLocaleString()} | Votos: ${m.votes.toLocaleString()}\n`
                 }
                 text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
             }
             
-            text += `> *Lihat kategori spesifik:*\n`
+            text += `> Ver categoría específica:\n`
             text += `> ${m.prefix}ai-leaderboard <category>\n\n`
-            text += `> *Kategori:* ${categories.join(', ')}`
+            text += `> Categorías: ${categories.join(', ')}`
             
             await sock.sendMessage(m.chat, {
                 text,
@@ -120,21 +120,21 @@ async function handler(m, { sock }) {
             
             if (!matchedCat) {
                 await m.react('❌')
-                return m.reply(`❌ Kategori tidak ditemukan!\n\n> *Kategori tersedia:*\n> ${categories.join(', ')}`)
+                return m.reply(`❌ ¡Categoría no encontrada!\n\n> Categorías disponibles:\n> ${categories.join(', ')}`)
             }
             
             const models = leaderboards[matchedCat].slice(0, 10)
             
-            let text = `🤖 *ᴀɪ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅ - ${matchedCat.toUpperCase()}*\n\n`
-            text += `> Top 10 AI Models\n\n`
+            let text = `🤖 *ʀᴀɴᴋɪɴɢ ᴅᴇ ɪᴀ - ${matchedCat.toUpperCase()}*\n\n`
+            text += `> Top 10 modelos de IA\n\n`
             
             text += `╭┈┈⬡「 📊 *ʀᴀɴᴋɪɴɢ* 」\n`
             for (const m of models) {
                 const medal = m.rank === 1 ? '🥇' : m.rank === 2 ? '🥈' : m.rank === 3 ? '🥉' : `#${m.rank}`
                 text += `┃\n`
                 text += `┃ ${medal} \`${m.model}\`\n`
-                text += `┃ ├ Score: *${m.score.toLocaleString()}*\n`
-                text += `┃ └ Votes: *${m.votes.toLocaleString()}*\n`
+                text += `┃ ├ Puntuación: *${m.score.toLocaleString()}*\n`
+                text += `┃ └ Votos: *${m.votes.toLocaleString()}*\n`
             }
             text += `╰┈┈┈┈┈┈┈┈⬡\n\n`
             
