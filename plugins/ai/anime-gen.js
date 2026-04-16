@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'anime-gen',
     alias: ['animegen', 'aianimegen', 'genai-anime'],
     category: 'ai',
-    description: 'Generate AI anime art dari prompt',
+    description: 'Generar arte anime con IA desde un prompt',
     usage: '.anime-gen <prompt>',
-    example: '.anime-gen girl, vibrant color, smilling',
+    example: '.anime-gen chica, colores vibrantes, sonriendo',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -23,17 +23,17 @@ async function handler(m, { sock }) {
     
     if (!prompt) {
         return m.reply(
-            `🎨 *ᴀɴɪᴍᴇ ᴀʀᴛ ɢᴇɴᴇʀᴀᴛᴏʀ*\n\n` +
-            `> Generate gambar anime AI dari prompt!\n\n` +
-            `*ᴄᴀʀᴀ ᴘᴀᴋᴀɪ:*\n` +
-            `> \`${m.prefix}anime-gen <deskripsi>\`\n\n` +
-            `*ᴄᴏɴᴛᴏʜ:*\n` +
-            `> \`${m.prefix}anime-gen girl, vibrant color, smilling, yellow pink gradient hair\`\n` +
-            `> \`${m.prefix}anime-gen boy, dark aesthetic, silver hair, red eyes\`\n\n` +
+            `🎨 *ᴀɴɪᴍᴇ ᴀʀᴛ ɢᴇɴᴇʀᴀᴅᴏʀ*\n\n` +
+            `> Genera imágenes anime con IA desde un prompt\n\n` +
+            `*ᴄómo ᴜsᴀʀ:*\n` +
+            `> \`${m.prefix}anime-gen <descripción>\`\n\n` +
+            `*ᴇᴊᴇᴍᴘʟᴏs:*\n` +
+            `> \`${m.prefix}anime-gen chica, colores vibrantes, sonriendo, cabello degradado rosa y amarillo\`\n` +
+            `> \`${m.prefix}anime-gen chico, estética oscura, cabello plateado, ojos rojos\`\n\n` +
             `*ᴛɪᴘs:*\n` +
-            `> • Gunakan bahasa Inggris\n` +
-            `> • Makin detail prompt, makin bagus hasil\n` +
-            `> • Tambahkan style: vibrant, dark, pastel, etc`
+            `> • Usa inglés para mejores resultados\n` +
+            `> • Mientras más detallado el prompt, mejor la imagen\n` +
+            `> • Agrega estilos: vibrante, oscuro, pastel, etc`
         )
     }
     
@@ -47,18 +47,21 @@ async function handler(m, { sock }) {
         
         if (!data?.status || !data?.data?.url) {
             m.react('❌')
-            return m.reply('❌ *ɢᴀɢᴀʟ*\n\n> Gagal generate gambar. Coba lagi nanti!')
+            return m.reply('❌ *ERROR*\n\n> No se pudo generar la imagen. ¡Inténtalo más tarde!')
         }
         
         const result = data.data  
         await sock.sendMedia(m.chat, result.url, null, m, {
             type: 'image'
         })
+        
         m.react('✅')
+
     } catch (error) {
         m.react('☢')
+
         if (error.code === 'ECONNABORTED') {
-            m.reply('⏱️ *ᴛɪᴍᴇᴏᴜᴛ*\n\n> Request terlalu lama. Coba lagi!')
+            m.reply('⏱️ *TIEMPO AGOTADO*\n\n> La solicitud tardó demasiado. ¡Inténtalo de nuevo!')
         } else {
             m.reply(te(m.prefix, m.command, m.pushName))
         }
