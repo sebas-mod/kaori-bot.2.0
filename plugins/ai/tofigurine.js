@@ -5,8 +5,8 @@ const pluginConfig = {
     name: 'tofigure3',
     alias: ['figurine3', 'tofigure3', 'bandai3', 'actionfigure3'],
     category: 'ai',
-    description: 'Ubah foto menjadi action figure/figurine koleksi',
-    usage: '.tofigure3 (reply/kirim gambar)',
+    description: 'Convertir una foto en una figura de colección / action figure',
+    usage: '.tofigure3 (responde/envía una imagen)',
     example: '.tofigure3',
     isOwner: false,
     isPremium: true,
@@ -29,8 +29,8 @@ async function handler(m, { sock }) {
     
     if (!isImage) {
         return m.reply(
-            `🎭 *ᴛᴏ ꜰɪɢᴜʀ 3*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke figurine/action figure\n\n` +
+            `🎭 *ᴛᴏ ꜰɪɢᴜʀᴀ 3*\n\n` +
+            `> Envía o responde a una imagen para convertirla en una figura de colección\n\n` +
             `\`${m.prefix}tofigure3\``
         )
     }
@@ -39,6 +39,7 @@ async function handler(m, { sock }) {
     
     try {
         let buffer
+        
         if (m.quoted && m.quoted.isMedia) {
             buffer = await m.quoted.download()
         } else if (m.isMedia) {
@@ -47,10 +48,8 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen`)
         }
-        
-        
         
         const result = await nanoBanana(buffer, PROMPT)
         
