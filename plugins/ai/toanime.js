@@ -5,8 +5,8 @@ const pluginConfig = {
     name: 'toanime',
     alias: ['anime', 'animefy', 'ghibli'],
     category: 'ai',
-    description: 'Ubah foto menjadi gaya anime/Ghibli Studio',
-    usage: '.toanime (reply/kirim gambar)',
+    description: 'Convertir una imagen a estilo anime / Studio Ghibli',
+    usage: '.toanime (responde/envía una imagen)',
     example: '.toanime',
     isOwner: false,
     isPremium: true,
@@ -29,13 +29,14 @@ async function handler(m, { sock }) {
     if (!isImage) {
         return m.reply(
             `🎨 *ᴛᴏ ᴀɴɪᴍᴇ*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke gaya anime\n\n` +
+            `> Envía o responde a una imagen para convertirla a estilo anime\n\n` +
             `\`${m.prefix}toanime\``
         )
     }
     
     try {
         let buffer
+        
         if (m.quoted && m.quoted.isMedia) {
             buffer = await m.quoted.download()
         } else if (m.isMedia) {
@@ -44,7 +45,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ No se pudo descargar la imagen`)
         }
         
         await m.react('🕕')
