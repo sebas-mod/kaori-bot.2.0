@@ -2,29 +2,31 @@ import { exec } from 'child_process'
 import util from 'util'
 
 let handler = async (m, { conn }) => {
+  // 👑 OWNER CHECK (tu sistema)
+  const owners = global.config.owner.map(([n]) =>
+    n.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+  )
+
+  if (!owners.includes(m.sender)) {
+    return m.reply('🚫 *Solo el Owner puede usar este comando.*')
+  }
+
+  await m.reply('🔍 *Analizando entorno del bot...*')
+
+  // 🔎 PASO 1: DEBUG REAL DEL ENTORNO
+  exec('pwd && ls -a && git remote -v && git branch', (err, debug) => {
+    console.log('📂 DEBUG ENTORNO:\n', debug)
+  })
+
+  await m.reply('🔄 *Forzando actualización desde GitHub...*')
+
   try {
-    // 👑 Detectar owner real
-    const owners = global.config.owner.map(([n]) =>
-      n.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-    )
-
-    const isRealOwner = owners.includes(m.sender)
-
-    console.log('📱 Remitente:', m.sender)
-    console.log('👑 Owners:', owners)
-    console.log('✅ Es owner?:', isRealOwner)
-
-    if (!isRealOwner) {
-      return m.reply('🚫 *Solo el Owner puede usar este comando.*')
-    }
-
-    await m.reply('🔄 *Actualizando desde GitHub...*\nEspera unos segundos ⏳')
-
-    // 🔥 UPDATE FORZADO (el que sí funciona siempre)
+    // 🔥 MÉTODO ULTRA SEGURO
     const cmd = `
-      git fetch origin &&
+      git fetch --all &&
       git reset --hard origin/main &&
-      git clean -fd
+      git clean -fd &&
+      git pull origin main
     `
 
     exec(cmd, (error, stdout, stderr) => {
@@ -33,23 +35,21 @@ let handler = async (m, { conn }) => {
 
       if (error) {
         console.error('❌ ERROR:', error)
-        return m.reply('❌ *Error al actualizar:*\n' + util.format(error))
+
+        return m.reply(
+          '❌ *Error real detectado:*\n\n' +
+          util.format(error) +
+          '\n\n📌 Ejecutá en consola:\n```git pull```'
+        )
       }
 
-      let resultado = (stdout || '').trim()
-
-      if (!resultado) {
-        resultado = '✔️ Sin cambios, el bot ya está actualizado.'
-      }
+      let resultado = stdout?.trim() || '✔️ Sin cambios detectados.'
 
       m.reply(
-        `📦 *Resultado del update:*\n\`\`\`\n${resultado}\n\`\`\`\n\n♻️ *Reiniciando bot...*`
+        `📦 *UPDATE COMPLETADO*\n\n\`\`\`\n${resultado}\n\`\`\`\n\n♻️ Reiniciando...`
       )
 
-      // 🔁 Reinicio automático
-      setTimeout(() => {
-        process.exit(0)
-      }, 2000)
+      setTimeout(() => process.exit(0), 2000)
     })
 
   } catch (e) {
