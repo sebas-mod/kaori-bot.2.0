@@ -1,5 +1,4 @@
 
-//  utamakan baca object config sampai bawah
 const config = {
 
     info: {
