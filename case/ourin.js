@@ -133,7 +133,7 @@ async function handleCommand(m, sock) {
                             forwardingScore: 9999,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
-                                newsletterJid: '120363208449943317@newsletter',
+                                newsletterJid: '',
                                 newsletterName: 'Ourin Case System',
                                 serverMessageId: 127
                             }
