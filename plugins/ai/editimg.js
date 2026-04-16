@@ -1,11 +1,12 @@
 const { uploadToTmpFiles } = require('../../src/lib/ourin-tmpfiles')
+
 const pluginConfig = {
     name: 'editimage',
     alias: ['editimg', 'imgedit'],
     category: 'ai',
-    description: 'Edit gambar dengan AI menggunakan prompt',
+    description: 'Editar imágenes con IA usando prompts',
     usage: '.editimage <prompt>',
-    example: '.editimage make it anime style',
+    example: '.editimage convertir a estilo anime',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -17,24 +18,30 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const prompt = m.args.join(' ')
+    
     if (!prompt) {
         return m.reply(
-            `*ᴇᴅɪᴛ ɪᴍᴀɢᴇ*\n\n` +
-            `> Edit gambar dengan AI\n\n` +
-            `\`Contoh: ${m.prefix}editimage make it anime style\`\n\n` +
-            `> Reply atau kirim gambar dengan caption`
+            `*ᴇᴅɪᴛᴀʀ ɪᴍᴀɢᴇɴ*\n\n` +
+            `> Edita imágenes con IA\n\n` +
+            `\`Ejemplo: ${m.prefix}editimage convertir a estilo anime\`\n\n` +
+            `> Responde o envía una imagen con el comando`
         )
     }
     
     const isImage = m.isImage || (m.quoted && m.quoted.isImage)
+    
     if (!isImage) {
-        return m.reply(`*ᴇᴅɪᴛ ɪᴍᴀɢᴇ*\n\n> Reply atau kirim gambar dengan caption`)
+        return m.reply(
+            `*ᴇᴅɪᴛᴀʀ ɪᴍᴀɢᴇɴ*\n\n` +
+            `> Responde o envía una imagen con el comando`
+        )
     }
     
     m.react('🕕')
 
     try {
         let mediaBuffer
+
         if (m.isImage && m.download) {
             mediaBuffer = await m.download()
         } else if (m.quoted && m.quoted.isImage && m.quoted.download) {
@@ -43,22 +50,24 @@ async function handler(m, { sock }) {
         
         if (!mediaBuffer || !Buffer.isBuffer(mediaBuffer)) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Gagal mengunduh gambar`)
+            return m.reply(`❌ *ERROR*\n\n> No se pudo descargar la imagen`)
         }
 
         const image = await uploadToTmpFiles(mediaBuffer, { filename: 'image.jpg' })
         
-        
         await sock.sendMessage(m.chat, {
             image: { url: `https://api-faa.my.id/faa/editfoto?url=${encodeURIComponent(image.directUrl)}&prompt=${encodeURIComponent(prompt)}` },
-            caption: `DONE`
+            caption: `LISTO`
         }, { quoted: m })
         
         m.react('✅')
+
     } catch (error) {
         m.react('❌')
-        m.reply(`🍀 *Waduhh, sepertinya ini ada kendala*
-> Silahkan coba ke versi ${m.prefix}ourinbanana`)
+        m.reply(
+            `🍀 *Ups, parece que hubo un problema*\n` +
+            `> Intenta la versión ${m.prefix}ourinbanana`
+        )
     }
 }
 
