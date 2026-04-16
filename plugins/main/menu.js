@@ -162,7 +162,7 @@ txt += `╰────────────────⬣\n\n`;
 }
 
 function getContextInfo(botConfig, m, thumbBuffer, renderLargerThumbnail = false) {
-    const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter';
+    const saluranId = botConfig.saluran?.id || '';
     const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
     const saluranLink = botConfig.saluran?.link || '';
     
@@ -285,7 +285,7 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
                 
             case 5:
                 const prefix = botConfig.command?.prefix || '.';
-                const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter';
+                const saluranId = botConfig.saluran?.id || '';
                 const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                 
                 const categories = getCategories();
@@ -471,7 +471,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                 
             case 6:
                 const thumbPathV6 = path.join(process.cwd(), 'assets', 'images', 'ourin3.jpg');
-                const saluranIdV6 = botConfig.saluran?.id || '120363208449943317@newsletter';
+                const saluranIdV6 = botConfig.saluran?.id || '';
                 const saluranNameV6 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                 const saluranLinkV6 = botConfig.saluran?.link || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t';
                 
@@ -806,7 +806,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                                 isForwarded: true,
                                 forwardingScore: 9999,
                                 forwardedNewsletterMessageInfo: {
-                                    newsletterJid: botConfig.saluran?.id || '120363208449943317@newsletter',
+                                    newsletterJid: botConfig.saluran?.id || '',
                                     newsletterName: botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI',
                                     serverMessageId: 127
                                 }
@@ -828,7 +828,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                     const prefixV9 = botConfig.command?.prefix || '.';
                     const categoriesV9 = getCategories();
                     const cmdsByCatV9 = getCommandsByCategory();
-                    const saluranIdV9 = botConfig.saluran?.id || '120363208449943317@newsletter';
+                    const saluranIdV9 = botConfig.saluran?.id || '';
                     const saluranNameV9 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const saluranLinkV9 = botConfig.saluran?.link || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t';
                     
@@ -973,7 +973,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                     const prefixV10 = botConfig.command?.prefix || '.';
                     const categoriesV10 = getCategories();
                     const cmdsByCatV10 = getCommandsByCategory();
-                    const saluranIdV10 = botConfig.saluran?.id || '120363208449943317@newsletter';
+                    const saluranIdV10 = botConfig.saluran?.id || '';
                     const saluranNameV10 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const timeHelper = require('../../src/lib/ourin-time');
                     const timeStrV10 = timeHelper.formatTime('HH:mm:ss');
@@ -1132,7 +1132,7 @@ Klik tombol di bawah untuk menampilkan menu
                 
             case 11:
                 try {
-                    const saluranIdV11 = botConfig.saluran?.id || '120363208449943317@newsletter';
+                    const saluranIdV11 = botConfig.saluran?.id || '';
                     const saluranNameV11 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const docuThumbV11 = thumbBuffer || imageBuffer || fs.readFileSync(path.join(process.cwd(), 'assets', 'images', 'ourin-allmenu.jpg'));
                     const prefix = botConfig.command?.prefix || '.';
@@ -1292,8 +1292,8 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                                         name: 'cta_url',
                                         buttonParamsJson: JSON.stringify({
                                             display_text: '🌏 Kunjungi Saluran Kami',
-                                            url: botConfig.saluran?.url || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t',
-                                            merchant_url: botConfig.saluran?.url || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t'
+                                            url: botConfig.saluran?.url || '',
+                                            merchant_url: botConfig.saluran?.url || ''
                                         })
                                     },
                                     {
@@ -1325,7 +1325,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                 break;
             case 12:
                 try {
-                    const saluranIdV12 = botConfig.saluran?.id || '120363208449943317@newsletter';
+                    const saluranIdV12 = botConfig.saluran?.id || '';
                     const saluranNameV12 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const docuThumbV12 = thumbBuffer || imageBuffer || fs.readFileSync(path.join(process.cwd(), 'assets', 'images', 'ourin-allmenu.jpg'));
                     const prefix = botConfig.command?.prefix || '.';
@@ -1466,8 +1466,8 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                                 body: `🍃 OWNER BOT: ${botConfig.owner?.name || 'Ourin-AI'}`,
                                 mediaType: 1,
                                 thumbnail: fs.readFileSync('./assets/images/ourin-v11.jpg') || '',
-                                mediaUrl: botConfig?.info?.website || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t',
-                                sourceUrl: botConfig?.info?.website || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t',
+                                mediaUrl: botConfig?.info?.website || '',
+                                sourceUrl: botConfig?.info?.website || '',
                                 renderLargerThumbnail: true
                             },
                             nativeFlowMessage: {
@@ -1505,9 +1505,9 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                 
             case 13: {
                 const thumbPathV13 = path.join(process.cwd(), 'assets', 'images', 'ourin3.jpg');
-                const saluranIdV13 = botConfig.saluran?.id || '120363208449943317@newsletter';
+                const saluranIdV13 = botConfig.saluran?.id || '';
                 const saluranNameV13 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
-                const saluranLinkV13 = botConfig.saluran?.link || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t';
+                const saluranLinkV13 = botConfig.saluran?.link || '';
                 const categories = getCategories();
                 const commandsByCategory = getCommandsByCategory();
                 const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'jpm', 'pushkontak', 'panel', 'user'];
@@ -1789,7 +1789,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                     externalAdReply: {
                         title: botConfig.bot?.name || 'Ourin-AI',
                         body: `WhatsApp Bot Multi Device`,
-                        sourceUrl: botConfig.saluran?.link || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t',
+                        sourceUrl: botConfig.saluran?.link || '',
                         mediaType: 1,
                         showAdAttribution: false,
                         renderLargerThumbnail: true,
@@ -1839,7 +1839,7 @@ ${categories.map(cat => `│ *${m.prefix}menucat ${cat}*`).join('\n')}
             
             case 14:
                 try {
-                    const saluranIdV14 = botConfig.saluran?.id || '120363208449943317@newsletter';
+                    const saluranIdV14 = botConfig.saluran?.id || '';
                     const saluranNameV14 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const docuThumbV14 = fs.readFileSync(path.join(process.cwd(), 'assets', 'images', 'ourin-v11.jpg'));
 
