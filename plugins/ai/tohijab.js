@@ -7,8 +7,8 @@ const pluginConfig = {
     name: 'tohijab',
     alias: ['hijab', 'hijabstyle', 'addhijab'],
     category: 'ai',
-    description: 'Tambahkan hijab ke gambar',
-    usage: '.tohijab (reply gambar)',
+    description: 'Agregar hijab a una imagen',
+    usage: '.tohijab (responde a una imagen)',
     example: '.tohijab',
     isOwner: false,
     isPremium: false,
@@ -23,7 +23,7 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🧕 *ʜɪᴊᴀʙ sᴛʏʟᴇ*\n\n> Kirim/reply gambar\n\n\`${m.prefix}tohijab\``)
+        return m.reply(`🧕 *ʜɪᴊᴀʙ sᴛʏʟᴇ*\n\n> Envía/responde a una imagen\n\n\`${m.prefix}tohijab\``)
     }
     
     m.react('🕕')
@@ -38,7 +38,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const imageUrl = await uploadImage(buffer, 'image.jpg')
