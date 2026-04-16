@@ -76,7 +76,7 @@ const config = {
     },
 
     saluran: {
-        id: '120363408589011962@newsletter', // ID saluran (contoh: 120363xxx@newsletter)                          // ID saluran (contoh: 120363xxx@newsletter)
+        id: '', // ID saluran (contoh: 120363xxx@newsletter)                          // ID saluran (contoh: 120363xxx@newsletter)
         name: 'WHATSAPP BOT MULTI DEVICE',       // Nama saluran
         link: ''                          // Link saluran
     },
