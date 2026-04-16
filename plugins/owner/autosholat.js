@@ -1,22 +1,23 @@
-const { execSync } = require('child_process')
-const { spawn } = require('child_process')
-const path = require('path')
-const fs = require('fs')
+const { getDatabase } = require('../../src/lib/ourin-database');
+const config = require('../../config');
+const { getTodaySchedule, extractPrayerTimes, searchKota } = require('../../src/lib/ourin-sholat-api');
+const te = require('../../src/lib/ourin-error')
+
 const pluginConfig = {
-    name: 'up',
-    alias: ['gitpull', 'update'],
+    name: 'autosholat',
+    alias: ['sholat', 'autoadzan'],
     category: 'owner',
-    description: 'Actualizar el bot desde GitHub usando git pull',
-    usage: '.up',
-    example: '.up',
+    description: 'Toggle pengingat waktu sholat otomatis dengan audio adzan dan tutup grup',
+    usage: '.autosholat on/off/status/kota <nama>',
+    example: '.autosholat on',
     isOwner: true,
     isPremium: false,
     isGroup: false,
     isPrivate: false,
-    cooldown: 60,
+    cooldown: 5,
     energi: 0,
     isEnabled: true
-}
+};
 
 const AUDIO_ADZAN = 'https://media.vocaroo.com/mp3/1ofLT2YUJAjQ';
 
