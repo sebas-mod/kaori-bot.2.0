@@ -1,58 +1,37 @@
-const { spawn } = require('child_process')
+```js
+const { exec } = require("child_process")
 
-const pluginConfig = {
-    name: 'update',
-    alias: ['up'],
-    category: 'owner',
-    description: 'Actualizar bot desde GitHub',
-    usage: '.update',
-    isOwner: true
+module.exports = {
+  name: "update",
+  alias: ["gitpull", "actualizar"],
+  category: "owner",
+  desc: "Actualiza el bot desde GitHub",
+  owner: true, // importante para restringir
+
+  async run({ sock, m }) {
+    await sock.sendMessage(m.chat, { text: "🔄 Actualizando bot desde Git..." }, { quoted: m })
+
+    exec("git pull", async (err, stdout, stderr) => {
+      if (err) {
+        console.error(err)
+        return sock.sendMessage(m.chat, { 
+          text: `❌ Error al actualizar:\n${err.message}` 
+        }, { quoted: m })
+      }
+
+      if (stderr) {
+        return sock.sendMessage(m.chat, { 
+          text: `⚠️ Advertencia:\n${stderr}` 
+        }, { quoted: m })
+      }
+
+      await sock.sendMessage(m.chat, { 
+        text: `✅ Actualización completada:\n\n${stdout}\n\n♻️ Reiniciando...` 
+      }, { quoted: m })
+
+      // Reinicio del bot
+      process.exit(0)
+    })
+  }
 }
-
-async function handler(m, { sock }) {
-    try {
-        await m.reply('🔄 Actualizando bot desde GitHub...')
-
-        let output = ''
-
-        const run = (cmd, args) => {
-            return new Promise((resolve, reject) => {
-                const p = spawn(cmd, args)
-
-                p.stdout.on('data', d => {
-                    output += d.toString()
-                    console.log(d.toString())
-                })
-
-                p.stderr.on('data', d => {
-                    output += d.toString()
-                    console.log(d.toString())
-                })
-
-                p.on('close', code => {
-                    if (code !== 0) reject()
-                    else resolve()
-                })
-            })
-        }
-
-        // 🔥 comandos reales
-        await run('git', ['fetch', '--all'])
-        await run('git', ['reset', '--hard', 'origin/main'])
-        await run('git', ['clean', '-fd'])
-
-        if (!output.trim()) {
-            output = '✔️ Sin cambios (ya actualizado)'
-        }
-
-        await m.reply(`📦 RESULTADO:\n\`\`\`\n${output}\n\`\`\`\n\n♻️ Reiniciando...`)
-
-        setTimeout(() => process.exit(0), 2000)
-
-    } catch (e) {
-        console.log('ERROR UPDATE:', e)
-        m.reply('❌ Error real al actualizar (ver consola)')
-    }
-}
-
-module.exports = { pluginConfig, handler }
+```
