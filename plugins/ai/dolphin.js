@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'dolphin',
     alias: ['dolphinai', 'dphn'],
     category: 'ai',
-    description: 'Chat dengan Dolphin AI (24B Model)',
-    usage: '.dolphin <pertanyaan> atau .dolphin --<template> <pertanyaan>',
-    example: '.dolphin jelaskan tentang AI',
+    description: 'Chatear con Dolphin AI (modelo 24B)',
+    usage: '.dolphin <pregunta> o .dolphin --<template> <pregunta>',
+    example: '.dolphin explica qué es la IA',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -42,7 +42,7 @@ async function dolphinAI(question, template = 'logical') {
         .map(line => line.choices[0].delta.content)
         .join('')
     
-    if (!result) throw new Error('Tidak ada respon dari AI')
+    if (!result) throw new Error('No hubo respuesta de la IA')
     
     return result
 }
@@ -53,17 +53,17 @@ async function handler(m, { sock }) {
     if (!text) {
         return m.reply(
             `🐬 *ᴅᴏʟᴘʜɪɴ ᴀɪ*\n\n` +
-            `> Chat dengan Dolphin AI 24B Model\n\n` +
+            `> Chatea con Dolphin AI (modelo 24B)\n\n` +
             `╭┈┈⬡「 📋 *ᴛᴇᴍᴘʟᴀᴛᴇs* 」\n` +
-            `┃ • \`logical\` - Jawaban logis\n` +
-            `┃ • \`creative\` - Jawaban kreatif\n` +
-            `┃ • \`summarize\` - Ringkasan\n` +
-            `┃ • \`code-beginner\` - Kode pemula\n` +
-            `┃ • \`code-advanced\` - Kode lanjutan\n` +
+            `┃ • \`logical\` - Respuesta lógica\n` +
+            `┃ • \`creative\` - Respuesta creativa\n` +
+            `┃ • \`summarize\` - Resumen\n` +
+            `┃ • \`code-beginner\` - Código para principiantes\n` +
+            `┃ • \`code-advanced\` - Código avanzado\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `> *Contoh:*\n` +
-            `> ${m.prefix}dolphin apa itu AI?\n` +
-            `> ${m.prefix}dolphin --creative buat puisi`
+            `> *Ejemplos:*\n` +
+            `> ${m.prefix}dolphin ¿qué es la IA?\n` +
+            `> ${m.prefix}dolphin --creative escribe un poema`
         )
     }
     
@@ -79,15 +79,16 @@ async function handler(m, { sock }) {
     }
     
     if (!text) {
-        return m.reply(`❌ Masukkan pertanyaan!`)
+        return m.reply(`❌ ¡Debes escribir una pregunta!`)
     }
     
     await m.react('🕕')
     
     try {
         const result = await dolphinAI(text, template)
+        
         let reply = `🐬 *ᴅᴏʟᴘʜɪɴ ᴀɪ*\n\n`
-        reply += `> Template: *${template}*\n\n`
+        reply += `> Plantilla: *${template}*\n\n`
         reply += `${result}`
         
         await m.reply(reply)
