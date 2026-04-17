@@ -1,13 +1,13 @@
-const { createCanvas, loadImage } = require('canvas')
+const axios = require('axios')
 const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
-    name: 'pacarsertifikat',
-    alias: ['certpareja', 'parejacert', 'cerpareja'],
+    name: 'cerpareja',
+    alias: ['certpareja', 'parejacert'],
     category: 'canvas',
     description: 'Crear certificado de pareja',
-    usage: '.pacarsertifikat <nombre1> <nombre2>',
-    example: '.pacarsertifikat Juan María',
+    usage: '.cerpareja <nombre1> <nombre2>',
+    example: '.cerpareja Juan María',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,9 +24,9 @@ async function handler(m, { sock }) {
         return m.reply(
             `💑 *CERTIFICADO DE PAREJA*\n\n` +
             `╭┈┈⬡「 📋 *CÓMO USAR* 」\n` +
-            `┃ ◦ \`${m.prefix}pacarsertifikat <nombre1> <nombre2>\`\n` +
+            `┃ ◦ \`${m.prefix}cerpareja <nombre1> <nombre2>\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Ejemplo: \`${m.prefix}pacarsertifikat Juan María\``
+            `> Ejemplo: \`${m.prefix}cerpareja Juan María\``
         )
     }
     
@@ -36,60 +36,17 @@ async function handler(m, { sock }) {
     m.react('💑')
     
     try {
-        // 🎨 Crear canvas
-        const canvas = createCanvas(1024, 600)
-        const ctx = canvas.getContext('2d')
-
-        // 🔥 Fondo desde tu URL
-        const background = await loadImage('https://imagenes-one.vercel.app/certificadofondo.png')
-        ctx.drawImage(background, 0, 0, 1024, 600)
-
-        // ✍️ Configuración de texto
-        ctx.textAlign = 'center'
-
-        // Título
-        ctx.fillStyle = '#8b5c5c'
-        ctx.font = 'bold 50px sans-serif'
-        ctx.fillText('CERTIFICADO DE AMOR', 512, 100)
-
-        // Texto
-        ctx.fillStyle = '#444'
-        ctx.font = '24px sans-serif'
-        ctx.fillText('Este certificado confirma que', 512, 170)
-
-        // 💑 Nombres
-        ctx.fillStyle = '#d16b86'
-        ctx.font = 'bold 40px sans-serif'
-        ctx.fillText(name1, 512, 260)
-
-        ctx.font = '30px sans-serif'
-        ctx.fillText('&', 512, 300)
-
-        ctx.font = 'bold 40px sans-serif'
-        ctx.fillText(name2, 512, 340)
-
-        // Mensaje final
-        ctx.fillStyle = '#444'
-        ctx.font = '24px sans-serif'
-        ctx.fillText('Están oficialmente en una relación 💖', 512, 420)
-
-        // 📅 Fecha
-        const fecha = new Date().toLocaleDateString('es-AR')
-        ctx.font = '20px sans-serif'
-        ctx.fillText(`Fecha: ${fecha}`, 512, 470)
-
-        const buffer = canvas.toBuffer('image/png')
-
-        // 📤 Enviar imagen
-        await sock.sendMessage(m.chat, {
-            image: buffer,
-            caption: `💑 *Certificado generado*\n❤️ ${name1} & ${name2}`
-        }, { quoted: m })
-
+        // 🔥 TU ENDPOINT
+        const url = `https://imagenes-one.vercel.app/api/certificado?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}`
+        
+        await sock.sendMedia(m.chat, url, null, m, {
+            type: 'image'
+        })
+        
         m.react('✅')
         
     } catch (error) {
-        console.error('CANVAS ERROR:', error)
+        console.error(error)
         m.react('☢')
         m.reply(te(m.prefix, m.command, m.pushName))
     }
