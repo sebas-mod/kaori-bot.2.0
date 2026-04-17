@@ -4,11 +4,11 @@ const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
     name: 'pacarsertifikat',
-    alias: ['sertifikatpacar', 'certpacar', 'pacarcert'],
+    alias: ['sertifikatpareja', 'certpareja', 'parejacert'],
     category: 'canvas',
-    description: 'Membuat sertifikat pacar',
-    usage: '.pacarsertifikat <nama1> <nama2>',
-    example: '.pacarsertifikat Budi Ani',
+    description: 'Crear certificado de pareja',
+    usage: '.pacarsertifikat <nombre1> <nombre2>',
+    example: '.pacarsertifikat Juan María',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -21,13 +21,14 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     const args = m.args || []
     
+    // Validación
     if (args.length < 2) {
         return m.reply(
-            `💑 *sᴇʀᴛɪꜰɪᴋᴀᴛ ᴘᴀᴄᴀʀ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ \`${m.prefix}pacarsertifikat <nama1> <nama2>\`\n` +
+            `💑 *sᴇʀᴛɪꜰɪᴄᴀᴅᴏ ᴅᴇ ᴘᴀʀᴇᴊᴀ*\n\n` +
+            `╭┈┈⬡「 📋 *ᴄᴏ́ᴍᴏ ᴜsᴀʀ* 」\n` +
+            `┃ ◦ \`${m.prefix}pacarsertifikat <nombre1> <nombre2>\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Contoh: \`${m.prefix}pacarsertifikat Budi Ani\``
+            `> Ejemplo: \`${m.prefix}pacarsertifikat Juan María\``
         )
     }
     
@@ -40,7 +41,7 @@ async function handler(m, { sock }) {
         const apiKey = config.APIkey?.lolhuman
         
         if (!apiKey) {
-            throw new Error('API Key tidak ditemukan di config')
+            throw new Error('API Key no encontrada en config')
         }
         
         const apiUrl = `https://api.lolhuman.xyz/api/pacarserti?apikey=${apiKey}&name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}`
