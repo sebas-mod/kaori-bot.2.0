@@ -6,14 +6,14 @@ const path = require('path');
 const projectRoot = path.resolve(__dirname, '..');
 const configPath = path.join(__dirname, 'translation.config.json');
 
-async function loadCopilot() {
-  const mod = await import(pathToFileUrl(path.join(__dirname, 'copilot.js')));
-  return mod.Copilot;
-}
-
 function pathToFileUrl(filePath) {
   const resolved = path.resolve(filePath).replace(/\\/g, '/');
   return new URL(`file://${resolved.startsWith('/') ? '' : '/'}${resolved}`).href;
+}
+
+async function loadCopilot() {
+  const mod = await import(pathToFileUrl(path.join(__dirname, 'copilot.mjs')));
+  return mod.Copilot;
 }
 
 const defaultConfig = {
