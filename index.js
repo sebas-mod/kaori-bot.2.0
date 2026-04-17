@@ -85,7 +85,6 @@ const {
 const { startAutoBackup } = require("./src/lib/ourin-backup");
 const { handleAntiTagSW } = require("./src/lib/ourin-group-protection");
 const { initSholatScheduler } = require("./src/lib/ourin-sholat-scheduler");
-const { initAutoJpmScheduler } = require("./src/lib/ourin-auto-jpm");
 const { startMemoryMonitor } = require("./src/lib/ourin-memory-monitor");
 const { startTempCleaner } = require("./src/lib/ourin-temp-cleaner");
 const { startDailyPruner } = require("./src/lib/ourin-data-pruner");
@@ -416,7 +415,7 @@ async function main() {
         startGroupScheduleChecker(sock);
         startSewaChecker(sock);
         initScheduler(config, sock);
-        initAutoJpmScheduler(sock);
+        //initAutoJpmScheduler(sock);
         initSholatScheduler(sock);
         try {
           const { initSahurCron } = require('./plugins/religi/autosahur');
