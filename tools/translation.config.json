@@ -1,5 +1,4 @@
 {
-  "sourceLanguage": "auto",
   "targetLanguage": "es",
   "copyOnlyDirectories": [
     ".git",
@@ -27,7 +26,6 @@
     ".menu",
     ".owner",
     ".play",
-    ".sticker",
     ".help"
   ],
   "commandPrefixes": [
