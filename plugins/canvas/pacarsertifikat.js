@@ -2,11 +2,15 @@ const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
     name: 'cerpareja',
-    alias: ['certpareja'],
+    alias: ['certpareja', 'parejacert'],
     category: 'canvas',
-    description: 'Certificado de pareja',
+    description: 'Crear certificado de pareja',
     usage: '.cerpareja <nombre1> <nombre2>',
     example: '.cerpareja Juan María',
+    isOwner: false,
+    isPremium: false,
+    isGroup: false,
+    isPrivate: false,
     cooldown: 10,
     energi: 1,
     isEnabled: true
@@ -18,8 +22,10 @@ async function handler(m, { sock }) {
     if (args.length < 2) {
         return m.reply(
             `💑 *CERTIFICADO DE PAREJA*\n\n` +
-            `➤ ${m.prefix}cerpareja <nombre1> <nombre2>\n\n` +
-            `Ejemplo:\n${m.prefix}cerpareja Juan María`
+            `╭┈┈⬡「 📋 *CÓMO USAR* 」\n` +
+            `┃ ◦ \`${m.prefix}cerpareja <nombre1> <nombre2>\`\n` +
+            `╰┈┈⬡\n\n` +
+            `> Ejemplo: \`${m.prefix}cerpareja Juan María\``
         )
     }
 
