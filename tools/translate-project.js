@@ -2,23 +2,26 @@
 
 const fsp = require('fs/promises');
 const path = require('path');
-const OpenAI = require('openai');
-
-console.log('USANDO TRADUCTOR OPENAI');
 
 const projectRoot = path.resolve(__dirname, '..');
 const configPath = path.join(__dirname, 'translation.config.json');
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+async function loadCopilot() {
+  const mod = await import(pathToFileUrl(path.join(__dirname, 'copilot.js')));
+  return mod.Copilot;
+}
+
+function pathToFileUrl(filePath) {
+  const resolved = path.resolve(filePath).replace(/\\/g, '/');
+  return new URL(`file://${resolved.startsWith('/') ? '' : '/'}${resolved}`).href;
+}
 
 const defaultConfig = {
   targetLanguage: 'es',
   copyOnlyDirectories: ['.git', 'node_modules', 'assets', 'database'],
   copyOnlyFiles: ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'],
   textExtensions: ['.js', '.json', '.md', '.txt'],
-  protectedTerms: ['WhatsApp', 'Baileys', 'Node.js', 'API', 'AI'],
+  protectedTerms: ['WhatsApp', 'Baileys', 'Node.js', 'API', 'AI', '.menu', '.owner', '.play', '.help'],
   commandPrefixes: ['.', '#', '!', '/', '\\'],
   skipPatterns: [
     '^https?://',
@@ -30,9 +33,8 @@ const defaultConfig = {
 };
 
 async function main() {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Falta OPENAI_API_KEY en el entorno.');
-  }
+  const Copilot = await loadCopilot();
+  const copilot = new Copilot();
 
   const cli = parseArgs(process.argv.slice(2));
   const fileConfig = await loadJson(configPath);
@@ -45,6 +47,7 @@ async function main() {
     : path.join(path.dirname(inputRoot), `${path.basename(inputRoot)}-${config.targetLanguage}`);
 
   const state = {
+    copilot,
     config,
     inputRoot,
     outputRoot,
@@ -59,6 +62,7 @@ async function main() {
     errorDetails: []
   };
 
+  console.log('USANDO TRADUCTOR COPILOT');
   console.log(`Entrada: ${inputRoot}`);
   console.log(`Salida: ${outputRoot}`);
   console.log(`Modo: ${inPlace ? 'in-place' : 'copia'}`);
@@ -160,17 +164,12 @@ async function walkDirectory(currentDir, state) {
       }
     } catch (error) {
       state.stats.errors += 1;
-
-      const detail = {
+      state.errorDetails.push({
         file: sourcePath,
         message: error.message,
         stack: error.stack || ''
-      };
-
-      state.errorDetails.push(detail);
-
+      });
       console.log(`[ERROR] ${sourcePath} :: ${error.message}`);
-
       if (!state.inPlace) {
         await ensureParent(destPath);
         await fsp.copyFile(sourcePath, destPath);
@@ -262,11 +261,7 @@ async function translateText(text, state, filePath = '') {
     return text.replace(trimmed, state.cache.get(cacheKey));
   }
 
-  const translated = await translateWithOpenAI(
-    trimmed,
-    state.config.targetLanguage,
-    state.config.protectedTerms
-  );
+  const translated = await translateWithCopilot(trimmed, state);
 
   if (translated && translated !== trimmed) {
     console.log(`[TRADUCIDO] ${filePath} :: "${trimmed}" -> "${translated}"`);
@@ -277,31 +272,22 @@ async function translateText(text, state, filePath = '') {
   return text.replace(trimmed, translated);
 }
 
-async function translateWithOpenAI(text, targetLanguage, protectedTerms) {
-  const terms = protectedTerms.length
-    ? `No traduzcas estos términos: ${protectedTerms.join(', ')}.`
-    : '';
+async function translateWithCopilot(text, state) {
+  const prompt = [
+    `Traduce al ${state.config.targetLanguage} solo este texto visible para usuario.`,
+    'No cambies comandos, variables, rutas, nombres técnicos ni sintaxis.',
+    `No traduzcas estos términos: ${state.config.protectedTerms.join(', ')}.`,
+    'Devuelve solo el texto traducido.',
+    '',
+    text
+  ].join('\n');
 
-  try {
-    const response = await client.responses.create({
-      model: 'gpt-5-mini',
-      input: [
-        {
-          role: 'system',
-          content: `Traduce solo mensajes visibles para usuario al idioma ${targetLanguage}. No cambies comandos, rutas, variables, nombres técnicos, ids, keys, JSON keys ni sintaxis. ${terms} Responde solo con el texto traducido.`
-        },
-        {
-          role: 'user',
-          content: text
-        }
-      ]
-    });
+  const res = await state.copilot.ask(prompt, {
+    sessionId: 'translator',
+    model: 'default'
+  });
 
-    return (response.output_text || text).trim();
-  } catch (error) {
-    const detail = error?.response?.data || error?.message || String(error);
-    throw new Error(`OpenAI API error: ${JSON.stringify(detail)}`);
-  }
+  return (res.text || text).trim();
 }
 
 function shouldSkipPiece(text, config) {
@@ -365,10 +351,7 @@ async function ensureParent(filePath) {
 }
 
 async function writeReport(state) {
-  const reportPath = state.inPlace
-    ? path.join(state.inputRoot, 'translation-report.json')
-    : path.join(state.outputRoot, 'translation-report.json');
-
+  const reportPath = path.join(projectRoot, 'translation-report.json');
   const report = {
     generatedAt: new Date().toISOString(),
     inputRoot: state.inputRoot,
