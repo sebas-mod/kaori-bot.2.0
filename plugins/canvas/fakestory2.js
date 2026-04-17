@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'fakestory2',
     alias: ['fstory2', 'igstory2'],
     category: 'canvas',
-    description: 'Fake Instagram story dengan 1 gambar full',
-    usage: '.fakestory2 <nama>',
-    example: '.fakestory2 Misaki (reply gambar)',
+    description: 'Historia fake de Instagram con 1 imagen completa',
+    usage: '.fakestory2 <nombre>',
+    example: '.fakestory2 Misaki (responder imagen)',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -191,7 +191,7 @@ async function getAvatarBuffer(sock, jid) {
         return fs.readFileSync(DEFAULT_PP_PATH)
     }
     
-    throw new Error('Tidak dapat mengambil foto profil')
+    throw new Error('No se pudo obtener la foto de perfil')
 }
 
 async function handler(m, { sock }) {
@@ -208,9 +208,9 @@ async function handler(m, { sock }) {
             m.react('❌')
             return m.reply(
                 `📷 *ꜰᴀᴋᴇ sᴛᴏʀʏ 2*\n\n` +
-                `> Reply gambar!\n\n` +
-                `> Format: \`${m.prefix}fakestory2 <nama>\`\n` +
-                `> Contoh: \`${m.prefix}fakestory2 Misaki\``
+                `> ¡Responde una imagen!\n\n` +
+                `> Formato: \`${m.prefix}fakestory2 <nombre>\`\n` +
+                `> Ejemplo: \`${m.prefix}fakestory2 Misaki\``
             )
         }
         
@@ -223,7 +223,7 @@ async function handler(m, { sock }) {
         
         if (!imageBuffer) {
             m.react('❌')
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak bisa download gambar`)
+            return m.reply(`❌ *FALLÓ*\n\n> No se pudo descargar la imagen`)
         }
         
         const resultBuffer = await createFakeStory(username, avatarBuffer, imageBuffer)
