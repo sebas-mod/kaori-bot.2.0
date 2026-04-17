@@ -1,0 +1,46 @@
+{
+  "sourceLanguage": "auto",
+  "targetLanguage": "es",
+  "copyOnlyDirectories": [
+    ".git",
+    "node_modules"
+  ],
+  "copyOnlyFiles": [
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml"
+  ],
+  "textExtensions": [
+    ".md",
+    ".txt",
+    ".js",
+    ".json",
+    ".yml",
+    ".yaml",
+    ".sh",
+    ".env",
+    ".example"
+  ],
+  "protectedTerms": [
+    "AI",
+    "API",
+    "Baileys",
+    "Docker",
+    "FFmpeg",
+    "Gemini",
+    "Groq",
+    "Node.js",
+    "OURIN",
+    "Ourin",
+    "Pterodactyl",
+    "VPS",
+    "WhatsApp"
+  ],
+  "skipPatterns": [
+    "^https?://",
+    "^www\\.",
+    "^[A-Za-z]:\\\\",
+    "^[./~\\\\]",
+    "^[A-Za-z0-9_.-]+$"
+  ]
+}
