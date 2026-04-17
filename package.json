@@ -7,7 +7,10 @@
     "start": "NODE_ENV=development node index.js",
     "dev": "NODE_ENV=development node index.js",
     "win:start": "set NODE_ENV=development&& node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "translate:base": "node tools/translate-project.js --scope base",
+    "translate:plugins": "node tools/translate-project.js --scope plugins",
+    "translate:plugin": "node tools/translate-project.js --scope plugin"
   },
   "keywords": [
     "whatsapp",
