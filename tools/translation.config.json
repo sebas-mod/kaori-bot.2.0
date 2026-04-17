@@ -3,7 +3,9 @@
   "targetLanguage": "es",
   "copyOnlyDirectories": [
     ".git",
-    "node_modules"
+    "node_modules",
+    "assets",
+    "database"
   ],
   "copyOnlyFiles": [
     "package-lock.json",
@@ -11,30 +13,29 @@
     "pnpm-lock.yaml"
   ],
   "textExtensions": [
-    ".md",
-    ".txt",
     ".js",
     ".json",
-    ".yml",
-    ".yaml",
-    ".sh",
-    ".env",
-    ".example"
+    ".md",
+    ".txt"
   ],
   "protectedTerms": [
-    "AI",
-    "API",
+    "WhatsApp",
     "Baileys",
-    "Docker",
-    "FFmpeg",
-    "Gemini",
-    "Groq",
     "Node.js",
-    "OURIN",
-    "Ourin",
-    "Pterodactyl",
-    "VPS",
-    "WhatsApp"
+    "API",
+    "AI",
+    ".menu",
+    ".owner",
+    ".play",
+    ".sticker",
+    ".help"
+  ],
+  "commandPrefixes": [
+    ".",
+    "#",
+    "!",
+    "/",
+    "\\"
   ],
   "skipPatterns": [
     "^https?://",
