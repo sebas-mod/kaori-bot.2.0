@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'oh-no',
     alias: ['ohno', 'ohnomeme'],
     category: 'canvas',
-    description: 'Membuat meme oh no',
-    usage: '.oh-no <teks>',
-    example: '.oh-no Aku lupa ngerjain PR',
+    description: 'Crear meme "oh no"',
+    usage: '.oh-no <texto>',
+    example: '.oh-no Me olvidé de hacer la tarea',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -21,29 +21,37 @@ const pluginConfig = {
 async function handler(m, { sock }) {
     let text = m.text?.trim()
     
+    // Si no hay texto, usar el mensaje citado
     if (!text && m.quoted?.text) {
         text = m.quoted.text.trim()
     }
     
+    // Validación
     if (!text) {
         return m.reply(
             `😱 *ᴏʜ ɴᴏ ᴍᴇᴍᴇ*\n\n` +
-            `> Masukkan teks untuk meme\n\n` +
-            `> Contoh: \`${m.prefix}oh-no Aku lupa ngerjain PR\``
+            `> Ingresa un texto para el meme\n\n` +
+            `> Ejemplo: \`${m.prefix}oh-no Me olvidé de hacer la tarea\``
         )
     }
     
     const apikey = config.APIkey?.lolhuman
     if (!apikey) {
-        return m.reply(`❌ API key lolhuman tidak dikonfigurasi!`)
+        return m.reply(`❌ ¡La API key de lolhuman no está configurada!`)
     }
     
     m.react('🕕')
     
     try {
-        await sock.sendMedia(m.chat, `https://api.lolhuman.xyz/api/creator/ohno?apikey=${apikey}&text=${encodeURIComponent(text)}`, null, m, {
-            type: 'image',
-        })
+        await sock.sendMedia(
+            m.chat,
+            `https://api.lolhuman.xyz/api/creator/ohno?apikey=${apikey}&text=${encodeURIComponent(text)}`,
+            null,
+            m,
+            {
+                type: 'image',
+            }
+        )
         
         m.react('✅')
         
