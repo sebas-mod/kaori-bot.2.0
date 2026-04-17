@@ -7,7 +7,7 @@ const pluginConfig = {
     name: 'asupan',
     alias: ['asupanrandom'],
     category: 'asupan',
-    description: 'Random video asupan',
+    description: 'Video asupan aleatorio',
     usage: '.asupan',
     example: '.asupan',
     isOwner: false,
@@ -45,7 +45,7 @@ async function handler(m, { sock }) {
         
         if (urls.length === 0) {
             m.react('❌')
-            return m.reply(`❌ Data asupan tidak tersedia`)
+            return m.reply(`❌ Datos de asupan no disponibles`)
         }
         
         const url = urls[Math.floor(Math.random() * urls.length)]
@@ -60,7 +60,7 @@ async function handler(m, { sock }) {
         
     } catch (error) {
         m.react('❌')
-        m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Video asupan tidak ditemukan`)
+        m.reply(`❌ *ᴇʀʀᴏʀ*\n\n> Video asupan no encontrado`)
     }
 }
 
