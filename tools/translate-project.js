@@ -68,7 +68,6 @@ async function main() {
   }
 
   await walkDirectory(inputRoot, state);
-
   await writeReport(state);
 
   console.log('');
@@ -283,12 +282,8 @@ async function translateText(text, state, filePath = '') {
   }
 
   const prepared = protectTerms(trimmed, state.config.protectedTerms);
-  const result = await translate(prepared.value, {
-    from: state.config.sourceLanguage,
-    to: state.config.targetLanguage
-  });
-
-  const restored = restoreTerms(result.text, prepared.tokens);
+  const translatedText = await translateWithRetry(prepared.value, state);
+  const restored = restoreTerms(translatedText, prepared.tokens);
 
   if (restored && restored !== trimmed) {
     console.log(`[TRADUCIDO] ${filePath} :: "${trimmed}" -> "${restored}"`);
@@ -297,6 +292,39 @@ async function translateText(text, state, filePath = '') {
 
   state.cache.set(cacheKey, restored);
   return text.replace(trimmed, restored);
+}
+
+async function translateWithRetry(text, state, attempts = 5) {
+  let lastError;
+
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      if (i > 0) {
+        await sleep(2000 * i);
+      }
+
+      const result = await translate(text, {
+        from: state.config.sourceLanguage,
+        to: state.config.targetLanguage
+      });
+
+      await sleep(1200);
+      return result.text;
+    } catch (error) {
+      lastError = error;
+      const message = String(error.message || '');
+      const isRateLimit = message.includes('Too Many Requests');
+
+      if (!isRateLimit) {
+        throw error;
+      }
+
+      console.log(`[REINTENTO ${i + 1}] Esperando por limite de Google...`);
+      await sleep(5000 * (i + 1));
+    }
+  }
+
+  throw lastError;
 }
 
 function shouldSkipPiece(text, config) {
@@ -401,6 +429,10 @@ async function writeReport(state) {
   };
 
   await fsp.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function escapeRegex(value) {
