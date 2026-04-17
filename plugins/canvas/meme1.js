@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'meme1',
     alias: ['drakememe'],
     category: 'canvas',
-    description: 'Membuat meme drake format',
-    usage: '.meme1 <text1>|<text2>',
-    example: '.meme1 Tidur|Main HP',
+    description: 'Crear meme formato Drake',
+    usage: '.meme1 <texto1>|<texto2>',
+    example: '.meme1 Dormir|Usar el celular',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -24,9 +24,9 @@ async function handler(m, { sock }) {
     
     if (parts.length < 2 || !parts[0] || !parts[1]) {
         return m.reply(
-            `🎭 *ᴍᴇᴍᴇ ᴅʀᴀᴋᴇ*\n\n` +
-            `> Masukkan 2 teks dengan pemisah |\n\n` +
-            `> Contoh: \`${m.prefix}meme1 Tidur|Main HP\``
+            `🎭 *MEME DRAKE*\n\n` +
+            `> Ingresa 2 textos separados con |\n\n` +
+            `> Ejemplo: \`${m.prefix}meme1 Dormir|Usar el celular\``
         )
     }
     
@@ -35,7 +35,7 @@ async function handler(m, { sock }) {
     
     const apikey = config.APIkey?.lolhuman
     if (!apikey) {
-        return m.reply(`❌ API key lolhuman tidak dikonfigurasi!`)
+        return m.reply(`❌ ¡API key de lolhuman no configurada!`)
     }
     
     m.react('🕕')
