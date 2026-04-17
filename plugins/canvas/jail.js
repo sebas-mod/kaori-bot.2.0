@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'jail',
     alias: ['penjara', 'prison'],
     category: 'canvas',
-    description: 'Membuat efek penjara pada gambar',
-    usage: '.jail (reply gambar)',
+    description: 'Aplicar efecto de cárcel a una imagen',
+    usage: '.jail (responder imagen)',
     example: '.jail',
     isOwner: false,
     isPremium: false,
@@ -31,7 +31,7 @@ async function uploadToTmpfiles(buffer) {
     if (res.data?.data?.url) {
         return res.data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/')
     }
-    throw new Error('Upload gagal')
+    throw new Error('Error al subir la imagen')
 }
 
 async function handler(m, { sock }) {
@@ -39,10 +39,10 @@ async function handler(m, { sock }) {
     
     if (!isImage) {
         return m.reply(
-            `🔒 *ᴊᴀɪʟ ᴇꜰꜰᴇᴄᴛ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ Reply gambar dengan \`${m.prefix}jail\`\n` +
-            `┃ ◦ Kirim gambar dengan caption \`${m.prefix}jail\`\n` +
+            `🔒 *JAIL EFFECT*\n\n` +
+            `╭┈┈⬡「 📋 *CÓMO USAR* 」\n` +
+            `┃ ◦ Responde a una imagen con \`${m.prefix}jail\`\n` +
+            `┃ ◦ Envía una imagen con caption \`${m.prefix}jail\`\n` +
             `╰┈┈⬡`
         )
     }
@@ -58,14 +58,14 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer || buffer.length === 0) {
-            throw new Error('Gagal download gambar')
+            throw new Error('Error al descargar la imagen')
         }
         
         const imageUrl = await uploadToTmpfiles(buffer)
         const apiKey = config.APIkey?.lolhuman
         
         if (!apiKey) {
-            throw new Error('API Key tidak ditemukan di config')
+            throw new Error('API Key no encontrada en config')
         }
         
         await sock.sendMedia(m.chat, `https://api.lolhuman.xyz/api/creator1/jail?apikey=${apiKey}&img=${encodeURIComponent(imageUrl)}`, null, m, {
