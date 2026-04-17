@@ -6,8 +6,8 @@ const pluginConfig = {
     name: ['fakecall', 'fakecallwa'],
     alias: [],
     category: 'canvas',
-    description: 'Membuat gambar fake call WhatsApp',
-    usage: '.fakecall <nama> | <durasi>',
+    description: 'Crear imagen de llamada falsa de WhatsApp',
+    usage: '.fakecall <nombre> | <duración>',
     example: '.fakecall Zann | 19.00',
     isOwner: false,
     isPremium: false,
@@ -43,17 +43,17 @@ async function handler(m, { sock }) {
     
     if (!text || !text.includes('|')) {
         return m.reply(
-            `⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n` +
-            `> \`${m.prefix}fakecall <nama> | <durasi>\`\n\n` +
-            `> Contoh: \`${m.prefix}fakecall Marin | 19.00\`\n\n` +
-            `💡 *Tips:* Reply gambar untuk custom avatar`
+            `⚠️ *ᴄᴏᴍᴏ ᴜsᴀʀ*\n\n` +
+            `> \`${m.prefix}fakecall <nombre> | <duración>\`\n\n` +
+            `> Ejemplo: \`${m.prefix}fakecall Marin | 19.00\`\n\n` +
+            `💡 *Tip:* Responde a una imagen para usar un avatar personalizado`
         )
     }
     
     const [nama, durasi] = text.split('|').map(s => s.trim())
     
     if (!nama) {
-        return m.reply(`❌ Nama tidak boleh kosong!`)
+        return m.reply(`❌ ¡El nombre no puede estar vacío!`)
     }
     
     await m.react('🕕')
