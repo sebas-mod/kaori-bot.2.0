@@ -16,7 +16,7 @@ const configPath = path.join(__dirname, 'translation.config.json');
 const defaultConfig = {
   sourceLanguage: 'auto',
   targetLanguage: 'es',
-  copyOnlyDirectories: ['.git', 'node_modules'],
+  copyOnlyDirectories: ['.git', 'node_modules', 'assets', 'database'],
   copyOnlyFiles: ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'],
   textExtensions: ['.js', '.json', '.md', '.txt'],
   protectedTerms: ['WhatsApp', 'Baileys', 'Node.js', 'API', 'AI'],
@@ -32,12 +32,13 @@ const defaultConfig = {
 
 async function main() {
   if (!translate) {
-    throw new Error('Instala la dependencia: npm install @vitalets/google-translate-api');
+    throw new Error('No se encontro @vitalets/google-translate-api. Ejecuta npm install @vitalets/google-translate-api');
   }
 
   const cli = parseArgs(process.argv.slice(2));
   const fileConfig = await loadJson(configPath);
   const config = { ...defaultConfig, ...fileConfig };
+
   const inputRoot = resolveInputRoot(cli);
   const inPlace = Boolean(cli.inPlace);
   const outputRoot = inPlace
@@ -49,27 +50,54 @@ async function main() {
     inputRoot,
     outputRoot,
     inPlace,
-    cache: new Map()
+    cache: new Map(),
+    stats: {
+      filesTranslated: 0,
+      textsTranslated: 0,
+      skipped: 0,
+      errors: 0
+    }
   };
+
+  console.log(`Entrada: ${inputRoot}`);
+  console.log(`Salida: ${outputRoot}`);
+  console.log(`Modo: ${inPlace ? 'in-place' : 'copia'}`);
 
   if (!inPlace) {
     await fsp.rm(outputRoot, { recursive: true, force: true });
   }
 
   await walkDirectory(inputRoot, state);
-  console.log('Traduccion terminada.');
+
+  await writeReport(state);
+
+  console.log('');
+  console.log('Proceso completado.');
+  console.log(`Archivos traducidos: ${state.stats.filesTranslated}`);
+  console.log(`Textos traducidos: ${state.stats.textsTranslated}`);
+  console.log(`Archivos saltados: ${state.stats.skipped}`);
+  console.log(`Errores: ${state.stats.errors}`);
 }
 
 function parseArgs(argv) {
   const args = {};
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
+
     if (arg === '--scope' && argv[i + 1]) {
       args.scope = argv[++i];
       continue;
     }
     if (arg === '--plugin' && argv[i + 1]) {
       args.plugin = argv[++i];
+      continue;
+    }
+    if (arg === '--input' && argv[i + 1]) {
+      args.input = argv[++i];
+      continue;
+    }
+    if (arg === '--output' && argv[i + 1]) {
+      args.output = argv[++i];
       continue;
     }
     if (arg === '--in-place') {
@@ -80,8 +108,14 @@ function parseArgs(argv) {
 }
 
 function resolveInputRoot(cli) {
+  if (cli.input) return path.resolve(cli.input);
   if (cli.scope === 'plugins') return path.join(projectRoot, 'plugins');
-  if (cli.scope === 'plugin') return path.join(projectRoot, 'plugins', cli.plugin);
+  if (cli.scope === 'plugin') {
+    if (!cli.plugin) {
+      throw new Error('Si usas --scope plugin debes indicar --plugin nombre-del-plugin');
+    }
+    return path.join(projectRoot, 'plugins', cli.plugin);
+  }
   return projectRoot;
 }
 
@@ -107,15 +141,16 @@ async function walkDirectory(currentDir, state) {
 
     if (entry.isDirectory()) {
       if (state.config.copyOnlyDirectories.includes(entry.name)) {
-        if (!state.inPlace) await copyTree(sourcePath, destPath);
+        if (!state.inPlace) {
+          await copyTree(sourcePath, destPath);
+        }
         continue;
       }
       await walkDirectory(sourcePath, state);
       continue;
     }
 
-    const ext = path.extname(sourcePath).toLowerCase();
-    if (!state.config.textExtensions.includes(ext)) {
+    if (state.config.copyOnlyFiles.includes(entry.name)) {
       if (!state.inPlace) {
         await ensureParent(destPath);
         await fsp.copyFile(sourcePath, destPath);
@@ -123,38 +158,103 @@ async function walkDirectory(currentDir, state) {
       continue;
     }
 
-    const raw = await fsp.readFile(sourcePath, 'utf8');
-    const translated = ext === '.js'
-      ? await translateJsVisibleStrings(raw, state)
-      : await translateGenericText(raw, state);
-
-    await ensureParent(destPath);
-    await fsp.writeFile(destPath, translated, 'utf8');
+    try {
+      const handled = await processFile(sourcePath, destPath, state);
+      if (!handled && !state.inPlace) {
+        await ensureParent(destPath);
+        await fsp.copyFile(sourcePath, destPath);
+      }
+    } catch (error) {
+      state.stats.errors += 1;
+      console.error(`[ERROR] ${sourcePath} :: ${error.message}`);
+      if (!state.inPlace) {
+        await ensureParent(destPath);
+        await fsp.copyFile(sourcePath, destPath);
+      }
+    }
   }
 }
 
-async function translateJsVisibleStrings(code, state) {
-  return code.replace(/(['"`])((?:\\.|(?!\1).)*)\1/g, (match, quote, text) => {
-    return `__TRANS_${Buffer.from(JSON.stringify({ quote, text })).toString('base64')}__`;
-  }).replace(/__TRANS_([A-Za-z0-9+/=]+)__/g, (_, encoded) => {
-    return `__PENDING__${encoded}__`;
-  }).replace(/__PENDING__([A-Za-z0-9+/=]+)__/g, (_, encoded) => {
-    return `__ASYNC__${encoded}__`;
-  });
+async function processFile(sourcePath, destPath, state) {
+  const extension = path.extname(sourcePath).toLowerCase();
+  if (!state.config.textExtensions.includes(extension)) {
+    state.stats.skipped += 1;
+    return false;
+  }
+
+  const raw = await fsp.readFile(sourcePath, 'utf8');
+  let translated = raw;
+
+  if (extension === '.js') {
+    translated = await translateJsVisibleStrings(raw, state, sourcePath);
+  } else {
+    translated = await translateGenericText(raw, state, sourcePath);
+  }
+
+  if (translated !== raw) {
+    console.log(`[ARCHIVO] Traducido: ${sourcePath}`);
+    state.stats.filesTranslated += 1;
+  } else {
+    console.log(`[ARCHIVO] Sin cambios: ${sourcePath}`);
+  }
+
+  await ensureParent(destPath);
+  await fsp.writeFile(destPath, translated, 'utf8');
+  return true;
 }
 
-async function translateGenericText(content, state) {
+async function translateJsVisibleStrings(code, state, filePath) {
+  const stringRegex = /(['"`])((?:\\.|(?!\1)[\s\S])*?)\1/g;
+  let result = '';
+  let lastIndex = 0;
+  let match;
+
+  while ((match = stringRegex.exec(code)) !== null) {
+    const fullMatch = match[0];
+    const quote = match[1];
+    const content = match[2];
+    const start = match.index;
+
+    result += code.slice(lastIndex, start);
+
+    const translatedContent = await maybeTranslateJsString(content, state, filePath);
+    result += `${quote}${translatedContent}${quote}`;
+
+    lastIndex = start + fullMatch.length;
+  }
+
+  result += code.slice(lastIndex);
+  return result;
+}
+
+async function maybeTranslateJsString(content, state, filePath) {
+  const decoded = unescapeJsString(content);
+  const trimmed = decoded.trim();
+
+  if (!looksLikeHumanMessage(trimmed, state.config)) {
+    return content;
+  }
+
+  const translated = await translateText(decoded, state, filePath);
+  if (translated === decoded) {
+    return content;
+  }
+
+  return escapeJsString(translated);
+}
+
+async function translateGenericText(content, state, filePath) {
   const lines = content.split(/\r?\n/);
   const out = [];
 
   for (const line of lines) {
-    out.push(await translateLine(line, state));
+    out.push(await translateLine(line, state, filePath));
   }
 
   return out.join('\n');
 }
 
-async function translateLine(line, state) {
+async function translateLine(line, state, filePath) {
   const pieces = line.split(/(`[^`]*`|https?:\/\/\S+|www\.\S+|\s+)/g).filter(Boolean);
   const out = [];
 
@@ -163,35 +263,23 @@ async function translateLine(line, state) {
       out.push(piece);
       continue;
     }
-    out.push(await translateText(piece, state));
+    out.push(await translateText(piece, state, filePath));
   }
 
   return out.join('');
 }
 
-function shouldSkipPiece(text, config) {
-  const value = String(text || '');
-  if (!/\p{L}/u.test(value)) return true;
-  if (config.skipPatterns.some((pattern) => new RegExp(pattern, 'u').test(value.trim()))) return true;
-
-  const trimmed = value.trim();
-
-  if (config.commandPrefixes.some((prefix) => trimmed.startsWith(prefix))) return true;
-  if (/^[a-zA-Z0-9_]+\s*=/.test(trimmed)) return true;
-  if (/^(const|let|var|function|return|if|else|for|while|switch|case|module\.exports|exports\.)\b/.test(trimmed)) return true;
-
-  return false;
-}
-
-async function translateText(text, state) {
+async function translateText(text, state, filePath = '') {
   const trimmed = text.trim();
 
   if (!looksLikeHumanMessage(trimmed, state.config)) {
     return text;
   }
 
-  if (state.cache.has(trimmed)) {
-    return text.replace(trimmed, state.cache.get(trimmed));
+  const cacheKey = `${state.config.sourceLanguage}|${state.config.targetLanguage}|${trimmed}`;
+  if (state.cache.has(cacheKey)) {
+    const cached = state.cache.get(cacheKey);
+    return text.replace(trimmed, cached);
   }
 
   const prepared = protectTerms(trimmed, state.config.protectedTerms);
@@ -201,16 +289,39 @@ async function translateText(text, state) {
   });
 
   const restored = restoreTerms(result.text, prepared.tokens);
-  state.cache.set(trimmed, restored);
+
+  if (restored && restored !== trimmed) {
+    console.log(`[TRADUCIDO] ${filePath} :: "${trimmed}" -> "${restored}"`);
+    state.stats.textsTranslated += 1;
+  }
+
+  state.cache.set(cacheKey, restored);
   return text.replace(trimmed, restored);
 }
 
+function shouldSkipPiece(text, config) {
+  const value = String(text || '');
+  if (!/\p{L}/u.test(value)) return true;
+
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  if (config.skipPatterns.some((pattern) => new RegExp(pattern, 'u').test(trimmed))) return true;
+  if (config.commandPrefixes.some((prefix) => trimmed.startsWith(prefix))) return true;
+  if (/^[a-zA-Z0-9_]+\s*=/.test(trimmed)) return true;
+  if (/^(const|let|var|function|return|if|else|for|while|switch|case|module\.exports|exports\.)\b/.test(trimmed)) {
+    return true;
+  }
+
+  return false;
+}
+
 function looksLikeHumanMessage(text, config) {
-  if (text.length < 4) return false;
+  if (!text || text.length < 4) return false;
   if (config.commandPrefixes.some((prefix) => text.startsWith(prefix))) return false;
   if (/^[a-z0-9_.-]+$/i.test(text)) return false;
   if (/^[A-Z0-9_ -]+$/.test(text)) return false;
   if (/^\w+\([^)]*\)$/.test(text)) return false;
+  if (/^[{}[\]();,:.=<>/+*\-_%|&!?#\\]+$/.test(text)) return false;
   return /\s|[?!,:;]/.test(text);
 }
 
@@ -235,6 +346,26 @@ function restoreTerms(text, tokens) {
   return value;
 }
 
+function unescapeJsString(value) {
+  return value
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\\"/g, '"')
+    .replace(/\\'/g, '\'')
+    .replace(/\\\\/g, '\\');
+}
+
+function escapeJsString(value) {
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+    .replace(/"/g, '\\"')
+    .replace(/'/g, '\\\'');
+}
+
 async function copyTree(sourceDir, destDir) {
   await fsp.mkdir(destDir, { recursive: true });
   const entries = await fsp.readdir(sourceDir, { withFileTypes: true });
@@ -256,11 +387,28 @@ async function ensureParent(filePath) {
   await fsp.mkdir(path.dirname(filePath), { recursive: true });
 }
 
+async function writeReport(state) {
+  const reportPath = state.inPlace
+    ? path.join(state.inputRoot, 'translation-report.json')
+    : path.join(state.outputRoot, 'translation-report.json');
+
+  const report = {
+    generatedAt: new Date().toISOString(),
+    inputRoot: state.inputRoot,
+    outputRoot: state.outputRoot,
+    inPlace: state.inPlace,
+    stats: state.stats
+  };
+
+  await fsp.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+}
+
 function escapeRegex(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 main().catch((error) => {
-  console.error(error.message);
+  console.error('');
+  console.error(`Fallo el traductor: ${error.message}`);
   process.exitCode = 1;
 });
