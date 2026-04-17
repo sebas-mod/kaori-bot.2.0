@@ -4,6 +4,8 @@ const fsp = require('fs/promises');
 const path = require('path');
 const OpenAI = require('openai');
 
+console.log('USANDO TRADUCTOR OPENAI');
+
 const projectRoot = path.resolve(__dirname, '..');
 const configPath = path.join(__dirname, 'translation.config.json');
 
@@ -53,7 +55,8 @@ async function main() {
       textsTranslated: 0,
       skipped: 0,
       errors: 0
-    }
+    },
+    errorDetails: []
   };
 
   console.log(`Entrada: ${inputRoot}`);
@@ -79,11 +82,25 @@ function parseArgs(argv) {
   const args = {};
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--scope' && argv[i + 1]) args.scope = argv[++i];
-    else if (arg === '--plugin' && argv[i + 1]) args.plugin = argv[++i];
-    else if (arg === '--input' && argv[i + 1]) args.input = argv[++i];
-    else if (arg === '--output' && argv[i + 1]) args.output = argv[++i];
-    else if (arg === '--in-place') args.inPlace = true;
+    if (arg === '--scope' && argv[i + 1]) {
+      args.scope = argv[++i];
+      continue;
+    }
+    if (arg === '--plugin' && argv[i + 1]) {
+      args.plugin = argv[++i];
+      continue;
+    }
+    if (arg === '--input' && argv[i + 1]) {
+      args.input = argv[++i];
+      continue;
+    }
+    if (arg === '--output' && argv[i + 1]) {
+      args.output = argv[++i];
+      continue;
+    }
+    if (arg === '--in-place') {
+      args.inPlace = true;
+    }
   }
   return args;
 }
@@ -143,7 +160,17 @@ async function walkDirectory(currentDir, state) {
       }
     } catch (error) {
       state.stats.errors += 1;
-      console.error(`[ERROR] ${sourcePath} :: ${error.message}`);
+
+      const detail = {
+        file: sourcePath,
+        message: error.message,
+        stack: error.stack || ''
+      };
+
+      state.errorDetails.push(detail);
+
+      console.log(`[ERROR] ${sourcePath} :: ${error.message}`);
+
       if (!state.inPlace) {
         await ensureParent(destPath);
         await fsp.copyFile(sourcePath, destPath);
@@ -214,10 +241,12 @@ async function translateGenericText(content, state, filePath) {
   for (const line of lines) {
     const pieces = line.split(/(`[^`]*`|https?:\/\/\S+|www\.\S+|\s+)/g).filter(Boolean);
     const row = [];
+
     for (const piece of pieces) {
       if (shouldSkipPiece(piece, state.config)) row.push(piece);
       else row.push(await translateText(piece, state, filePath));
     }
+
     out.push(row.join(''));
   }
 
@@ -233,7 +262,11 @@ async function translateText(text, state, filePath = '') {
     return text.replace(trimmed, state.cache.get(cacheKey));
   }
 
-  const translated = await translateWithOpenAI(trimmed, state.config.targetLanguage, state.config.protectedTerms);
+  const translated = await translateWithOpenAI(
+    trimmed,
+    state.config.targetLanguage,
+    state.config.protectedTerms
+  );
 
   if (translated && translated !== trimmed) {
     console.log(`[TRADUCIDO] ${filePath} :: "${trimmed}" -> "${translated}"`);
@@ -249,21 +282,26 @@ async function translateWithOpenAI(text, targetLanguage, protectedTerms) {
     ? `No traduzcas estos términos: ${protectedTerms.join(', ')}.`
     : '';
 
-  const response = await client.responses.create({
-    model: 'gpt-5-mini',
-    input: [
-      {
-        role: 'system',
-        content: `Traduce solo mensajes visibles para usuario al idioma ${targetLanguage}. No cambies comandos, rutas, variables, nombres técnicos ni sintaxis. ${terms} Responde solo con el texto traducido.`
-      },
-      {
-        role: 'user',
-        content: text
-      }
-    ]
-  });
+  try {
+    const response = await client.responses.create({
+      model: 'gpt-5-mini',
+      input: [
+        {
+          role: 'system',
+          content: `Traduce solo mensajes visibles para usuario al idioma ${targetLanguage}. No cambies comandos, rutas, variables, nombres técnicos, ids, keys, JSON keys ni sintaxis. ${terms} Responde solo con el texto traducido.`
+        },
+        {
+          role: 'user',
+          content: text
+        }
+      ]
+    });
 
-  return (response.output_text || text).trim();
+    return (response.output_text || text).trim();
+  } catch (error) {
+    const detail = error?.response?.data || error?.message || String(error);
+    throw new Error(`OpenAI API error: ${JSON.stringify(detail)}`);
+  }
 }
 
 function shouldSkipPiece(text, config) {
@@ -309,9 +347,11 @@ function escapeJsString(value) {
 async function copyTree(sourceDir, destDir) {
   await fsp.mkdir(destDir, { recursive: true });
   const entries = await fsp.readdir(sourceDir, { withFileTypes: true });
+
   for (const entry of entries) {
     const sourcePath = path.join(sourceDir, entry.name);
     const destPath = path.join(destDir, entry.name);
+
     if (entry.isDirectory()) await copyTree(sourcePath, destPath);
     else {
       await ensureParent(destPath);
@@ -334,14 +374,15 @@ async function writeReport(state) {
     inputRoot: state.inputRoot,
     outputRoot: state.outputRoot,
     inPlace: state.inPlace,
-    stats: state.stats
+    stats: state.stats,
+    errors: state.errorDetails
   };
 
   await fsp.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 }
 
 main().catch((error) => {
-  console.error('');
-  console.error(`Fallo el traductor: ${error.message}`);
+  console.log('');
+  console.log(`Fallo el traductor: ${error.message}`);
   process.exitCode = 1;
 });
