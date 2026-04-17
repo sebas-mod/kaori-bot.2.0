@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'asupantiktok',
     alias: ['tiktokasupan', 'ttasupan'],
     category: 'asupan',
-    description: 'Video TikTok dari username random atau spesifik',
-    usage: '.asupantiktok [username]',
+    description: 'Video de TikTok desde un usuario aleatorio o específico',
+    usage: '.asupantiktok [usuario]',
     example: '.asupantiktok natajadeh',
     isOwner: false,
     isPremium: false,
@@ -43,7 +43,7 @@ async function handler(m, { sock }) {
         
         if (!data) {
             m.react('❌')
-            return m.reply(`🚩 *Username Tidak Ditemukan*\n\n> Username: ${query}`)
+            return m.reply(`🚩 *Usuario no encontrado*\n\n> Usuario: ${query}`)
         }
         
         const video = data
@@ -59,7 +59,7 @@ async function handler(m, { sock }) {
                 forwardingScore: 99,
                 externalAdReply: {
                     title: video.author.nickname,
-                    body: video.author.signature || 'Video TikTok',
+                    body: video.author.signature || 'Video de TikTok',
                     mediaType: 1,
                     sourceUrl: 'https://vt.tiktok.com',
                     thumbnailUrl: video.author.avatarThumb,
@@ -71,7 +71,7 @@ async function handler(m, { sock }) {
         
     } catch (error) {
         m.react('❌')
-        m.reply(`🚩 *Username Tidak Ditemukan*\n\n> Username: ${query}`)
+        m.reply(`🚩 *Usuario no encontrado*\n\n> Usuario: ${query}`)
     }
 }
 
