@@ -5,8 +5,8 @@ const pluginConfig = {
     name: 'tooilpainting',
     alias: ['oilpainting', 'tooil', 'oil'],
     category: 'ai',
-    description: 'Ubah foto menjadi gaya lukisan minyak (oil painting)',
-    usage: '.tooilpainting (reply/kirim gambar)',
+    description: 'Convierte una foto en estilo pintura al óleo',
+    usage: '.tooilpainting (responder/enviar imagen)',
     example: '.tooilpainting',
     isOwner: false,
     isPremium: true,
@@ -28,7 +28,7 @@ async function handler(m, { sock }) {
     if (!isImage) {
         return m.reply(
             `🖼️ *ᴛᴏ ᴏɪʟ ᴘᴀɪɴᴛɪɴɢ*\n\n` +
-            `> Kirim/reply gambar untuk diubah ke gaya lukisan minyak\n\n` +
+            `> Envía/responde a una imagen para convertirla en estilo pintura al óleo\n\n` +
             `\`${m.prefix}tooilpainting\``
         )
     }
@@ -45,7 +45,7 @@ async function handler(m, { sock }) {
         
         if (!buffer) {
             m.react('❌')
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const result = await nanoBanana(buffer, PROMPT)
