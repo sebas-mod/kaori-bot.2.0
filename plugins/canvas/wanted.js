@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'wanted',
     alias: ['wantedposter'],
     category: 'canvas',
-    description: 'Membuat poster wanted dari gambar',
-    usage: '.wanted (reply gambar)',
+    description: 'Crea un póster de “se busca” a partir de una imagen',
+    usage: '.wanted (responder imagen)',
     example: '.wanted',
     isOwner: false,
     isPremium: false,
@@ -31,7 +31,7 @@ async function uploadToTmpfiles(buffer) {
     if (res.data?.data?.url) {
         return res.data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/')
     }
-    throw new Error('Upload gagal')
+    throw new Error('Error al subir el archivo')
 }
 
 async function handler(m, { sock }) {
@@ -39,10 +39,10 @@ async function handler(m, { sock }) {
     
     if (!isImage) {
         return m.reply(
-            `🤠 *ᴡᴀɴᴛᴇᴅ ᴘᴏsᴛᴇʀ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ Reply gambar dengan \`${m.prefix}wanted\`\n` +
-            `┃ ◦ Kirim gambar dengan caption \`${m.prefix}wanted\`\n` +
+            `🤠 *ᴡᴀɴᴛᴇᴅ ᴘósᴛᴇʀ*\n\n` +
+            `╭┈┈⬡「 📋 *ᴄóᴍᴏ ᴜsᴀʀ* 」\n` +
+            `┃ ◦ Responde a una imagen con \`${m.prefix}wanted\`\n` +
+            `┃ ◦ Envía una imagen con el texto \`${m.prefix}wanted\`\n` +
             `╰┈┈⬡`
         )
     }
@@ -58,14 +58,14 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer || buffer.length === 0) {
-            throw new Error('Gagal download gambar')
+            throw new Error('Error al descargar la imagen')
         }
         
         const imageUrl = await uploadToTmpfiles(buffer)
         const apiKey = config.APIkey?.lolhuman
         
         if (!apiKey) {
-            throw new Error('API Key tidak ditemukan di config')
+            throw new Error('API Key no encontrada en el config')
         }
         
         const apiUrl = `https://api.lolhuman.xyz/api/creator1/wanted?apikey=${apiKey}&img=${encodeURIComponent(imageUrl)}`
