@@ -93,7 +93,7 @@ async function handler(m, { sock }) {
     m.react('💖')
 
     try {
-        const bgPath = path.join(process.cwd(), 'assets', 'images', 'certificadofondo.png')
+        const bgPath = path.join(process.cwd(), 'assets', 'images', 'certificado.jpg')
         const bg = await loadImage(bgPath)
 
         const canvas = createCanvas(bg.width, bg.height)
