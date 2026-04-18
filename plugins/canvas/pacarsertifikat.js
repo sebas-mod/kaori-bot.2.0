@@ -99,7 +99,7 @@ async function handler(m, { sock }) {
     m.react('💖')
 
     try {
-        const bgPath = path.join(process.cwd(), 'assets', 'images', 'certificado.jpg')
+        const bgPath = path.join(process.cwd(), 'assets', 'images', 'certificadofondo.png')
         console.log('[pacarsertifikat] ruta imagen:', bgPath)
         console.log('[pacarsertifikat] existe imagen:', fs.existsSync(bgPath))
 
