@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'tobrooklyn',
     alias: ['brooklyn', 'filterbrooklyn'],
     category: 'canvas',
-    description: 'Membuat filter Brooklyn pada gambar',
-    usage: '.tobrooklyn (reply gambar)',
+    description: 'Aplica filtro Brooklyn a una imagen',
+    usage: '.tobrooklyn (responder imagen)',
     example: '.tobrooklyn',
     isOwner: false,
     isPremium: false,
@@ -31,7 +31,7 @@ async function uploadToTmpfiles(buffer) {
     if (res.data?.data?.url) {
         return res.data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/')
     }
-    throw new Error('Upload gagal')
+    throw new Error('Error al subir el archivo')
 }
 
 async function handler(m, { sock }) {
@@ -40,9 +40,9 @@ async function handler(m, { sock }) {
     if (!isImage) {
         return m.reply(
             `🌁 *ʙʀᴏᴏᴋʟʏɴ ꜰɪʟᴛᴇʀ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ Reply gambar dengan \`${m.prefix}tobrooklyn\`\n` +
-            `┃ ◦ Kirim gambar dengan caption \`${m.prefix}tobrooklyn\`\n` +
+            `╭┈┈⬡「 📋 *ᴄóᴍᴏ ᴜsᴀʀ* 」\n` +
+            `┃ ◦ Responde a una imagen con \`${m.prefix}tobrooklyn\`\n` +
+            `┃ ◦ Envía una imagen con el texto \`${m.prefix}tobrooklyn\`\n` +
             `╰┈┈⬡`
         )
     }
@@ -58,14 +58,14 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer || buffer.length === 0) {
-            throw new Error('Gagal download gambar')
+            throw new Error('Error al descargar la imagen')
         }
         
         const imageUrl = await uploadToTmpfiles(buffer)
         const apiKey = config.APIkey?.lolhuman
         
         if (!apiKey) {
-            throw new Error('API Key tidak ditemukan di config')
+            throw new Error('API Key no encontrada en el config')
         }
         
         const apiUrl = `https://api.lolhuman.xyz/api/filter/brooklyn?apikey=${apiKey}&img=${encodeURIComponent(imageUrl)}`
