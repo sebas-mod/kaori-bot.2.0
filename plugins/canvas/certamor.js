@@ -14,8 +14,8 @@ if (fs.existsSync(fontBodyPath)) GlobalFonts.registerFromPath(fontBodyPath, 'Cor
 if (fs.existsSync(fontBodyBoldPath)) GlobalFonts.registerFromPath(fontBodyBoldPath, 'CormorantBold')
 
 const pluginConfig = {
-    name: 'pacarsertifikat',
-    alias: ['sertifikatpacar', 'certpacar', 'pacarcert', 'certificadoamor'],
+    name: 'certamor',
+    alias: ['certamor', 'certpacar', 'pacarcert', 'certificadoamor'],
     category: 'canvas',
     description: 'Crea un certificado de amor en español',
     usage: '.pacarsertifikat <nombre1> <nombre2>',
