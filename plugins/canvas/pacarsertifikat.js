@@ -74,7 +74,10 @@ function drawOrnamentLine(ctx, x, y, width, color = '#e7b9c7') {
 }
 
 async function handler(m, { sock }) {
+    console.log('[pacarsertifikat] comando ejecutado')
+
     const args = m.args || []
+    console.log('[pacarsertifikat] args:', args)
 
     if (args.length < 2) {
         return m.reply(
@@ -90,11 +93,22 @@ async function handler(m, { sock }) {
     const nombre2 = args.slice(1).join(' ').trim()
     const nombres = `${nombre1} y ${nombre2}`
 
+    console.log('[pacarsertifikat] nombre1:', nombre1)
+    console.log('[pacarsertifikat] nombre2:', nombre2)
+
     m.react('💖')
 
     try {
         const bgPath = path.join(process.cwd(), 'assets', 'images', 'certificado.jpg')
+        console.log('[pacarsertifikat] ruta imagen:', bgPath)
+        console.log('[pacarsertifikat] existe imagen:', fs.existsSync(bgPath))
+
+        if (!fs.existsSync(bgPath)) {
+            throw new Error(`No se encontró la imagen en: ${bgPath}`)
+        }
+
         const bg = await loadImage(bgPath)
+        console.log('[pacarsertifikat] imagen cargada:', bg.width, bg.height)
 
         const canvas = createCanvas(bg.width, bg.height)
         const ctx = canvas.getContext('2d')
@@ -159,6 +173,7 @@ async function handler(m, { sock }) {
         ctx.fillText('Hecho con mucho amor', centerX, 778)
 
         const buffer = canvas.toBuffer('image/png')
+        console.log('[pacarsertifikat] buffer generado, tamaño:', buffer.length)
 
         await sock.sendMessage(
             m.chat,
@@ -169,11 +184,15 @@ async function handler(m, { sock }) {
             { quoted: m }
         )
 
+        console.log('[pacarsertifikat] imagen enviada correctamente')
         m.react('✅')
     } catch (error) {
-        console.error('[pacarsertifikat] Error:', error)
+        console.error('[pacarsertifikat] ERROR REAL:', error)
+        console.error('[pacarsertifikat] mensaje:', error.message)
+        console.error('[pacarsertifikat] stack:', error.stack)
+
         m.react('☢')
-        m.reply(te(m.prefix, m.command, m.pushName))
+        m.reply(`Error al generar el certificado:\n${error.message}`)
     }
 }
 
