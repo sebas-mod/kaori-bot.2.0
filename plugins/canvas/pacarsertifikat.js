@@ -1,7 +1,17 @@
-const { createCanvas, loadImage } = require('@napi-rs/canvas')
+const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas')
 const path = require('path')
 const fs = require('fs')
 const te = require('../../src/lib/ourin-error')
+
+const fontScriptPath = path.join(process.cwd(), 'assets', 'fonts', 'AlexBrush-Regular.ttf')
+const fontTitlePath = path.join(process.cwd(), 'assets', 'fonts', 'Cinzel-Bold.ttf')
+const fontBodyPath = path.join(process.cwd(), 'assets', 'fonts', 'CormorantGaramond-Regular.ttf')
+const fontBodyBoldPath = path.join(process.cwd(), 'assets', 'fonts', 'CormorantGaramond-Bold.ttf')
+
+if (fs.existsSync(fontScriptPath)) GlobalFonts.registerFromPath(fontScriptPath, 'AlexBrush')
+if (fs.existsSync(fontTitlePath)) GlobalFonts.registerFromPath(fontTitlePath, 'Cinzel')
+if (fs.existsSync(fontBodyPath)) GlobalFonts.registerFromPath(fontBodyPath, 'Cormorant')
+if (fs.existsSync(fontBodyBoldPath)) GlobalFonts.registerFromPath(fontBodyBoldPath, 'CormorantBold')
 
 const pluginConfig = {
     name: 'pacarsertifikat',
@@ -51,7 +61,7 @@ function drawCenteredLines(ctx, text, x, y, maxWidth, lineHeight) {
     }
 }
 
-function drawOrnamentLine(ctx, x, y, width, color = '#e7b9c7') {
+function drawLineWithHeart(ctx, x, y, width, color = '#c897a8') {
     const left = x - width / 2
     const right = x + width / 2
 
@@ -61,23 +71,29 @@ function drawOrnamentLine(ctx, x, y, width, color = '#e7b9c7') {
 
     ctx.beginPath()
     ctx.moveTo(left, y)
-    ctx.lineTo(x - 24, y)
-    ctx.moveTo(x + 24, y)
+    ctx.lineTo(x - 30, y)
+    ctx.moveTo(x + 30, y)
     ctx.lineTo(right, y)
     ctx.stroke()
 
     ctx.fillStyle = color
-    ctx.beginPath()
-    ctx.arc(x, y, 5, 0, Math.PI * 2)
-    ctx.fill()
+    ctx.font = '20px serif'
+    ctx.fillText('❤', x, y + 1)
     ctx.restore()
 }
 
-async function handler(m, { sock }) {
-    console.log('[pacarsertifikat] comando ejecutado')
+function fitFontSize(ctx, text, startSize, minSize, maxWidth, family, weight = '') {
+    let size = startSize
+    while (size >= minSize) {
+        ctx.font = `${weight ? weight + ' ' : ''}${size}px ${family}`
+        if (ctx.measureText(text).width <= maxWidth) return size
+        size -= 2
+    }
+    return minSize
+}
 
+async function handler(m, { sock }) {
     const args = m.args || []
-    console.log('[pacarsertifikat] args:', args)
 
     if (args.length < 2) {
         return m.reply(
@@ -93,70 +109,65 @@ async function handler(m, { sock }) {
     const nombre2 = args.slice(1).join(' ').trim()
     const nombres = `${nombre1} y ${nombre2}`
 
-    console.log('[pacarsertifikat] nombre1:', nombre1)
-    console.log('[pacarsertifikat] nombre2:', nombre2)
-
     m.react('💖')
 
     try {
         const bgPath = path.join(process.cwd(), 'assets', 'images', 'certificadofondo.png')
-        console.log('[pacarsertifikat] ruta imagen:', bgPath)
-        console.log('[pacarsertifikat] existe imagen:', fs.existsSync(bgPath))
 
         if (!fs.existsSync(bgPath)) {
             throw new Error(`No se encontró la imagen en: ${bgPath}`)
         }
 
         const bg = await loadImage(bgPath)
-        console.log('[pacarsertifikat] imagen cargada:', bg.width, bg.height)
-
         const canvas = createCanvas(bg.width, bg.height)
         const ctx = canvas.getContext('2d')
 
         ctx.drawImage(bg, 0, 0, bg.width, bg.height)
 
-        const centerX = 760
+        const centerX = 825
 
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
 
-        ctx.shadowColor = 'rgba(255,255,255,0.45)'
-        ctx.shadowBlur = 12
-        ctx.fillStyle = '#936865'
-        ctx.font = 'bold 56px serif'
-        ctx.fillText('CERTIFICADO', centerX, 108)
-
+        ctx.shadowColor = 'rgba(255,255,255,0.28)'
         ctx.shadowBlur = 6
-        ctx.font = 'bold 28px serif'
-        ctx.fillText('DE', centerX, 150)
 
-        ctx.shadowBlur = 14
-        ctx.fillStyle = '#df8ea8'
-        ctx.font = 'italic 72px serif'
-        ctx.fillText('Amor', centerX, 218)
+        ctx.fillStyle = '#3a2c2c'
+        ctx.font = 'bold 54px Cinzel'
+        ctx.fillText('CERTIFICADO', centerX, 112)
+
+        ctx.fillStyle = '#4a3838'
+        ctx.font = 'bold 24px Cinzel'
+        ctx.fillText('DE', centerX, 160)
+
+        ctx.shadowBlur = 2
+        ctx.fillStyle = '#9e4f6d'
+        ctx.font = '76px AlexBrush'
+        ctx.fillText('Amor', centerX, 228)
 
         ctx.shadowBlur = 0
-        drawOrnamentLine(ctx, centerX, 265, 260)
+        drawLineWithHeart(ctx, centerX, 274, 250)
 
-        ctx.fillStyle = '#7f6b6a'
-        ctx.font = '28px serif'
-        ctx.fillText('Este certificado confirma que', centerX, 322)
+        ctx.fillStyle = '#2e2525'
+        ctx.font = '34px Cormorant'
+        ctx.fillText('Este certificado confirma que', centerX, 334)
 
-        ctx.fillStyle = '#cb6f8f'
-        ctx.font = 'bold 40px serif'
-        drawCenteredLines(ctx, nombres, centerX, 396, 430, 46)
+        const nombresSize = fitFontSize(ctx, nombres, 50, 28, 470, 'CormorantBold', 'bold')
+        ctx.fillStyle = '#111111'
+        ctx.font = `bold ${nombresSize}px CormorantBold`
+        drawCenteredLines(ctx, nombres, centerX, 414, 470, nombresSize + 8)
 
-        drawOrnamentLine(ctx, centerX, 456, 220)
+        drawLineWithHeart(ctx, centerX, 480, 240, '#cfa3af')
 
-        ctx.fillStyle = '#7f6b6a'
-        ctx.font = '28px serif'
-        drawCenteredLines(ctx, 'Están oficialmente unidos por el amor', centerX, 522, 430, 38)
+        ctx.fillStyle = '#1e1a1a'
+        ctx.font = '36px Cormorant'
+        drawCenteredLines(ctx, 'Están oficialmente unidos por el amor', centerX, 548, 500, 42)
 
-        ctx.fillStyle = '#b98998'
-        ctx.font = '24px serif'
-        drawCenteredLines(ctx, 'Con la bendición de los cerezos y mucho cariño', centerX, 606, 450, 32)
+        ctx.fillStyle = '#514343'
+        ctx.font = '28px Cormorant'
+        drawCenteredLines(ctx, 'Con la bendición de los cerezos y mucho cariño', centerX, 638, 510, 34)
 
-        drawOrnamentLine(ctx, centerX, 664, 240, '#edd0d8')
+        drawLineWithHeart(ctx, centerX, 698, 220, '#d7b0bb')
 
         const fecha = new Date().toLocaleDateString('es-ES', {
             day: '2-digit',
@@ -164,16 +175,17 @@ async function handler(m, { sock }) {
             year: 'numeric'
         })
 
-        ctx.fillStyle = '#8a6664'
-        ctx.font = '27px serif'
-        ctx.fillText(`Fecha: ${fecha}`, centerX, 730)
+        ctx.textAlign = 'right'
+        ctx.fillStyle = '#111111'
+        ctx.font = 'bold 30px CormorantBold'
+        ctx.fillText(`Fecha: ${fecha}`, 1040, 765)
 
-        ctx.fillStyle = '#d9a3b2'
-        ctx.font = 'italic 21px serif'
-        ctx.fillText('Hecho con mucho amor', centerX, 778)
+        ctx.textAlign = 'center'
+        ctx.fillStyle = '#8c5d70'
+        ctx.font = '38px AlexBrush'
+        ctx.fillText('Hecho con mucho amor', centerX, 814)
 
         const buffer = canvas.toBuffer('image/png')
-        console.log('[pacarsertifikat] buffer generado, tamaño:', buffer.length)
 
         await sock.sendMessage(
             m.chat,
@@ -184,13 +196,9 @@ async function handler(m, { sock }) {
             { quoted: m }
         )
 
-        console.log('[pacarsertifikat] imagen enviada correctamente')
         m.react('✅')
     } catch (error) {
         console.error('[pacarsertifikat] ERROR REAL:', error)
-        console.error('[pacarsertifikat] mensaje:', error.message)
-        console.error('[pacarsertifikat] stack:', error.stack)
-
         m.react('☢')
         m.reply(`Error al generar el certificado:\n${error.message}`)
     }
