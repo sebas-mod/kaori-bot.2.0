@@ -1,4 +1,4 @@
-const config = require('../../config')
+const config = require('../../config') 
 const { formatUptime, getTimeGreeting } = require('../../src/lib/ourin-formatter')
 const { getCommandsByCategory, getCategories, getPluginCount, getPlugin, getPluginsByCategory } = require('../../src/lib/ourin-plugins')
 const { getDatabase } = require('../../src/lib/ourin-database')
@@ -11,7 +11,7 @@ const pluginConfig = {
     name: 'allmenu',
     alias: ['fullmenu', 'am', 'allcommand', 'semua'],
     category: 'main',
-    description: 'Menampilkan semua command lengkap per kategori',
+    description: 'Muestra todos los comandos completos por categoría',
     usage: '.allmenu',
     example: '.allmenu',
     isOwner: false,
@@ -89,25 +89,19 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
     const totalCases = getCaseCount()
     const totalFeatures = totalCommands + totalCases
     
-    let userRole = 'User', roleEmoji = '👤'
-    if (m.isOwner) { userRole = 'Owner'; roleEmoji = '👑' }
+    let userRole = 'Usuario', roleEmoji = '👤'
+    if (m.isOwner) { userRole = 'Propietario'; roleEmoji = '👑' }
     else if (m.isPremium) { userRole = 'Premium'; roleEmoji = '💎' }
     
     const greeting = getTimeGreeting()
 
-    let txt = `Hai *@${m.pushName || "User"}* 🪸
-Aku ${botConfig.bot?.name || 'Ourin-AI'}, bot WhatsApp yang siap bantu kamu.  
+    let txt = `Hola *@${m.pushName || "Usuario"}* 🪸
+Soy ${botConfig.bot?.name || 'Ourin-AI'}, un bot de WhatsApp listo para ayudarte.  
 
-Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana langsung lewat WhatsApp — praktis tanpa ribet.
+Puedes usarme para buscar información, obtener datos o ayudarte con tareas simples directamente desde WhatsApp — práctico y sin complicaciones.
 
 `
-    txt += `╭┈┈⬡「 📖 *ᴋᴇᴛᴇʀᴀɴɢᴀɴ* 」\n`
-    txt += `┃ Ⓞ = Owner Only\n`
-    txt += `┃ ⓟ = Premium Only\n`
-    txt += `┃ Ⓛ = Limit Required\n`
-    txt += `┃ Ⓐ = Admin Only\n`
-    txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    
+
     const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'cek', 'economy', 'user', 'canvas', 'random', 'premium']
     const sortedCategories = [...categories].sort((a, b) => {
         const indexA = categoryOrder.indexOf(a)
@@ -165,8 +159,8 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
     }
     
     txt += `_© ${botConfig.bot?.name || 'Ourin-AI'} | ${require('moment-timezone')().tz('Asia/Jakarta').year()}_\n`
-    txt += `_ᴅᴇᴠᴇʟᴏᴘᴇʀ: ${botConfig.bot?.developer || 'Lucky Archz'}_`
-    
+    txt += `_ᴅᴇsᴀʀʀᴏʟʟᴀᴅᴏʀ: ${botConfig.bot?.developer || 'Lucky Archz'}_`
+
     const imagePath = path.join(process.cwd(), 'assets', 'images', 'ourin.jpg')
     const thumbPath = path.join(process.cwd(), 'assets', 'images', 'ourin2.jpg')
     
@@ -174,59 +168,58 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
     let thumbBuffer = fs.existsSync(thumbPath) ? fs.readFileSync(thumbPath) : null
     
     try {
- 
         await sock.sendMessage(m.chat, {    
-    interactiveMessage: {      
-        title: txt,      
-        footer: botConfig.bot?.name || 'Ourin-AI',      
-        image: thumbBuffer,
-        contextInfo: {
-            mentionedJid: [m.sender],
-            forwardingScore: 777,
-            isForwarded: true
-        },
-        externalAdReply: {
-            title: botConfig.bot?.name || 'Ourin-AI',
-            body: `Owner: ${botConfig.owner?.name || 'Lucky Archz'}`,
-            mediaType: 1,
-            thumbnail: imageBuffer,
-            mediaUrl: " X ",
-            sourceUrl: botConfig.info?.website,
-            renderLargerThumbnail: true       
-        },  
-        nativeFlowMessage: {        
-            messageParamsJson: JSON.stringify({          
-                limited_time_offer: {            
-                    text: "Hai " + m.pushName + "",            
-                    url: "https://ourin.site",            
-                    copy_code: botConfig.owner?.name || 'Ourin-AI',            
-                    expiration_time: Date.now()         
-                },    
-                bottom_sheet: {            
-                    in_thread_buttons_limit: 2,            
-                    divider_indices: [1, 2, 3, 4, 5, 999],            
-                    list_title: "zanxnpc",            
-                    button_title: "zanxnpc"          
-                },             
-            }),        
-            buttons: [ 
-                {
-                    name: "single_select",            
-                    buttonParamsJson: JSON.stringify({              
-                        has_multiple_buttons: true            
-                    })          
-                },               
-                {
-                    name: 'quick_reply',      
-                    buttonParamsJson: JSON.stringify({              
-                        display_text: 'Kembali Ke Menu Utama',
-                        id: prefix + 'menu'
-                    })
+            interactiveMessage: {      
+                title: txt,      
+                footer: botConfig.bot?.name || 'Ourin-AI',      
+                image: thumbBuffer,
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    forwardingScore: 777,
+                    isForwarded: true
+                },
+                externalAdReply: {
+                    title: botConfig.bot?.name || 'Ourin-AI',
+                    body: `Propietario: ${botConfig.owner?.name || 'Lucky Archz'}`,
+                    mediaType: 1,
+                    thumbnail: imageBuffer,
+                    mediaUrl: " X ",
+                    sourceUrl: botConfig.info?.website,
+                    renderLargerThumbnail: true       
+                },  
+                nativeFlowMessage: {        
+                    messageParamsJson: JSON.stringify({          
+                        limited_time_offer: {            
+                            text: "Hola " + m.pushName + "",            
+                            url: "https://ourin.site",            
+                            copy_code: botConfig.owner?.name || 'Ourin-AI',            
+                            expiration_time: Date.now()         
+                        },    
+                        bottom_sheet: {            
+                            in_thread_buttons_limit: 2,            
+                            divider_indices: [1, 2, 3, 4, 5, 999],            
+                            list_title: "zanxnpc",            
+                            button_title: "zanxnpc"          
+                        },             
+                    }),        
+                    buttons: [ 
+                        {
+                            name: "single_select",            
+                            buttonParamsJson: JSON.stringify({              
+                                has_multiple_buttons: true            
+                            })          
+                        },               
+                        {
+                            name: 'quick_reply',      
+                            buttonParamsJson: JSON.stringify({              
+                                display_text: 'Volver al menú principal',
+                                id: prefix + 'menu'
+                            })
+                        }    
+                    ]      
                 }    
-            ]      
-        }    
-    }  
-}, { quoted: m });
+            }  
+        }, { quoted: m });
     } catch (error) {
         console.error('[AllMenu] Error:', error.message)
         if (imageBuffer) {
