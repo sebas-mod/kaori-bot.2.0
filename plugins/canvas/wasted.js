@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'wasted',
     alias: ['gta', 'gtawasted'],
     category: 'canvas',
-    description: 'Membuat efek wasted GTA pada gambar',
-    usage: '.wasted (reply gambar)',
+    description: 'Aplica el efecto wasted de GTA a una imagen',
+    usage: '.wasted (responder imagen)',
     example: '.wasted',
     isOwner: false,
     isPremium: false,
@@ -31,7 +31,7 @@ async function uploadToTmpfiles(buffer) {
     if (res.data?.data?.url) {
         return res.data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/')
     }
-    throw new Error('Upload gagal')
+    throw new Error('Error al subir el archivo')
 }
 
 async function handler(m, { sock }) {
@@ -39,10 +39,10 @@ async function handler(m, { sock }) {
     
     if (!isImage) {
         return m.reply(
-            `💀 *ᴡᴀsᴛᴇᴅ ᴇꜰꜰᴇᴄᴛ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ* 」\n` +
-            `┃ ◦ Reply gambar dengan \`${m.prefix}wasted\`\n` +
-            `┃ ◦ Kirim gambar dengan caption \`${m.prefix}wasted\`\n` +
+            `💀 *ᴡᴀsᴛᴇᴅ ᴇꜰᴇᴄᴛᴏ*\n\n` +
+            `╭┈┈⬡「 📋 *ᴄóᴍᴏ ᴜsᴀʀ* 」\n` +
+            `┃ ◦ Responde a una imagen con \`${m.prefix}wasted\`\n` +
+            `┃ ◦ Envía una imagen con el texto \`${m.prefix}wasted\`\n` +
             `╰┈┈⬡`
         )
     }
@@ -58,14 +58,14 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer || buffer.length === 0) {
-            throw new Error('Gagal download gambar')
+            throw new Error('Error al descargar la imagen')
         }
         
         const imageUrl = await uploadToTmpfiles(buffer)
         const apiKey = config.APIkey?.lolhuman
         
         if (!apiKey) {
-            throw new Error('API Key tidak ditemukan di config')
+            throw new Error('API Key no encontrada en el config')
         }
         
         const apiUrl = `https://api.lolhuman.xyz/api/editor/wasted?apikey=${apiKey}&img=${encodeURIComponent(imageUrl)}`
