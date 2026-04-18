@@ -7,9 +7,9 @@ const pluginConfig = {
     name: 'ustadz',
     alias: ['ustad', 'quoteustadz', 'canvasustadz'],
     category: 'canvas',
-    description: 'Buat quote gaya ustadz',
-    usage: '.ustadz <text>',
-    example: '.ustadz Jangan lupa sholat',
+    description: 'Crea una frase estilo ustadz',
+    usage: '.ustadz <texto>',
+    example: '.ustadz No olvides rezar',
     isOwner: false,
     isPremium: false,
     isGroup: false,
@@ -25,8 +25,8 @@ async function handler(m, { sock }) {
     if (!text) {
         return m.reply(
             `👲 *ᴄᴀɴᴠᴀs ᴜsᴛᴀᴅᴢ*\n\n` +
-            `> Masukkan teks untuk dijadikan quote.\n\n` +
-            `> Contoh: \`${m.prefix}ustadz Jangan lupa bersyukur\``
+            `> Ingresa un texto para convertirlo en frase.\n\n` +
+            `> Ejemplo: \`${m.prefix}ustadz No olvides agradecer\``
         )
     }
     
