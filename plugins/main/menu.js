@@ -12,7 +12,7 @@ const pluginConfig = {
     name: 'menu',
     alias: ['help', 'bantuan', 'commands', 'm'],
     category: 'main',
-    description: 'Menampilkan menu utama bot',
+    description: 'Muestra el menú principal del bot',
     usage: '.menu',
     example: '.menu',
     isOwner: false,
@@ -72,7 +72,7 @@ function buildMenuText(m, botConfig, db, uptime, botMode = 'md') {
     
     const totalFeatures = totalCommands + totalCases;
     
-    let userRole = 'User', roleEmoji = '👤';
+    let userRole = 'Usuario', roleEmoji = '👤';
     if (m.isOwner) { userRole = 'Owner'; roleEmoji = '👑'; }
     else if (m.isPremium) { userRole = 'Premium'; roleEmoji = '💎'; }
     
@@ -81,30 +81,30 @@ function buildMenuText(m, botConfig, db, uptime, botMode = 'md') {
     const totalUsers = db.getUserCount();
     const greetEmoji = greeting.includes('pagi') ? '🌅' : greeting.includes('siang') ? '☀️' : greeting.includes('sore') ? '🌇' : '🌙';
     
-    let txt = `Hai *@${m.pushName || "User"}* 🪸
+    let txt = `Hola *@${m.pushName || "Usuario"}* 🪸
 
-Aku ${botConfig.bot?.name || 'Ourin-AI'}, bot WhatsApp yang siap bantu kamu.  
+Soy ${botConfig.bot?.name || 'Ourin-AI'}, un bot de WhatsApp listo para ayudarte.  
 
-Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana langsung lewat WhatsApp — praktis tanpa ribet.`
+Puedes usarme para buscar información, obtener datos o ayudarte con tareas simples directamente desde WhatsApp, práctico y sin complicaciones.`;
 
-   txt += `\n\n╭─〔 🤖 *ʙᴏᴛ ɪɴꜰᴏ* 〕\n`;
-txt += `*│* 🖐 ɴᴀᴍᴀ     : *${botConfig.bot?.name || 'Ourin-AI'}*\n`;
-txt += `*│* 🔑 ᴠᴇʀsɪ    : *v${botConfig.bot?.version || '1.2.0'}*\n`;
-txt += `*│* ⚙️ ᴍᴏᴅᴇ     : *${(botConfig.mode || 'public').toUpperCase()}*\n`;
-txt += `*│* 🧶 ᴘʀᴇꜰɪx    : *[ ${prefix} ]*\n`;
-txt += `*│* ⏱ ᴜᴘᴛɪᴍᴇ   : *${uptimeFormatted}*\n`;
-txt += `*│* 👥 ᴛᴏᴛᴀʟ    : *${totalUsers} Users*\n`;
-txt += `*│* 🏷 ɢʀᴏᴜᴘ     : *${botMode.toUpperCase()}*\n`;
-txt += `*│* 👑 ᴏᴡɴᴇʀ    : *${botConfig.owner?.name || 'Ourin-AI'}*\n`;
-txt += `╰────────────────⬣\n\n`;
+    txt += `\n\n╭─〔 🤖 *ʙᴏᴛ ɪɴꜰᴏ* 〕\n`;
+    txt += `*│* 🖐 ɴᴏᴍʙʀᴇ   : *${botConfig.bot?.name || 'Ourin-AI'}*\n`;
+    txt += `*│* 🔑 ᴠᴇʀsɪᴏɴ  : *v${botConfig.bot?.version || '1.2.0'}*\n`;
+    txt += `*│* ⚙️ ᴍᴏᴅᴏ     : *${(botConfig.mode || 'public').toUpperCase()}*\n`;
+    txt += `*│* 🧶 ᴘʀᴇꜰɪᴊᴏ  : *[ ${prefix} ]*\n`;
+    txt += `*│* ⏱ ᴜᴘᴛɪᴍᴇ   : *${uptimeFormatted}*\n`;
+    txt += `*│* 👥 ᴛᴏᴛᴀʟ    : *${totalUsers} Usuarios*\n`;
+    txt += `*│* 🏷 ɢʀᴜᴘᴏ    : *${botMode.toUpperCase()}*\n`;
+    txt += `*│* 👑 ᴏᴡɴᴇʀ    : *${botConfig.owner?.name || 'Ourin-AI'}*\n`;
+    txt += `╰────────────────⬣\n\n`;
 
-txt += `╭─〔 👤 *ᴜsᴇʀ ɪɴꜰᴏ* 〕\n`;
-txt += `*│* 🙋 ɴᴀᴍᴀ     : *${m.pushName}*\n`;
-txt += `*│* 🎭 ʀᴏʟᴇ     : *${roleEmoji} ${userRole}*\n`;
-txt += `*│* 🎟 ʟɪᴍɪᴛ    : *${m.isOwner || m.isPremium ? '∞ Unlimited' : (user?.limit ?? 25)}*\n`;
-txt += `*│* 🕒 ᴡᴀᴋᴛᴜ    : *${timeStr} WIB*\n`;
-txt += `*│* 📅 ᴛᴀɴɢɢᴀʟ  : *${dateStr}*\n`;
-txt += `╰────────────────⬣\n\n`;
+    txt += `╭─〔 👤 *ᴜsᴜᴀʀɪᴏ ɪɴꜰᴏ* 〕\n`;
+    txt += `*│* 🙋 ɴᴏᴍʙʀᴇ   : *${m.pushName}*\n`;
+    txt += `*│* 🎭 ʀᴏʟ      : *${roleEmoji} ${userRole}*\n`;
+    txt += `*│* 🎟 ʟɪᴍɪᴛᴇ   : *${m.isOwner || m.isPremium ? '∞ Ilimitado' : (user?.limit ?? 25)}*\n`;
+    txt += `*│* 🕒 ʜᴏʀᴀ     : *${timeStr} WIB*\n`;
+    txt += `*│* 📅 ꜰᴇᴄʜᴀ    : *${dateStr}*\n`;
+    txt += `╰────────────────⬣\n\n`;
     
     const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'cek', 'economy', 'user', 'canvas', 'random', 'premium', 'ephoto', 'jpm', 'pushkontak', 'panel', 'store'];
     const sortedCategories = [...categories].sort((a, b) => {
@@ -140,7 +140,7 @@ txt += `╰────────────────⬣\n\n`;
     const allowedCategories = modeAllowedMap[botMode];
     const excludeCategories = modeExcludeMap[botMode] || [];
     
-    txt += `📂 *ᴅᴀꜰᴛᴀʀ ᴍᴇɴᴜ*\n`
+    txt += `📂 *ʟɪsᴛᴀ ᴅᴇ ᴍᴇɴᴜ*\n`;
     
     for (const category of sortedCategories) {
         if (category === 'owner' && !m.isOwner) continue;
@@ -172,7 +172,7 @@ function getContextInfo(botConfig, m, thumbBuffer, renderLargerThumbnail = false
         isForwarded: true,
         externalAdReply: {
             title: botConfig.bot?.name || 'Ourin-AI',
-            body: `BOT WHATSAPP MULTI DEVICE`,
+            body: `BOT DE WHATSAPP MULTI DEVICE`,
             sourceUrl: saluranLink,
             mediaType: 1,
             showAdAttribution: false,
@@ -193,7 +193,7 @@ function getVerifiedQuoted(botConfig) {
                 message: {
                     'contactMessage': {
                     'displayName': `🪸 ${botConfig.bot?.name}`,
-                    'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:XL;ttname,;;;\nFN:ttname\nitem1.TEL;waid=13135550002:+1 (313) 555-0002\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
+                    'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:XL;ttname,;;;\nFN:ttname\nitem1.TEL;waid=13135550002:+1 (313) 555-0002\nitem1.X-ABLabel:Móvil\nEND:VCARD`,
                 sendEphemeral: true
             }}}  
 }
@@ -340,7 +340,7 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
                     categoryRows.push({
                         title: title,
                         id: `${prefix}menucat ${cat}`,
-                        description: `${cmds.length} commands`
+                        description: `${cmds.length} comandos`
                     });
                 }
                 
@@ -354,19 +354,19 @@ async function handler(m, { sock, config: botConfig, db, uptime }) {
                 const greetEmoji = greeting.includes('pagi') ? '🌅' : greeting.includes('siang') ? '☀️' : greeting.includes('sore') ? '🌇' : '🌙';
                 const uptimeFormatted = formatUptime(uptime);
                 
-                let headerText = `*@${m.pushName || "User"}* 🪸
+                let headerText = `*@${m.pushName || "Usuario"}* 🪸
 
-Aku ${botConfig.bot?.name || 'Ourin-AI'}, bot WhatsApp yang siap bantu kamu.  
+Soy ${botConfig.bot?.name || 'Ourin-AI'}, un bot de WhatsApp listo para ayudarte.  
 
-Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana langsung lewat WhatsApp — praktis tanpa ribet.\n\n`;
+Puedes usarme para buscar información, obtener datos o ayudarte con tareas simples directamente desde WhatsApp, práctico y sin complicaciones.\n\n`;
                 headerText += `╭┈┈⬡「 🤖 *ʙᴏᴛ ɪɴꜰᴏ* 」\n`;
-                headerText += `┃ \`◦\` ɴᴀᴍᴀ: *${botConfig.bot?.name || 'Ourin-AI'}*\n`;
-                headerText += `┃ \`◦\` ᴠᴇʀsɪ: *v${botConfig.bot?.version || '1.2.0'}*\n`;
-                headerText += `┃ \`◦\` ᴍᴏᴅᴇ: *${(botConfig.mode || 'public').toUpperCase()}*\n`;
+                headerText += `┃ \`◦\` ɴᴏᴍʙʀᴇ: *${botConfig.bot?.name || 'Ourin-AI'}*\n`;
+                headerText += `┃ \`◦\` ᴠᴇʀsɪᴏɴ: *v${botConfig.bot?.version || '1.2.0'}*\n`;
+                headerText += `┃ \`◦\` ᴍᴏᴅᴏ: *${(botConfig.mode || 'public').toUpperCase()}*\n`;
                 headerText += `┃ \`◦\` ᴜᴘᴛɪᴍᴇ: *${uptimeFormatted}*\n`;
                 headerText += `┃ \`◦\` ᴛᴏᴛᴀʟ ᴄᴍᴅ: *${totalCmds}*\n`;
                 headerText += `╰┈┈┈┈┈┈┈┈⬡\n\n`;
-                headerText += `📋 *Pilih kategori di bawah untuk melihat daftar command*`;
+                headerText += `📋 *Elige una categoría abajo para ver la lista de comandos*`;
                 
                 try {
                     const { generateWAMessageFromContent, proto } = require('ourin');
@@ -375,9 +375,9 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                         {
                             name: 'single_select',
                             buttonParamsJson: JSON.stringify({
-                                title: '📁 ᴘɪʟɪʜ ᴍᴇɴᴜ',
+                                title: '📁 ᴇʟᴇɢɪʀ ᴍᴇɴᴜ',
                                 sections: [{
-                                    title: '📋 PILIH CATEGORY',
+                                    title: '📋 ELEGIR CATEGORÍA',
                                     rows: categoryRows
                                 }]
                             })
@@ -385,14 +385,14 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                         {
                             name: 'quick_reply',
                             buttonParamsJson: JSON.stringify({
-                                display_text: '📊 TOTAL SEMUA FITUR',
+                                display_text: '📊 TOTAL DE FUNCIONES',
                                 id: `${prefix}totalfitur`
                             })
                         },
                         {
                             name: 'quick_reply',
                             buttonParamsJson: JSON.stringify({
-                                display_text: '📊 SEMUA MENU',
+                                display_text: '📊 TODOS LOS MENÚS',
                                 id: `${prefix}allmenu`
                             })
                         }
@@ -422,7 +422,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                                         text: headerText
                                     }),
                                     footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                                        text: `© ${botConfig.bot?.name || 'Ourin-AI'} | ${sortedCats.length} Categories`
+                                        text: `© ${botConfig.bot?.name || 'Ourin-AI'} | ${sortedCats.length} Categorías`
                                     }),
                                     header: proto.Message.InteractiveMessage.Header.fromObject({
                                         title: `${botConfig.bot?.name || 'Ourin-AI'}`,
@@ -452,7 +452,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                 } catch (btnError) {
                     console.error('[Menu V5] Button error:', btnError.message);
                     
-                    let catListText = `📋 *ᴋᴀᴛᴇɢᴏʀɪ ᴍᴇɴᴜ*\n\n`;
+                    let catListText = `📋 *ᴄᴀᴛᴇɢᴏʀɪ́ᴀs ᴅᴇʟ ᴍᴇɴᴜ*\n\n`;
                     for (const cat of sortedCats) {
                         if (cat === 'owner' && !m.isOwner) continue;
                         const cmds = commandsByCategory[cat] || [];
@@ -460,7 +460,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                         const emoji = CATEGORY_EMOJIS[cat] || '📁';
                         catListText += `> ${emoji} \`${prefix}menucat ${cat}\` - ${toMonoUpperBold(cat)} (${cmds.length})\n`;
                     }
-                    catListText += `\n_Ketik perintah kategori untuk melihat command_`;
+                    catListText += `\n_Escribe el comando de categoría para ver sus comandos_`;
                     
                     const fallbackMsg = { contextInfo: getContextInfo(botConfig, m, thumbBuffer) };
                     if (imageBuffer) { fallbackMsg.image = imageBuffer; fallbackMsg.caption = headerText + '\n\n' + catListText; }
@@ -504,7 +504,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                     },
                     externalAdReply: {
                         title: botConfig.bot?.name || 'Ourin-AI',
-                        body: `v${botConfig.bot?.version || '1.0.1'} • Fast Response Bot`,
+                        body: `v${botConfig.bot?.version || '1.0.1'} • Bot de respuesta rápida`,
                         sourceUrl: saluranLinkV6,
                         mediaType: 1,
                         showAdAttribution: false,
@@ -580,10 +580,10 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                             cardBody += `◦ \`${prefixV7}${toSmallCaps(cmd)}\`\n`;
                         }
                         if (cmds.length > 15) {
-                            cardBody += `\n_...dan ${cmds.length - 15} command lainnya_`;
+                            cardBody += `\n_...y ${cmds.length - 15} comandos más_`;
                         }
                         
-                        cardBody += `\n\n> Total: ${cmds.length} commands`;
+                        cardBody += `\n\n> Total: ${cmds.length} comandos`;
                         
                         let cardMedia = null;
                         try {
@@ -627,7 +627,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                                 buttons: [{
                                     name: 'quick_reply',
                                     buttonParamsJson: JSON.stringify({
-                                        display_text: `📋 Lihat ${categoryName}`,
+                                        display_text: `📋 Ver ${categoryName}`,
                                         id: `${prefixV7}menucat ${cat}`
                                     })
                                 }]
@@ -651,7 +651,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                                 },
                                 interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                                     body: proto.Message.InteractiveMessage.Body.fromObject({
-                                        text: `${getTimeGreeting()} *${m.pushName}!*\n\n> Geser untuk melihat kategori menu\n> Ketuk tombol untuk melihat detail`
+                                        text: `${getTimeGreeting()} *${m.pushName}!*\n\n> Desliza para ver las categorías del menú\n> Toca el botón para ver los detalles`
                                     }),
                                     footer: proto.Message.InteractiveMessage.Footer.fromObject({
                                         text: `${botConfig.bot?.name || 'Ourin'} v${botConfig.bot?.version || '1.0'}`
@@ -695,7 +695,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                     totalCmdV8 += (cmdsByCatV8[cat] || []).length;
                 }
                 
-                let roleV8 = '𝙐𝙨𝙚𝙧', emojiV8 = '◈';
+                let roleV8 = '𝙐𝙨𝙪𝙖𝙧𝙞𝙤', emojiV8 = '◈';
                 if (m.isOwner) { roleV8 = '𝙊𝙬𝙣𝙚𝙧'; emojiV8 = '♚'; }
                 else if (m.isPremium) { roleV8 = '𝙋𝙧𝙚𝙢𝙞𝙪𝙢'; emojiV8 = '✦'; }
                 
@@ -729,23 +729,23 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                 menuV8 += `*${botConfig.bot?.name || '𝗢𝗨𝗥𝗜𝗡-𝗔𝗜'}*\n`;
                 menuV8 += `${randomSparkle()}━━━━━━━━━━━━━━━━━━━━━${randomSparkle()}\n\n`;
                 
-                menuV8 += `┏━━━〔 ${emojiV8} *𝗣𝗥𝗢𝗙𝗜𝗟𝗘* 〕━━━┓\n`;
+                menuV8 += `┏━━━〔 ${emojiV8} *𝗣𝗘𝗥𝗙𝗜𝗟* 〕━━━┓\n`;
                 menuV8 += `┃ 👤 *${m.pushName}*\n`;
                 menuV8 += `┃ 🏷️ ${roleV8}\n`;
                 menuV8 += `┃ ⏰ ${timeV8} WIB\n`;
                 menuV8 += `┃ 📅 ${dateV8}\n`;
                 menuV8 += `┗━━━━━━━━━━━━━━━┛\n\n`;
                 
-                menuV8 += `┏━━〔 ⚡ *𝗦𝗬𝗦𝗧𝗘𝗠 𝗦𝗧𝗔𝗧𝗦* 〕━━┓\n`;
-                menuV8 += `┃ 🎫 Limit   ➤ ${m.isOwner || m.isPremium ? '∞ Unlimited' : `${userV8?.limit ?? 25}/25`}\n`;
-                menuV8 += `┃ ⏱️ Uptime  ➤ ${uptimeV8}\n`;
-                menuV8 += `┃ 🔧 Mode    ➤ ${botMode.toUpperCase()}\n`;
-                menuV8 += `┃ 📊 Total   ➤ ${totalCmdV8} Commands\n`;
-                menuV8 += `┃ 👥 Users   ➤ ${db.getUserCount()} Aktif\n`;
+                menuV8 += `┏━━〔 ⚡ *𝗘𝗦𝗧𝗔𝗗𝗢 𝗗𝗘𝗟 𝗦𝗜𝗦𝗧𝗘𝗠𝗔* 〕━━┓\n`;
+                menuV8 += `┃ 🎫 Límite   ➤ ${m.isOwner || m.isPremium ? '∞ Ilimitado' : `${userV8?.limit ?? 25}/25`}\n`;
+                menuV8 += `┃ ⏱️ Uptime   ➤ ${uptimeV8}\n`;
+                menuV8 += `┃ 🔧 Modo     ➤ ${botMode.toUpperCase()}\n`;
+                menuV8 += `┃ 📊 Total    ➤ ${totalCmdV8} Comandos\n`;
+                menuV8 += `┃ 👥 Usuarios ➤ ${db.getUserCount()} Activos\n`;
                 menuV8 += `┗━━━━━━━━━━━━━━━━━━━━━━┛\n\n`;
                 
                 menuV8 += `╭══════════════════════╮\n`;
-                menuV8 += `║  📋 *𝗖𝗢𝗠𝗠𝗔𝗡𝗗 𝗟𝗜𝗦𝗧*    ║\n`;
+                menuV8 += `║  📋 *𝗟𝗜𝗦𝗧𝗔 𝗗𝗘 𝗖𝗢𝗠𝗔𝗡𝗗𝗢𝗦*   ║\n`;
                 menuV8 += `╰══════════════════════╯\n\n`;
                 
                 for (const cat of sortedCatsV8) {
@@ -758,7 +758,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                     
                     const emojiCat = CATEGORY_EMOJIS[cat] || '▣';
                     menuV8 += `┌─────「 ${emojiCat} *${cat.toUpperCase()}* 」\n`;
-                    menuV8 += `│ ✦ Total: ${cmdsV8.length} commands\n`;
+                    menuV8 += `│ ✦ Total: ${cmdsV8.length} comandos\n`;
                     menuV8 += `│\n`;
                     
                     for (const cmd of cmdsV8) {
@@ -768,8 +768,8 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                     menuV8 += `└───────────────────\n\n`;
                 }
                 
-                menuV8 += `╭━━〔 💡 *𝗧𝗜𝗣𝗦* 〕━━╮\n`;
-                menuV8 += `│ ❸ Follow channel ${config.saluran?.link || 'Ourin-AI'}\n`;
+                menuV8 += `╭━━〔 💡 *𝗖𝗢𝗡𝗦𝗘𝗝𝗢𝗦* 〕━━╮\n`;
+                menuV8 += `│ ❸ Sigue el canal ${config.saluran?.link || 'Ourin-AI'}\n`;
                 menuV8 += `╰━━━━━━━━━━━━━━━━━━╯\n\n`;
                 
                 menuV8 += `> ${randomSparkle()} *${botConfig.bot?.name}* v${botConfig.bot?.version || '1.7.1'} ${randomSparkle()}`;
@@ -796,8 +796,8 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                             itemCount: totalCmdV8,
                             status: 'INQUIRY',
                             surface: 'CATALOG',
-                            message: `${botConfig.bot?.name || 'Ourin-AI'} Menu`,
-                            orderTitle: `📋 ${totalCmdV8} Commands`,
+                            message: `${botConfig.bot?.name || 'Ourin-AI'} Menú`,
+                            orderTitle: `📋 ${totalCmdV8} Comandos`,
                             sellerJid: botConfig.botNumber ? `${botConfig.botNumber}@s.whatsapp.net` : m.sender,
                             token: 'ourin-menu-v8',
                             totalAmount1000: 0,
@@ -859,7 +859,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                         const emojiCat = CATEGORY_EMOJIS[cat] || '📁';
                         menuRowsV9.push({
                             title: `${emojiCat} ${cat.toUpperCase()}`,
-                            description: `${totalCmdsV9} commands`,
+                            description: `${totalCmdsV9} comandos`,
                             id: `${prefixV9}menucat ${cat}`
                         });
                     }
@@ -891,7 +891,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                         {
                             name: "cta_url",
                             buttonParamsJson: JSON.stringify({
-                                display_text: "Nomor Owner ku",
+                                display_text: "Mi número de owner",
                                 url: zannerz,
                                 merchant_url: zannerz
                             })
@@ -899,7 +899,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                         {
                             name: "quick_reply",
                             buttonParamsJson: JSON.stringify({
-                                display_text: "🧾 Tampilkan Semua Menu",
+                                display_text: "🧾 Mostrar todos los menús",
                                 id: `${m.prefix}allmenu`,
                             })
                         },
@@ -936,7 +936,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                                                 in_thread_buttons_energi: 2,
                                                 divider_indices: [1, 2, 3, 4, 5, 999],
                                                 list_title: botConfig.bot?.name || 'Ourin-AI',
-                                                button_title: '🍀 ριℓιн кαтєgσяι'
+                                                button_title: '🍀 ᴇʟᴇɢɪʀ ᴄᴀᴛᴇɢᴏʀɪ́ᴀ'
                                             },
                                         }),
                                         buttons: buttonsV9
@@ -1013,7 +1013,7 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                         const emojiCat = CATEGORY_EMOJIS[cat] || '📁';
                         menuRowsV10.push({
                             title: `${emojiCat} ${cat.toUpperCase()}`,
-                            description: `${totalCmds} commands`,
+                            description: `${totalCmds} comandos`,
                             id: `${m.prefix}menucat ${cat}`
                         });
                     }
@@ -1039,21 +1039,21 @@ Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana lan
                     }
                     
                     const footerTextV10 = `
-Hai *@${m.pushName || "User"}* 🪸
+Hola *@${m.pushName || "Usuario"}* 🪸
 
-Aku ${botConfig.bot?.name || 'Ourin-AI'}, bot WhatsApp yang siap bantu kamu.  
+Soy ${botConfig.bot?.name || 'Ourin-AI'}, un bot de WhatsApp listo para ayudarte.  
 
-Kamu bisa pakai aku buat cari info, ambil data, atau bantu hal-hal sederhana langsung lewat WhatsApp — praktis tanpa ribet.
+Puedes usarme para buscar información, obtener datos o ayudarte con tareas simples directamente desde WhatsApp, práctico y sin complicaciones.
 
 ─────────────────────────
-Nama    : ${botConfig.bot?.name || 'Ourin-AI'}
-Versi : v${botConfig.bot?.version || '1.9.0'}
+Nombre  : ${botConfig.bot?.name || 'Ourin-AI'}
+Versión : v${botConfig.bot?.version || '1.9.0'}
 Runtime : Node.js ${process.version}
-Bot Up  : ${uptimeFmtV10}
+Activo  : ${uptimeFmtV10}
 
-Owner ku kak   : ${botConfig.owner?.name || 'Lucky Archz'}
+Mi owner : ${botConfig.owner?.name || 'Lucky Archz'}
 ─────────────────────────
-Klik tombol di bawah untuk menampilkan menu
+Haz clic en el botón de abajo para mostrar el menú
 `;
                     
                     const buttonsV10 = [{
@@ -1079,14 +1079,14 @@ Klik tombol di bawah untuk menampilkan menu
                                 },
                                 interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                                     header: proto.Message.InteractiveMessage.Header.fromObject({
-                                        title: `${botConfig.bot?.name || 'Ourin-AI'} Menu`,
+                                        title: `${botConfig.bot?.name || 'Ourin-AI'} Menú`,
                                         hasMediaAttachment: !!productImageV10,
                                         productMessage: {
                                             product: {
                                                 productImage: productImageV10?.imageMessage || null,
                                                 productId: productId,
-                                                title: `${botConfig.bot?.name || 'Ourin-AI'} Menu`,
-                                                description: 'Menu',
+                                                title: `${botConfig.bot?.name || 'Ourin-AI'} Menú`,
+                                                description: 'Menú',
                                                 currencyCode: 'USD',
                                                 priceAmount1000: '1000000000000000',
                                                 retailerId: botConfig.bot?.name || 'Ourin',
@@ -1136,85 +1136,86 @@ Klik tombol di bawah untuk menampilkan menu
                     const saluranNameV11 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const docuThumbV11 = thumbBuffer || imageBuffer || fs.readFileSync(path.join(process.cwd(), 'assets', 'images', 'ourin-allmenu.jpg'));
                     const prefix = botConfig.command?.prefix || '.';
-                const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter';
-                const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
-                
-                const categories = getCategories();
-                const commandsByCategory = getCommandsByCategory();
-                const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'jpm', 'pushkontak', 'panel', 'user'];
-                
-                const sortedCats = [...categories].sort((a, b) => {
-                    const indexA = categoryOrder.indexOf(a);
-                    const indexB = categoryOrder.indexOf(b);
-                    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-                });
-                
-                const toMonoUpperBold = (text) => {
-                    const chars = {
-                        'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚',
-                        'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡',
-                        'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨',
-                        'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭'
-                    };
-                    return text.toUpperCase().split('').map(c => chars[c] || c).join('');
-                };
-                
-                const categoryRows = [];
-                
-                const modeAllowedMap = {
-                    md: null,
-                    cpanel: ['main', 'group', 'sticker', 'owner', 'tools', 'panel'],
-                    store: ['main', 'group', 'sticker', 'owner', 'store'],
-                    pushkontak: ['main', 'group', 'sticker', 'owner', 'pushkontak']
-                };
-                const modeExcludeMap = {
-                    md: ['panel', 'pushkontak', 'store'],
-                    cpanel: null,
-                    store: null,
-                    pushkontak: null
-                };
-                
-                const allowedCats = modeAllowedMap[botMode];
-                const excludeCats = modeExcludeMap[botMode] || [];
-                
-                for (const cat of sortedCats) {
-                    if (cat === 'owner' && !m.isOwner) continue;
-                    if (allowedCats && !allowedCats.includes(cat.toLowerCase())) continue;
-                    if (excludeCats && excludeCats.includes(cat.toLowerCase())) continue;
+                    const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter';
+                    const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     
-                    const cmds = commandsByCategory[cat] || [];
-                    if (cmds.length === 0) continue;
+                    const categories = getCategories();
+                    const commandsByCategory = getCommandsByCategory();
+                    const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'jpm', 'pushkontak', 'panel', 'user'];
                     
-                    const emoji = CATEGORY_EMOJIS[cat] || '📁';
-                    const title = `${emoji} ${toMonoUpperBold(cat)}`;
-                    
-                    categoryRows.push({
-                        header: `${toMonoUpperBold('MENU ' + title)}`,
-                        id: `${prefix}menucat ${cat}`,
-                        title: `Berisi ${cmds.length} Perintah`,
-                        description: 'Tap untuk membuka menu category ini'
+                    const sortedCats = [...categories].sort((a, b) => {
+                        const indexA = categoryOrder.indexOf(a);
+                        const indexB = categoryOrder.indexOf(b);
+                        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
                     });
-                }
-                
-                let totalCmds = 0;
-                for (const cat of categories) {
-                    totalCmds += (commandsByCategory[cat] || []).length;
-                }
+                    
+                    const toMonoUpperBold = (text) => {
+                        const chars = {
+                            'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚',
+                            'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡',
+                            'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨',
+                            'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭'
+                        };
+                        return text.toUpperCase().split('').map(c => chars[c] || c).join('');
+                    };
+                    
+                    const categoryRows = [];
+                    
+                    const modeAllowedMap = {
+                        md: null,
+                        cpanel: ['main', 'group', 'sticker', 'owner', 'tools', 'panel'],
+                        store: ['main', 'group', 'sticker', 'owner', 'store'],
+                        pushkontak: ['main', 'group', 'sticker', 'owner', 'pushkontak']
+                    };
+                    const modeExcludeMap = {
+                        md: ['panel', 'pushkontak', 'store'],
+                        cpanel: null,
+                        store: null,
+                        pushkontak: null
+                    };
+                    
+                    const allowedCats = modeAllowedMap[botMode];
+                    const excludeCats = modeExcludeMap[botMode] || [];
+                    
+                    for (const cat of sortedCats) {
+                        if (cat === 'owner' && !m.isOwner) continue;
+                        if (allowedCats && !allowedCats.includes(cat.toLowerCase())) continue;
+                        if (excludeCats && excludeCats.includes(cat.toLowerCase())) continue;
+                        
+                        const cmds = commandsByCategory[cat] || [];
+                        if (cmds.length === 0) continue;
+                        
+                        const emoji = CATEGORY_EMOJIS[cat] || '📁';
+                        const title = `${emoji} ${toMonoUpperBold(cat)}`;
+                        
+                        categoryRows.push({
+                            header: `${toMonoUpperBold('MENU ' + title)}`,
+                            id: `${prefix}menucat ${cat}`,
+                            title: `Contiene ${cmds.length} comandos`,
+                            description: 'Toca para abrir este menú de categoría'
+                        });
+                    }
+                    
+                    let totalCmds = 0;
+                    for (const cat of categories) {
+                        totalCmds += (commandsByCategory[cat] || []).length;
+                    }
+                    
                     await sock.sendMessage(m.chat, {
                         interactiveMessage: {
-                            title: `Hallo Kak *@${m.pushName}*
+                            title: `Hola *@${m.pushName}*
                             
-Sebelumnya, terima kasih yak sudah menggunakan bot kami
+Antes que nada, gracias por usar nuestro bot
 
-╭─ \`INFORMASI BOT\` 𝜗ৎ
-┆ ᵎᵎ Nama Bot : *${botConfig.bot?.name || 'Ourin-AI'}*
-┆ ᵎᵎ Owner Bot : *${botConfig.owner?.name || 'Ourin-AI'}*
-┆ ᵎᵎ Prefix : *${botConfig.command?.prefix || '.'}*
-┆ ᵎᵎ Total Perintah : *${totalCmds}*
-┆ ᵎᵎ Role Kamu : ${m.isOwner ? 'Owner' : m.isPremium ? "Premium" : "User Biasa"}
+╭─ \`INFORMACIÓN DEL BOT\` 𝜗ৎ
+┆ ᵎᵎ Nombre del bot : *${botConfig.bot?.name || 'Ourin-AI'}*
+┆ ᵎᵎ Owner del bot  : *${botConfig.owner?.name || 'Ourin-AI'}*
+┆ ᵎᵎ Prefijo        : *${botConfig.command?.prefix || '.'}*
+┆ ᵎᵎ Total comandos : *${totalCmds}*
+┆ ᵎᵎ Tu rol         : ${m.isOwner ? 'Owner' : m.isPremium ? "Premium" : "Usuario normal"}
 ╰─────
 
-silahkan tekan tombol dibawah untuk memilih menu`,
+por favor pulsa el botón de abajo para elegir un menú`,
                             footer: botConfig.settings?.footer || `© ${botConfig.bot?.name || 'Ourin-AI'} 2026`,
                             document: fs.readFileSync('./package.json'),
                             mimetype: 'image/png',
@@ -1242,7 +1243,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                             nativeFlowMessage: {
                                 messageParamsJson: JSON.stringify({
                                     limited_time_offer: {
-                                        text: `Gunakan bot ini dengan bijak yak`,
+                                        text: `Usa este bot con responsabilidad`,
                                         url: botConfig.saluran?.url || 'https://whatsapp.com/channel/0029VbB37bgBfxoAmAlsgE0t',
                                         copy_code: botConfig.bot?.name || 'Ourin-AI',
                                         expiration_time: Date.now() * 999
@@ -1250,8 +1251,8 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                                     bottom_sheet: {            
                                         in_thread_buttons_limit: 2,            
                                         divider_indices: [1, 2, 3, 4, 5, 999],            
-                                        list_title: "Pilih Menu",            
-                                        button_title: "🍀 Pilih Menu Disini"          
+                                        list_title: "Elegir menú",            
+                                        button_title: "🍀 Elegir menú aquí"          
                                     },    
                                     tap_target_configuration: {            
                                         title: " X ",            
@@ -1277,10 +1278,10 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                                     {            
                                         name: "single_select",            
                                         buttonParamsJson: JSON.stringify({              
-                                            title: "Pilihan Menu",              
+                                            title: "Opciones de menú",              
                                             sections: [                
                                                 {                  
-                                                    title: "🍀 Silahkan pilih menu yang kamu inginkan",                  
+                                                    title: "🍀 Por favor elige el menú que quieres ver",                  
                                                     highlight_label: botConfig.bot?.name || 'Ourin-AI',                  
                                                     rows: categoryRows                  
                                                 }              
@@ -1291,7 +1292,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                                     {
                                         name: 'cta_url',
                                         buttonParamsJson: JSON.stringify({
-                                            display_text: '🌏 Kunjungi Saluran Kami',
+                                            display_text: '🌏 Visita nuestro canal',
                                             url: botConfig.saluran?.url || '',
                                             merchant_url: botConfig.saluran?.url || ''
                                         })
@@ -1299,14 +1300,14 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                                     {
                                         name: 'quick_reply',
                                         buttonParamsJson: JSON.stringify({
-                                            display_text: '🖐 Owner Kami',
+                                            display_text: '🖐 Nuestro owner',
                                             id: `${m.prefix}owner`
                                         })
                                     },
                                     {
                                         name: 'quick_reply',
                                         buttonParamsJson: JSON.stringify({
-                                            display_text: '🌺 Lihat Semua Menu',
+                                            display_text: '🌺 Ver todos los menús',
                                             id: `${m.prefix}allmenu`
                                         })
                                     },  
@@ -1323,77 +1324,79 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                     await sock.sendMessage(m.chat, fallbackV11, { quoted: getVerifiedQuoted(botConfig) });
                 }
                 break;
+
             case 12:
                 try {
                     const saluranIdV12 = botConfig.saluran?.id || '';
                     const saluranNameV12 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const docuThumbV12 = thumbBuffer || imageBuffer || fs.readFileSync(path.join(process.cwd(), 'assets', 'images', 'ourin-allmenu.jpg'));
                     const prefix = botConfig.command?.prefix || '.';
-                const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter';
-                const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
-                
-                const categories = getCategories();
-                const commandsByCategory = getCommandsByCategory();
-                const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'jpm', 'pushkontak', 'panel', 'user'];
-                
-                const sortedCats = [...categories].sort((a, b) => {
-                    const indexA = categoryOrder.indexOf(a);
-                    const indexB = categoryOrder.indexOf(b);
-                    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-                });
-                
-                const toMonoUpperBold = (text) => {
-                    const chars = {
-                        'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚',
-                        'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡',
-                        'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨',
-                        'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭'
-                    };
-                    return text.toUpperCase().split('').map(c => chars[c] || c).join('');
-                };
-                
-                const categoryRows = [];
-                
-                const modeAllowedMap = {
-                    md: null,
-                    cpanel: ['main', 'group', 'sticker', 'owner', 'tools', 'panel'],
-                    store: ['main', 'group', 'sticker', 'owner', 'store'],
-                    pushkontak: ['main', 'group', 'sticker', 'owner', 'pushkontak']
-                };
-                const modeExcludeMap = {
-                    md: ['panel', 'pushkontak', 'store'],
-                    cpanel: null,
-                    store: null,
-                    pushkontak: null
-                };
-                
-                const allowedCats = modeAllowedMap[botMode];
-                const excludeCats = modeExcludeMap[botMode] || [];
-                
-                for (const cat of sortedCats) {
-                    if (cat === 'owner' && !m.isOwner) continue;
-                    if (allowedCats && !allowedCats.includes(cat.toLowerCase())) continue;
-                    if (excludeCats && excludeCats.includes(cat.toLowerCase())) continue;
+                    const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter';
+                    const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     
-                    const cmds = commandsByCategory[cat] || [];
-                    if (cmds.length === 0) continue;
+                    const categories = getCategories();
+                    const commandsByCategory = getCommandsByCategory();
+                    const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'jpm', 'pushkontak', 'panel', 'user'];
                     
-                    const emoji = CATEGORY_EMOJIS[cat] || '📁';
-                    const title = `${emoji} ${toMonoUpperBold(cat)}`;
-                    
-                    categoryRows.push({
-                        name: 'quick_reply',
-                        buttonParamsJson: JSON.stringify({
-                            display_text: `${toMonoUpperBold(cat)}`,
-                            id: `${m.prefix}menucat ${cat}`
-                        })
+                    const sortedCats = [...categories].sort((a, b) => {
+                        const indexA = categoryOrder.indexOf(a);
+                        const indexB = categoryOrder.indexOf(b);
+                        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
                     });
-                }
-                
-                let totalCmds = 0;
-                for (const cat of categories) {
-                    totalCmds += (commandsByCategory[cat] || []).length;
-                }
+                    
+                    const toMonoUpperBold = (text) => {
+                        const chars = {
+                            'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚',
+                            'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡',
+                            'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨',
+                            'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭'
+                        };
+                        return text.toUpperCase().split('').map(c => chars[c] || c).join('');
+                    };
+                    
+                    const categoryRows = [];
+                    
+                    const modeAllowedMap = {
+                        md: null,
+                        cpanel: ['main', 'group', 'sticker', 'owner', 'tools', 'panel'],
+                        store: ['main', 'group', 'sticker', 'owner', 'store'],
+                        pushkontak: ['main', 'group', 'sticker', 'owner', 'pushkontak']
+                    };
+                    const modeExcludeMap = {
+                        md: ['panel', 'pushkontak', 'store'],
+                        cpanel: null,
+                        store: null,
+                        pushkontak: null
+                    };
+                    
+                    const allowedCats = modeAllowedMap[botMode];
+                    const excludeCats = modeExcludeMap[botMode] || [];
+                    
+                    for (const cat of sortedCats) {
+                        if (cat === 'owner' && !m.isOwner) continue;
+                        if (allowedCats && !allowedCats.includes(cat.toLowerCase())) continue;
+                        if (excludeCats && excludeCats.includes(cat.toLowerCase())) continue;
+                        
+                        const cmds = commandsByCategory[cat] || [];
+                        if (cmds.length === 0) continue;
+                        
+                        const emoji = CATEGORY_EMOJIS[cat] || '📁';
+                        const title = `${emoji} ${toMonoUpperBold(cat)}`;
+                        
+                        categoryRows.push({
+                            name: 'quick_reply',
+                            buttonParamsJson: JSON.stringify({
+                                display_text: `${toMonoUpperBold(cat)}`,
+                                id: `${m.prefix}menucat ${cat}`
+                            })
+                        });
+                    }
+                    
+                    let totalCmds = 0;
+                    for (const cat of categories) {
+                        totalCmds += (commandsByCategory[cat] || []).length;
+                    }
+
                     function formatBytes(bytes, decimals = 2) {
                         if (!Number.isFinite(bytes) || bytes < 0) return "0 B";
                         if (bytes === 0) return "0 B";
@@ -1405,6 +1408,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                         const pretty = fixed.replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
                         return `${pretty} ${units[i]}`;
                     }
+
                     const obj = JSON.parse(fs.readFileSync('./database/main/users.json'));
                     const jsonStr = JSON.stringify(obj);
                     const bytes = Buffer.byteLength(jsonStr, "utf8");
@@ -1414,6 +1418,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                     } catch (error) {
                         pp = fs.readFileSync('./assets/images/pp-kosong.jpg')
                     }
+
                     const zanton = [
                         {            
                             name: "single_select",            
@@ -1430,21 +1435,23 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                         {
                             name: 'quick_reply',
                             buttonParamsJson: JSON.stringify({
-                                display_text: 'Lihat Semua Menu',
+                                display_text: 'Ver todos los menús',
                                 id: `${m.prefix}allmenu`
                             })
                         },  
                     ]
+
                     zanton.push(...categoryRows)
+
                     await sock.sendMessage(m.chat, {
                         interactiveMessage: {
-                            title: `🌾 *𝘏𝘪! ${m.pushName}*
+                            title: `🌾 *Hola, ${m.pushName}*
 
-𝘛𝘩𝘢𝘯𝘬𝘴 𝘧𝘰𝘳 𝘮𝘦𝘴𝘴𝘢𝘨𝘪𝘯𝘨 𝘶𝘴. 𝘠𝘰𝘶’𝘳𝘦 𝘯𝘰𝘸 𝘤𝘩𝘢𝘵𝘵𝘪𝘯𝘨 𝘸𝘪𝘵𝘩 𝘰𝘶𝘳 𝘈𝘶𝘵𝘰𝘮𝘢𝘵𝘪𝘤 𝘞𝘩𝘢𝘵𝘴𝘈𝘱𝘱 𝘉𝘰𝘵. 
+Gracias por escribirnos. Ahora estás hablando con nuestro bot automático de WhatsApp.
 
 ╭─「 *${m.pushName}* 」
-│ • Bot Version     : *${botConfig.bot?.version || '2.1.0'}*
-│ • Database         : ${formatBytes(bytes)}
+│ • Versión del bot : *${botConfig.bot?.version || '2.1.0'}*
+│ • Base de datos   : ${formatBytes(bytes)}
 ╰──`,
                             footer: botConfig.settings?.footer || `© ${botConfig.bot?.name || 'Ourin-AI'} 2026`,
                             document: fs.readFileSync('./package.json'),
@@ -1463,7 +1470,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                             },
                             externalAdReply: {
                                 title: botConfig.bot?.name || 'Ourin-AI',
-                                body: `🍃 OWNER BOT: ${botConfig.owner?.name || 'Ourin-AI'}`,
+                                body: `🍃 OWNER DEL BOT: ${botConfig.owner?.name || 'Ourin-AI'}`,
                                 mediaType: 1,
                                 thumbnail: fs.readFileSync('./assets/images/ourin-v11.jpg') || '',
                                 mediaUrl: botConfig?.info?.website || '',
@@ -1475,8 +1482,8 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                                     bottom_sheet: {            
                                         in_thread_buttons_limit: 2,            
                                         divider_indices: [1, 2, 3, 4, 5, 999],            
-                                        list_title: "SIlahkan pilih category yang ingin dilihat",            
-                                        button_title: "🧾 Tap Here!"          
+                                        list_title: "Por favor elige la categoría que quieres ver",            
+                                        button_title: "🧾 Toca aquí!"          
                                     },    
                                     tap_target_configuration: {            
                                         title: " X ",            
@@ -1492,6 +1499,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                     }, { quoted: {
                         key: {remoteJid: '0@s.whatsapp.net', fromMe: false, id: `ownername`, participant: '0@s.whatsapp.net'}, message: {requestPaymentMessage: {currencyCodeIso4217: "USD", amount1000: 999999999, requestFrom: '0@s.whatsapp.net', noteMessage: { extendedTextMessage: { text: `${botConfig?.bot?.name}`}}, expiryTimestamp: 999999999, amount: {value: 91929291929, offset: 1000, currencyCode: "USD"}}}
                     } });
+
                 } catch (v12Error) {
                     console.error('[Menu V12] Error:', v12Error.message);
                     const fallbackV12 = { contextInfo: getContextInfo(botConfig, m, thumbBuffer) };
@@ -1531,22 +1539,14 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                 try {
                     const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
                     
-                    /**
-                     * Fungsi untuk membuat gambar profil menggunakan @napi-rs/canvas
-                     * @param {Object} data Data user
-                     * @returns {Promise<Buffer>} Buffer gambar PNG
-                     */
                     async function createProfileCard(data) {
-                        // Ukuran kanvas
                         const canvas = createCanvas(800, 250);
                         const ctx = canvas.getContext('2d');
                     
-                        // Tema Warna "Edgy Graphic Design"
-                        const accentColor = '#CCFF00'; // Volt Green (Hijau stabilo/kuning)
+                        const accentColor = '#CCFF00';
                         const fgColor = '#FFFFFF';
                     
-                        // 1. Background Image dengan Kontras Tinggi (Object-fit Cover)
-                        ctx.fillStyle = '#09090B'; // Mencegah background putih transparan WA
+                        ctx.fillStyle = '#09090B';
                         ctx.fillRect(0, 0, 800, 250);
                         try {
                             const bgImage = await loadImage(data.backgroundUrl);
@@ -1571,12 +1571,9 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                             ctx.fillRect(0, 0, 800, 250);
                         }
                     
-                        // Overlay gelap pekat agar terkesan misterius & solid
                         ctx.fillStyle = 'rgba(9, 9, 11, 0.85)';
                         ctx.fillRect(0, 0, 800, 250);
                     
-                        // 2. Bentuk Asimetris (Sentuhan "Human Design")
-                        // Alih-alih kotak rapi, kita buat bidang miring di latar belakang
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
                         ctx.beginPath();
                         ctx.moveTo(0, 0);
@@ -1585,7 +1582,6 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                         ctx.lineTo(0, 250);
                         ctx.fill();
                     
-                        // Garis miring aksen
                         ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
                         ctx.lineWidth = 1;
                         ctx.beginPath();
@@ -1593,25 +1589,20 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                         ctx.lineTo(330, 250);
                         ctx.stroke();
                     
-                        // 3. Tipografi "Watermark" Super Besar di Background
                         ctx.fillStyle = 'rgba(204, 255, 0, 0.05)';
                         ctx.font = '900 150px sans-serif'; 
                         ctx.fillText(`LV${data.level}`, 300, 220);
                     
-                        // 4. Elemen Dekoratif Mikro (Khas Desain Grafis)
-                        // Teks sistem kecil di pojok kiri atas
                         ctx.fillStyle = '#666666';
                         ctx.font = '10px monospace';
                         ctx.fillText('// SYS_ONLINE : USER_PROFILE', 30, 25);
                         ctx.fillText('ID_HASH: ' + Math.random().toString(36).substring(2, 10).toUpperCase(), 30, 40);
                     
-                        // Garis "Barcode" di pojok kanan atas
                         ctx.fillStyle = accentColor;
                         ctx.fillRect(770, 20, 6, 40);
                         ctx.fillRect(760, 20, 2, 40);
                         ctx.fillRect(752, 20, 3, 40);
                     
-                        // 5. Konfigurasi Avatar (Bentuk Lingkaran Rapi)
                         const avatarSize = 130;
                         const avatarX = 50;
                         const avatarY = 60;
@@ -1619,14 +1610,12 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                         const centerY = avatarY + avatarSize / 2;
                         const radius = avatarSize / 2;
                     
-                        // Memotong area avatar menjadi lingkaran
                         ctx.save();
                         ctx.beginPath();
                         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
                         ctx.closePath();
                         ctx.clip(); 
                     
-                        // Memuat gambar avatar
                         try {
                             const avatar = await loadImage(data.avatarUrl);
                             ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
@@ -1636,106 +1625,84 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                         }
                         ctx.restore();
                     
-                        // Bingkai Lingkaran yang Rapi
                         ctx.beginPath();
                         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
-                        ctx.lineWidth = 4; // Ketebalan border
+                        ctx.lineWidth = 4;
                         ctx.strokeStyle = accentColor;
                         ctx.stroke();
-                    
-                        // ==========================================
-                        // AREA TEKS DAN BADGE
-                        // ==========================================
                         
-                        // 6. Nama Pengguna (Besar & Tegas, Jangan di toUpperCase() agar Emoji aman)
                         ctx.fillStyle = fgColor;
                         ctx.font = '900 42px sans-serif'; 
                         let displayName = data.name || 'User';
                         if (displayName.length > 15) displayName = displayName.substring(0, 15) + '...';
                         ctx.fillText(displayName, 230, 100);
                     
-                        // 7. Badge Rank Miring (Slanted Badge)
                         ctx.save();
                         ctx.translate(230, 115);
                         ctx.fillStyle = accentColor;
                         ctx.beginPath();
                         ctx.moveTo(0, 0);
-                        ctx.lineTo(120, 0); // Lebar atas
-                        ctx.lineTo(110, 24); // Miring ke kiri bawah
-                        ctx.lineTo(-10, 24); // Miring ke kiri bawah
+                        ctx.lineTo(120, 0);
+                        ctx.lineTo(110, 24);
+                        ctx.lineTo(-10, 24);
                         ctx.fill();
                         
-                        ctx.fillStyle = '#000000'; // Teks hitam di dalam badge Volt Green
+                        ctx.fillStyle = '#000000';
                         ctx.font = 'bold 14px sans-serif';
                         ctx.fillText(data.rank.toUpperCase(), 10, 17);
                         ctx.restore();
                     
-                        // ==========================================
-                        // AREA PROGRESS BAR (Gaya Segmented/Terputus-putus)
-                        // ==========================================
                         const barX = 230;
-                        const barY = 172; // Posisi bar disesuaikan agar panel teks di bawah lega
+                        const barY = 172;
                         const barWidth = 500;
-                        const segments = 25; // Dibagi 25 kotak kecil
+                        const segments = 25;
                         const gap = 3;
                         const segmentWidth = (barWidth - (gap * (segments - 1))) / segments;
                     
                         const xpRatio = Math.min(data.currentXp / data.requiredXp, 1);
                         const activeSegments = Math.floor(xpRatio * segments);
                     
-                        // Background Bar (Kotak-kotak kosong)
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
                         for (let i = 0; i < segments; i++) {
                             ctx.fillRect(barX + (i * (segmentWidth + gap)), barY, segmentWidth, 8);
                         }
                     
-                        // Foreground Bar (Kotak-kotak terisi)
                         ctx.fillStyle = accentColor;
                         for (let i = 0; i < activeSegments; i++) {
                             ctx.fillRect(barX + (i * (segmentWidth + gap)), barY, segmentWidth, 8);
                         }
                     
-                        // ==========================================
-                        // AREA DETAIL EXP & LEVEL (HUD STYLE)
-                        // ==========================================
-                        const dataY = barY + 18; // Jarak turun dari progress bar
+                        const dataY = barY + 18;
                     
-                        // 1. PANEL EXP (Kiri)
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; // Background transparan putih
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
                         ctx.beginPath();
                         ctx.moveTo(barX, dataY);
-                        ctx.lineTo(barX + 210, dataY); // Ujung atas kanan
-                        ctx.lineTo(barX + 198, dataY + 26); // Ujung bawah kanan (miring ke dalam)
-                        ctx.lineTo(barX, dataY + 26); // Ujung bawah kiri
+                        ctx.lineTo(barX + 210, dataY);
+                        ctx.lineTo(barX + 198, dataY + 26);
+                        ctx.lineTo(barX, dataY + 26);
                         ctx.fill();
                     
-                        // Aksen Garis Volt Green di kiri Panel EXP
                         ctx.fillStyle = accentColor;
                         ctx.fillRect(barX, dataY, 4, 26);
                     
-                        // Teks Label "EXP"
                         ctx.fillStyle = '#FFFFFF';
                         ctx.font = 'bold 13px sans-serif';
                         ctx.textAlign = 'left';
                         ctx.fillText('EXP', barX + 15, dataY + 18);
                     
-                        // Teks Angka EXP Current (Warna Volt Green agar menyala)
                         ctx.fillStyle = accentColor;
                         ctx.font = 'bold 14px monospace';
                         ctx.fillText(data.currentXp.toString(), barX + 50, dataY + 18);
                     
-                        // Pemisah & Angka EXP Max (Warna Abu-abu netral)
                         const currentXpWidth = ctx.measureText(data.currentXp.toString()).width;
                         ctx.fillStyle = '#888888';
                         ctx.font = '14px monospace';
                         ctx.fillText(` / ${data.requiredXp}`, barX + 50 + currentXpWidth, dataY + 18);
                     
-                        // 2. BADGE LEVEL (Kanan)
                         const badgeW = 90;
                         ctx.save();
                         ctx.translate(barX + barWidth - badgeW, dataY);
                         
-                        // Bentuk Badge: Kiri miring (konsisten), kanan lurus (sejajar ujung bar)
                         ctx.fillStyle = accentColor;
                         ctx.beginPath();
                         ctx.moveTo(12, 0); 
@@ -1744,11 +1711,9 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                         ctx.lineTo(0, 26);
                         ctx.fill();
                     
-                        // Teks "LVL X" warna hitam pekat di dalam badge
                         ctx.fillStyle = '#000000';
                         ctx.font = '900 16px sans-serif';
                         ctx.textAlign = 'center';
-                        // Titik X diatur ke 48 agar teks berada tepat di tengah visual panel miring
                         ctx.fillText(`LVL ${data.level}`, 48, 19); 
                         ctx.restore();
                     
@@ -1788,7 +1753,7 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                     isForwarded: true,
                     externalAdReply: {
                         title: botConfig.bot?.name || 'Ourin-AI',
-                        body: `WhatsApp Bot Multi Device`,
+                        body: `Bot de WhatsApp Multi Device`,
                         sourceUrl: botConfig.saluran?.link || '',
                         mediaType: 1,
                         showAdAttribution: false,
@@ -1812,14 +1777,14 @@ silahkan tekan tombol dibawah untuk memilih menu`,
                     }
                     await sock.sendMessage(m.chat, {
                         image: bannerThumbV13,
-                        caption: `🎄 ʜᴀʟʟᴏ *${m.pushName}*
+                        caption: `🎄 ʜᴏʟᴀ *${m.pushName}*
 
-╭─ *✦* \`${toMonoUpperBold('biodata bot')}\` *✦*
+╭─ *✦* \`${toMonoUpperBold('datos del bot')}\` *✦*
 │ ʙᴏᴛ : *${botConfig.bot?.name || 'Ourin-AI'}*
 │ ᴠᴇʀsɪᴏɴ : *${botConfig.bot?.version || '2.1.0'}*
 ╰───
 
-╭─ *✦* \`${toMonoUpperBold(`list category`)}\` *✦*
+╭─ *✦* \`${toMonoUpperBold(`lista de categorías`)}\` *✦*
 ${categories.map(cat => `│ *${m.prefix}menucat ${cat}*`).join('\n')}
 ╰─────────────`,
                         contextInfo: contextInfoV13,
@@ -1843,68 +1808,68 @@ ${categories.map(cat => `│ *${m.prefix}menucat ${cat}*`).join('\n')}
                     const saluranNameV14 = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI';
                     const docuThumbV14 = fs.readFileSync(path.join(process.cwd(), 'assets', 'images', 'ourin-v11.jpg'));
 
-                const categories = getCategories();
-                const commandsByCategory = getCommandsByCategory();
-                const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'jpm', 'pushkontak', 'panel', 'user'];
-                
-                const sortedCats = [...categories].sort((a, b) => {
-                    const indexA = categoryOrder.indexOf(a);
-                    const indexB = categoryOrder.indexOf(b);
-                    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-                });
-                
-                const toMonoUpperBold = (text) => {
-                    const chars = {
-                        'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚',
-                        'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡',
-                        'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨',
-                        'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭'
-                    };
-                    return text.toUpperCase().split('').map(c => chars[c] || c).join('');
-                };
-                
-                const categoryRows = [];
-                
-                const modeAllowedMap = {
-                    md: null,
-                    cpanel: ['main', 'group', 'sticker', 'owner', 'tools', 'panel'],
-                    store: ['main', 'group', 'sticker', 'owner', 'store'],
-                    pushkontak: ['main', 'group', 'sticker', 'owner', 'pushkontak']
-                };
-                const modeExcludeMap = {
-                    md: ['panel', 'pushkontak', 'store'],
-                    cpanel: null,
-                    store: null,
-                    pushkontak: null
-                };
-                
-                const allowedCats = modeAllowedMap[botMode];
-                const excludeCats = modeExcludeMap[botMode] || [];
-                
-                for (const cat of sortedCats) {
-                    if (cat === 'owner' && !m.isOwner) continue;
-                    if (allowedCats && !allowedCats.includes(cat.toLowerCase())) continue;
-                    if (excludeCats && excludeCats.includes(cat.toLowerCase())) continue;
+                    const categories = getCategories();
+                    const commandsByCategory = getCommandsByCategory();
+                    const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'jpm', 'pushkontak', 'panel', 'user'];
                     
-                    const cmds = commandsByCategory[cat] || [];
-                    if (cmds.length === 0) continue;
-                    
-                    const emoji = CATEGORY_EMOJIS[cat] || '📁';
-                    const title = `${emoji} ${toMonoUpperBold(cat)}`;
-                    
-                    categoryRows.push({
-                        name: 'quick_reply',
-                        buttonParamsJson: JSON.stringify({
-                            display_text: `${toMonoUpperBold(cat)}`,
-                            id: `${m.prefix}menucat ${cat}`
-                        })
+                    const sortedCats = [...categories].sort((a, b) => {
+                        const indexA = categoryOrder.indexOf(a);
+                        const indexB = categoryOrder.indexOf(b);
+                        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
                     });
-                }
-                
-                let totalCmds = 0;
-                for (const cat of categories) {
-                    totalCmds += (commandsByCategory[cat] || []).length;
-                }
+                    
+                    const toMonoUpperBold = (text) => {
+                        const chars = {
+                            'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚',
+                            'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡',
+                            'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨',
+                            'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭'
+                        };
+                        return text.toUpperCase().split('').map(c => chars[c] || c).join('');
+                    };
+                    
+                    const categoryRows = [];
+                    
+                    const modeAllowedMap = {
+                        md: null,
+                        cpanel: ['main', 'group', 'sticker', 'owner', 'tools', 'panel'],
+                        store: ['main', 'group', 'sticker', 'owner', 'store'],
+                        pushkontak: ['main', 'group', 'sticker', 'owner', 'pushkontak']
+                    };
+                    const modeExcludeMap = {
+                        md: ['panel', 'pushkontak', 'store'],
+                        cpanel: null,
+                        store: null,
+                        pushkontak: null
+                    };
+                    
+                    const allowedCats = modeAllowedMap[botMode];
+                    const excludeCats = modeExcludeMap[botMode] || [];
+                    
+                    for (const cat of sortedCats) {
+                        if (cat === 'owner' && !m.isOwner) continue;
+                        if (allowedCats && !allowedCats.includes(cat.toLowerCase())) continue;
+                        if (excludeCats && excludeCats.includes(cat.toLowerCase())) continue;
+                        
+                        const cmds = commandsByCategory[cat] || [];
+                        if (cmds.length === 0) continue;
+                        
+                        const emoji = CATEGORY_EMOJIS[cat] || '📁';
+                        const title = `${emoji} ${toMonoUpperBold(cat)}`;
+                        
+                        categoryRows.push({
+                            name: 'quick_reply',
+                            buttonParamsJson: JSON.stringify({
+                                display_text: `${toMonoUpperBold(cat)}`,
+                                id: `${m.prefix}menucat ${cat}`
+                            })
+                        });
+                    }
+                    
+                    let totalCmds = 0;
+                    for (const cat of categories) {
+                        totalCmds += (commandsByCategory[cat] || []).length;
+                    }
                     const obj = JSON.parse(fs.readFileSync('./database/main/users.json'));
                     const jsonStr = JSON.stringify(obj);
                     const bytes = Buffer.byteLength(jsonStr, "utf8");
@@ -1930,80 +1895,80 @@ ${categories.map(cat => `│ *${m.prefix}menucat ${cat}*`).join('\n')}
                         {
                             name: 'quick_reply',
                             buttonParamsJson: JSON.stringify({
-                                display_text: 'Lihat Semua Menu',
+                                display_text: 'Ver todos los menús',
                                 id: `${m.prefix}allmenu`
                             })
                         },  
                     ]
                     zanton.push(...categoryRows)
                     
-    const msg = generateWAMessageFromContent(m.chat, {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: { deviceListMetadata: {}, deviceListMetadataVersion: 2 },
-          interactiveMessage: proto.Message.InteractiveMessage.create({
-            contextInfo: {
-              mentionedJid: [m.sender],
-              forwardingScore: 19,
-              isForwarded: true,
-              forwardedNewsletterMessageInfo: { newsletterId: saluranIdV14, newsletterName: `- ${saluranNameV14}`, serverMessageId: -1 },
-              externalAdReply: {
-                title: botConfig?.bot?.bame,
-                body: null,
-                thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
-                sourceUrl: null,
-                mediaType: 1,
-                renderLargerThumbnail: true,
-              },
-            },
-            header: {
-              title: null,
-              locationMessage: {
-                degreesLatitude: 0,
-                degreesLongitude: 0,
-                name: `꫶ᥫ᭡꫶ ${m.pushName || "User"}`,
-                url: `https://ss.ss`,
-                address: `Semoga harimu menyenangkan :3`,
-                jpegThumbnail: await sharp(docuThumbV14).resize({ width: 300, height: 300 }).toBuffer(),
-              },
-              subtitle: "",
-              hasMediaAttachment: false,
-            },
-            body: { text: null },
-            footer: { text:  `Halo kak *${m.pushName}* ≽^• ˕ • ྀི≼\n` +
-    `*⌞ INFO USER ⌝*\n` +
-    `‧ Number    : +${m.sender.split("@")[0]}\n` +
-    `‧ Name    : ${m.pushName}\n\n` +
-    `*⌞ INFO BOT ⌝*\n` +
-    `‧ Name    : ${botConfig.bot?.name || "Bot"}\n` +
-    `‧ Version : ${botConfig.bot?.version || "v1.0.0"}\n` +
-    `‧ Prefix  : ${m.prefix || "No Prefix"}\n\n` +
-    `*⌞ CARA PAKAI ⌝*\n` +
-    `‧ Klik tombol untuk melihat menu kategori\n` +
-    `‧ Klik *LIHAT SEMUA MENU* untuk seluruh fitur`},
-            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-              buttons: zanton,
-              messageParamsJson: JSON.stringify({
-                bottom_sheet: {
-                  in_thread_buttons_limit: 1,
-                  divider_indices: [1],
-                  list_title: getTimeGreeting(),
-                  button_title: "𖤍",
-                },
-              }),
-            }),
-          }),
-        },
-      },
-    }, { 
-      quoted: m,
-      userJid: sock.user?.id 
-    });
+                    const msg = generateWAMessageFromContent(m.chat, {
+                      viewOnceMessage: {
+                        message: {
+                          messageContextInfo: { deviceListMetadata: {}, deviceListMetadataVersion: 2 },
+                          interactiveMessage: proto.Message.InteractiveMessage.create({
+                            contextInfo: {
+                              mentionedJid: [m.sender],
+                              forwardingScore: 19,
+                              isForwarded: true,
+                              forwardedNewsletterMessageInfo: { newsletterId: saluranIdV14, newsletterName: `- ${saluranNameV14}`, serverMessageId: -1 },
+                              externalAdReply: {
+                                title: botConfig?.bot?.bame,
+                                body: null,
+                                thumbnail: fs.readFileSync("./assets/images/ourin.jpg"),
+                                sourceUrl: null,
+                                mediaType: 1,
+                                renderLargerThumbnail: true,
+                              },
+                            },
+                            header: {
+                              title: null,
+                              locationMessage: {
+                                degreesLatitude: 0,
+                                degreesLongitude: 0,
+                                name: `꫶ᥫ᭡꫶ ${m.pushName || "Usuario"}`,
+                                url: `https://ss.ss`,
+                                address: `Espero que tengas un lindo día :3`,
+                                jpegThumbnail: await sharp(docuThumbV14).resize({ width: 300, height: 300 }).toBuffer(),
+                              },
+                              subtitle: "",
+                              hasMediaAttachment: false,
+                            },
+                            body: { text: null },
+                            footer: { text:  `Hola *${m.pushName}* ≽^• ˕ • ྀི≼\n` +
+                            `*⌞ INFO USUARIO ⌝*\n` +
+                            `‧ Número  : +${m.sender.split("@")[0]}\n` +
+                            `‧ Nombre  : ${m.pushName}\n\n` +
+                            `*⌞ INFO BOT ⌝*\n` +
+                            `‧ Nombre   : ${botConfig.bot?.name || "Bot"}\n` +
+                            `‧ Versión  : ${botConfig.bot?.version || "v1.0.0"}\n` +
+                            `‧ Prefijo  : ${m.prefix || "Sin prefijo"}\n\n` +
+                            `*⌞ CÓMO USAR ⌝*\n` +
+                            `‧ Haz clic en el botón para ver el menú por categoría\n` +
+                            `‧ Haz clic en *VER TODOS LOS MENÚS* para ver todas las funciones`},
+                            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                              buttons: zanton,
+                              messageParamsJson: JSON.stringify({
+                                bottom_sheet: {
+                                  in_thread_buttons_limit: 1,
+                                  divider_indices: [1],
+                                  list_title: getTimeGreeting(),
+                                  button_title: "𖤍",
+                                },
+                              }),
+                            }),
+                          }),
+                        },
+                      },
+                    }, { 
+                      quoted: m,
+                      userJid: sock.user?.id 
+                    });
 
-    await sock.relayMessage(msg.key.remoteJid, msg.message, { 
-      messageId: msg.key.id,
-      quoted: m
-    });
+                    await sock.relayMessage(msg.key.remoteJid, msg.message, { 
+                      messageId: msg.key.id,
+                      quoted: m
+                    });
                 } catch (v14Error) {
                     console.error('[Menu V14] Error:', v14Error.message);
                     const fallbackV14 = { contextInfo: getContextInfo(botConfig, m, thumbBuffer) };
@@ -2014,6 +1979,7 @@ ${categories.map(cat => `│ *${m.prefix}menucat ${cat}*`).join('\n')}
                     } });
                 }
                 break;
+
             default:
                 await m.reply(text);
         }
