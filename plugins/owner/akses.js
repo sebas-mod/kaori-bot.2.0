@@ -2,12 +2,12 @@ const { getDatabase } = require('../../src/lib/ourin-database')
 const ms = require('ms')
 
 const pluginConfig = {
-    name: 'akses',
-    alias: ['addakses', 'delakses', 'listakses', 'addaccess', 'delaccess', 'listaccess'],
+    name: 'acceso',
+    alias: ['daracceso', 'quitaracceso', 'listacceso'],
     category: 'owner',
-    description: 'Grant temporary/permanent command access to users',
-    usage: '.addakses <cmd> <duration> <user>',
-    example: '.addakses addowner 30d @user',
+    description: 'Dar acceso temporal o permanente a comandos',
+    usage: '.daracceso <cmd> <duración> <usuario>',
+    example: '.daracceso addowner 30d @user',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -17,14 +17,17 @@ const pluginConfig = {
     isEnabled: true
 }
 
-async function handler(m, { sock, plugins }) {
+async function handler(m, { sock }) {
     const db = getDatabase()
     const cmd = m.command.toLowerCase()
-    const isAdd = ['addakses', 'addaccess'].includes(cmd)
-    const isDel = ['delakses', 'delaccess'].includes(cmd)
-    const isList = ['listakses', 'listaccess'].includes(cmd)
+
+    const isAdd = ['daracceso'].includes(cmd)
+    const isDel = ['quitaracceso'].includes(cmd)
+    const isList = ['listacceso'].includes(cmd)
+
     let target = m.mentionedJid?.[0]
     if (!target && m.quoted) target = m.quoted.sender
+
     if (!target && m.args.length > 0) {
         for (const arg of m.args) {
             if (/^\d{5,15}$/.test(arg)) {
@@ -36,146 +39,132 @@ async function handler(m, { sock, plugins }) {
             }
         }
     }
+
     let commandTarget = null
     let durationTarget = null
+
     if (isAdd) {
-        if (!target) return m.reply(`❌ *Target Invalid*\n\nTag user / Reply chat / Tulis nomor target`)
+        if (!target) return m.reply(`❌ Usuario inválido\n\nTag / reply o número`)
+
         const cleanArgs = m.args.filter(a => !a.includes('@') && !/^\d{10,}$/.test(a))
+
         if (cleanArgs.length < 2) {
             return m.reply(
-                `⚠️ *Format Salah*\n\n` +
-                `Format: \`${m.prefix}addakses <command> <durasi> <target>\`\n\n` +
-                `*Contoh:*\n` +
-                `> \`${m.prefix}addakses addowner 30d @user\` (30 Hari)\n` +
-                `> \`${m.prefix}addakses unban permanent @user\` (Selamanya)\n\n` +
-                `*Durasi Support:* 1h, 1d, 30d, 1y`
+                `⚠️ Formato incorrecto\n\n` +
+                `Uso: \`${m.prefix}daracceso <cmd> <duración> <usuario>\`\n\n` +
+                `Ejemplo:\n` +
+                `> ${m.prefix}daracceso addowner 30d @user\n` +
+                `> ${m.prefix}daracceso ban permanente @user`
             )
         }
+
         commandTarget = cleanArgs[0].toLowerCase()
         durationTarget = cleanArgs[1].toLowerCase()
     }
-    
+
     const user = db.getUser(target) || {}
     if (!user.access) user.access = []
+
+    // LISTAR
     if (isList) {
-        if (!target) target = m.sender 
+        if (!target) target = m.sender
+
         const targetData = db.getUser(target) || {}
         const accessList = targetData.access || []
         const now = Date.now()
-        const activeAccess = accessList.filter(a => a.expired === null || a.expired > now)
-        if (activeAccess.length !== accessList.length) {
-            targetData.access = activeAccess
+
+        const active = accessList.filter(a => a.expired === null || a.expired > now)
+
+        if (active.length !== accessList.length) {
+            targetData.access = active
             db.setUser(target, targetData)
         }
-        
-        if (activeAccess.length === 0) {
-            return m.reply(`📊 *ᴜsᴇʀ ᴀᴄᴄᴇss*\n\nTarget: @${target.split('@')[0]}\nStatus: *Tidak punya akses khusus*`)
+
+        if (active.length === 0) {
+            return m.reply(`📊 Accesos\n\n@${target.split('@')[0]} no tiene accesos`)
         }
-        
-        let txt = `📊 *ᴜsᴇʀ ᴀᴄᴄᴇss*\n\n`
-        txt += `Target: @${target.split('@')[0]}\n`
-        txt += `Total: *${activeAccess.length}* commands\n`
-        txt += `━━━━━━━━━━━━━━━\n\n`
-        
-        activeAccess.forEach((acc, i) => {
-            let expiredTxt = '♾️ Permanent'
+
+        let txt = `📊 *ACCESOS*\n\n`
+        txt += `Usuario: @${target.split('@')[0]}\n`
+        txt += `Total: ${active.length}\n\n`
+
+        active.forEach((acc, i) => {
+            let exp = '∞ Permanente'
             if (acc.expired) {
-                const timeLeft = acc.expired - now
-                if (timeLeft > 0) {
-                    expiredTxt = '🕕 ' + ms(timeLeft, { long: true })
-                } else {
-                    expiredTxt = '🔴 Expired'
-                }
+                const left = acc.expired - now
+                exp = left > 0 ? ms(left, { long: true }) : 'Expirado'
             }
-            
-            txt += `${i+1}. *${acc.cmd}*\n`
-            txt += `   └ ${expiredTxt}\n`
+
+            txt += `${i + 1}. ${acc.cmd}\n`
+            txt += `   └ ${exp}\n`
         })
-        
-        return sock.sendMessage(m.chat, {
-            text: txt,
-            mentions: [target]
-        }, { quoted: m })
+
+        return sock.sendMessage(m.chat, { text: txt, mentions: [target] }, { quoted: m })
     }
+
+    // AGREGAR
     if (isAdd) {
         let expiredTime = null
-        if (durationTarget !== 'permanent' && durationTarget !== 'perm') {
-            try {
-                const durationMs = ms(durationTarget)
-                if (!durationMs) return m.reply(`❌ Format durasi salah! Gunakan: 1h, 1d, 30d`)
-                expiredTime = Date.now() + durationMs
-            } catch {
-                return m.reply(`❌ Format durasi tidak dikenali!`)
-            }
+
+        if (durationTarget !== 'permanente' && durationTarget !== 'perm') {
+            const durationMs = ms(durationTarget)
+            if (!durationMs) return m.reply(`❌ Duración inválida (usa: 1h, 1d, 30d)`)
+            expiredTime = Date.now() + durationMs
         }
-        
-        const existingIdx = user.access.findIndex(a => a.cmd === commandTarget)
-        if (existingIdx !== -1) {
-            user.access[existingIdx].expired = expiredTime
+
+        const idx = user.access.findIndex(a => a.cmd === commandTarget)
+
+        if (idx !== -1) {
+            user.access[idx].expired = expiredTime
             db.setUser(target, user)
+
             return m.reply(
-                `✅ *ᴀᴋsᴇs ᴅɪᴘᴇʀʙᴀʀᴜɪ*\n\n` +
-                `Command: \`${commandTarget}\`\n` +
-                `Durasi: *${durationTarget}*\n` +
-                `Target: @${target.split('@')[0]}`
+                `✅ Acceso actualizado\n\n` +
+                `Cmd: ${commandTarget}\n` +
+                `Duración: ${durationTarget}\n` +
+                `Usuario: @${target.split('@')[0]}`
             )
         }
+
         user.access.push({
             cmd: commandTarget,
             expired: expiredTime
         })
-        
-        // console.log('[DEBUG AddAccess] Saving user with access:', JSON.stringify(user.access))
+
         db.setUser(target, user)
-        // console.log('[DEBUG AddAccess] After save:', JSON.stringify(db.getUser(target)?.access))
-        
-        await sock.sendMessage(m.chat, {
-            text: `✅ *ᴀᴋsᴇs ᴅɪʙᴇʀɪᴋᴀɴ*\n\n` +
-                `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-                `┃ 🔑 ᴄᴍᴅ: \`${commandTarget}\`\n` +
-                `┃ ⏱️ ᴅᴜʀᴀsɪ: *${durationTarget}*\n` +
-                `┃ 👤 ᴛᴀʀɢᴇᴛ: @${target.split('@')[0]}\n` +
-                `╰┈┈⬡`,
+
+        return sock.sendMessage(m.chat, {
+            text:
+                `✅ Acceso otorgado\n\n` +
+                `Cmd: ${commandTarget}\n` +
+                `Duración: ${durationTarget}\n` +
+                `Usuario: @${target.split('@')[0]}`,
             mentions: [target]
         }, { quoted: m })
     }
+
+    // ELIMINAR
     if (isDel) {
-        if (!target) return m.reply(`❌ Tag user yang mau dihapus aksesnya!`)
-        const now = Date.now()
-        const activeAccess = user.access.filter(a => a.expired === null || a.expired > now)
+        if (!target) return m.reply(`❌ Tag usuario`)
+
         let specificCmd = m.args.find(a => !a.includes('@') && !/^\d+$/.test(a))
+
         if (specificCmd) {
             specificCmd = specificCmd.toLowerCase()
+
             const idx = user.access.findIndex(a => a.cmd === specificCmd)
-            if (idx === -1) return m.reply(`❌ User tidak punya akses command \`${specificCmd}\``)
-            
+            if (idx === -1) return m.reply(`❌ No tiene ese acceso`)
+
             user.access.splice(idx, 1)
             db.setUser(target, user)
-            return m.reply(`✅ Akses \`${specificCmd}\` berhasil dicabut dari @${target.split('@')[0]}`)
+
+            return m.reply(`✅ Acceso ${specificCmd} eliminado`)
         }
-        
-        if (activeAccess.length === 0) {
-            return m.reply(`⚠️ User ini tidak memiliki akses command apapun.`)
-        }
-        const rows = activeAccess.map(acc => {
-            const exp = acc.expired ? ms(acc.expired - now) : 'Permanent'
-            return {
-                title: `Hapus: ${acc.cmd}`,
-                description: `Sisa durasi: ${exp}`,
-                id: `${m.prefix}delakses ${acc.cmd} ${target}`
-            }
-        })
-        const listMessage = {
-            text: `🔓 *CABUT AKSES*\n\nPilih akses command yang ingin dihapus dari @${target.split('@')[0]}`,
-            title: "Manage Access",
-            buttonText: "PILIH COMMAND",
-            sections: [{
-                title: "Active Access List",
-                rows: rows
-            }]
-        }
-        
-        return sock.sendMessage(m.chat, listMessage, { quoted: m })
+
+        user.access = []
+        db.setUser(target, user)
+
+        return m.reply(`✅ Todos los accesos eliminados`)
     }
 }
 
