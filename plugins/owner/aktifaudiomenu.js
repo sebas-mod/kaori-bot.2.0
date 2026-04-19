@@ -1,12 +1,12 @@
 const { getDatabase } = require('../../src/lib/ourin-database')
 
 const pluginConfig = {
-    name: 'aktifaudiomenu',
-    alias: ['audiomenu', 'setaudiomenu', 'toggleaudiomenu'],
+    name: 'audiomenu',
+    alias: ['setaudio', 'toggleaudio', 'menuaudio'],
     category: 'owner',
-    description: 'Toggle audio saat menampilkan menu',
-    usage: '.aktifaudiomenu ya/gak',
-    example: '.aktifaudiomenu ya',
+    description: 'Activar o desactivar audio en el menú',
+    usage: '.audiomenu on/off',
+    example: '.audiomenu on',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -16,7 +16,7 @@ const pluginConfig = {
     isEnabled: true
 }
 
-async function handler(m, { sock, db }) {
+async function handler(m, { db }) {
     const args = m.args || []
     const option = args[0]?.toLowerCase()
 
@@ -24,35 +24,35 @@ async function handler(m, { sock, db }) {
 
     if (!option) {
         return m.reply(
-            `🔊 *ᴀᴜᴅɪᴏ ᴍᴇɴᴜ sᴇᴛᴛɪɴɢ*\n\n` +
-            `> Status: *${current ? '✅ Aktif' : '❌ Nonaktif'}*\n\n` +
-            `*Cara pakai:*\n` +
-            `> \`${m.prefix}aktifaudiomenu ya\` - Aktifkan audio\n` +
-            `> \`${m.prefix}aktifaudiomenu gak\` - Nonaktifkan audio`
+            `🔊 *CONFIG AUDIO MENU*\n\n` +
+            `Estado: *${current ? '✅ Activado' : '❌ Desactivado'}*\n\n` +
+            `Uso:\n` +
+            `> \`${m.prefix}audiomenu on\`\n` +
+            `> \`${m.prefix}audiomenu off\``
         )
     }
 
-    if (option === 'ya' || option === 'on' || option === '1' || option === 'aktif') {
-        if (current) {
-            return m.reply(`⚠️ Audio menu sudah aktif!`)
-        }
+    if (['on', '1', 'activar', 'si', 'sí'].includes(option)) {
+        if (current) return m.reply(`⚠️ Ya está activado`)
+
         db.setting('audioMenu', true)
         await db.save()
+
         m.react('✅')
-        return m.reply(`✅ Audio menu *diaktifkan*!\n\n> Sekarang ketika ada yang ketik \`.menu\`, audio akan muncul.`)
+        return m.reply(`✅ Audio del menú activado`)
     }
 
-    if (option === 'gak' || option === 'off' || option === '0' || option === 'nonaktif') {
-        if (!current) {
-            return m.reply(`⚠️ Audio menu sudah nonaktif!`)
-        }
+    if (['off', '0', 'desactivar', 'no'].includes(option)) {
+        if (!current) return m.reply(`⚠️ Ya está desactivado`)
+
         db.setting('audioMenu', false)
         await db.save()
+
         m.react('✅')
-        return m.reply(`❌ Audio menu *dinonaktifkan*!\n\n> Sekarang \`.menu\` tidak akan ada audio.`)
+        return m.reply(`❌ Audio del menú desactivado`)
     }
 
-    return m.reply(`❌ Opsi tidak valid!\n\nGunakan: \`ya\` atau \`gak\``)
+    return m.reply(`❌ Opción inválida\nUsa: on / off`)
 }
 
 module.exports = {
