@@ -4,9 +4,9 @@ const pluginConfig = {
     name: 'delenergi',
     alias: ['kurangenergi', 'removeenergi', 'hapusenergi', 'delenergy'],
     category: 'owner',
-    description: 'Kurangi energi user',
-    usage: '.delenergi <jumlah> @user',
-    example: '.delenergi 50 @user',
+    description: 'Reducir la energía de un usuario',
+    usage: '.delenergi <cantidad> @usuario',
+    example: '.delenergi 50 @usuario',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -17,7 +17,7 @@ const pluginConfig = {
 }
 
 function formatNumber(num) {
-    if (num === -1) return '∞ Unlimited'
+    if (num === -1) return '∞ Ilimitado'
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
@@ -42,21 +42,21 @@ async function handler(m, { sock }) {
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `⚡ *ᴅᴇʟ ᴇɴᴇʀɢɪ*\n\n` +
-            `> \`.delenergi <jumlah>\` - dari diri sendiri\n` +
-            `> \`.delenergi <jumlah> @user\` - dari user\n\n` +
-            `\`Contoh: ${m.prefix}delenergi 50\``
+            `⚡ *ELIMINAR ENERGÍA*\n\n` +
+            `> \`.delenergi <cantidad>\` - de ti mismo\n` +
+            `> \`.delenergi <cantidad> @usuario\` - de otro usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}delenergi 50\``
         )
     }
     
     if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah harus lebih dari 0`)
+        return m.reply(`❌ *ERROR*\n\n> La cantidad debe ser mayor a 0`)
     }
     
     const user = db.getUser(targetJid)
     
     if (!user) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan di database`)
+        return m.reply(`❌ *ERROR*\n\n> Usuario no encontrado en la base de datos`)
     }
     
     if (user.energi === -1) {
@@ -68,11 +68,11 @@ async function handler(m, { sock }) {
     m.react('✅')
     
     await m.reply(
-        `✅ *ᴇɴᴇʀɢɪ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 ᴜsᴇʀ: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ ᴋᴜʀᴀɴɢ: *-${formatNumber(amount)}*\n` +
-        `┃ ⚡ sɪsᴀ: *${formatNumber(newEnergi)}*\n` +
+        `✅ *ENERGÍA REDUCIDA*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Reducido: *-${formatNumber(amount)}*\n` +
+        `┃ ⚡ Restante: *${formatNumber(newEnergi)}*\n` +
         `╰┈┈⬡`,
         { mentions: [targetJid] }
     )
