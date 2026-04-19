@@ -4,9 +4,9 @@ const pluginConfig = {
     name: 'delkoin',
     alias: ['kurangkoin', 'removekoin', 'delcoin', 'delmoney'],
     category: 'owner',
-    description: 'Kurangi koin user',
-    usage: '.delkoin <jumlah> @user',
-    example: '.delkoin 50000 @user',
+    description: 'Reducir monedas de un usuario',
+    usage: '.delkoin <cantidad> @usuario',
+    example: '.delkoin 50000 @usuario',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -45,21 +45,21 @@ async function handler(m, { sock }) {
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `💰 *ᴅᴇʟ ᴋᴏɪɴ*\n\n` +
-            `> \`.delkoin <jumlah>\` - dari diri sendiri\n` +
-            `> \`.delkoin <jumlah> @user\` - dari user\n\n` +
-            `\`Contoh: ${m.prefix}delkoin 50000\``
+            `💰 *ELIMINAR MONEDAS*\n\n` +
+            `> \`.delkoin <cantidad>\` - de ti mismo\n` +
+            `> \`.delkoin <cantidad> @usuario\` - de otro usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}delkoin 50000\``
         )
     }
     
     if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah harus lebih dari 0`)
+        return m.reply(`❌ *ERROR*\n\n> La cantidad debe ser mayor a 0`)
     }
     
     const user = db.getUser(targetJid)
     
     if (!user) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan di database`)
+        return m.reply(`❌ *ERROR*\n\n> Usuario no encontrado en la base de datos`)
     }
     
     const newKoin = db.updateKoin(targetJid, -amount)
@@ -67,11 +67,11 @@ async function handler(m, { sock }) {
     m.react('✅')
     
     await m.reply(
-        `✅ *ᴋᴏɪɴ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 ᴜsᴇʀ: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ ᴋᴜʀᴀɴɢ: *-${formatKoin(amount)}*\n` +
-        `┃ 💰 sɪsᴀ: *${formatKoin(newKoin)}*\n` +
+        `✅ *MONEDAS REDUCIDAS*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Reducido: *-${formatKoin(amount)}*\n` +
+        `┃ 💰 Restante: *${formatKoin(newKoin)}*\n` +
         `╰┈┈⬡`,
         { mentions: [targetJid] }
     )
