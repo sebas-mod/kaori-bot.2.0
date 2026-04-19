@@ -7,8 +7,8 @@ const pluginConfig = {
     name: 'colongpp',
     alias: ['stealpp', 'malingpp', 'ambilpp'],
     category: 'owner',
-    description: 'Ambil & pakai foto profil target sebagai PP bot',
-    usage: '.colongpp (reply pesan target)',
+    description: 'Tomar y usar la foto de perfil del objetivo como PP del bot',
+    usage: '.colongpp (responder mensaje del objetivo)',
     example: '.colongpp',
     isOwner: true,
     isPremium: false,
@@ -36,10 +36,10 @@ async function handler(m, { sock }) {
 
     if (!targetJid) {
         return m.reply(
-            `🕵️ *ᴄᴏʟᴏɴɢ ᴘᴘ*\n\n` +
-            `> Reply pesan seseorang untuk mencuri PP-nya\n\n` +
-            `*ᴄᴀʀᴀ:*\n` +
-            `> Reply pesan target → \`${m.prefix}colongpp\``
+            `🕵️ *ROBAR FOTO DE PERFIL*\n\n` +
+            `> Responde al mensaje de alguien para tomar su foto de perfil\n\n` +
+            `*CÓMO USAR:*\n` +
+            `> Responde al mensaje del objetivo → \`${m.prefix}colongpp\``
         )
     }
 
@@ -47,7 +47,7 @@ async function handler(m, { sock }) {
 
     try {
         let ppBuffer
-        let source = 'profil'
+        let source = 'perfil'
 
         try {
             const ppUrl = await sock.profilePictureUrl(targetJid, 'image')
@@ -56,7 +56,7 @@ async function handler(m, { sock }) {
         } catch {
             const res = await axios.get(FALLBACK_PP, { responseType: 'arraybuffer', timeout: 15000 })
             ppBuffer = Buffer.from(res.data)
-            source = 'default (target tidak punya PP)'
+            source = 'default (el usuario no tiene foto)'
         }
 
         const processed = await resizeForPP(ppBuffer)
@@ -66,9 +66,9 @@ async function handler(m, { sock }) {
         const targetNumber = targetJid.split('@')[0]
         await m.react('✅')
         return m.reply(
-            `✅ *ᴘᴘ ʙᴇʀʜᴀsɪʟ ᴅɪᴄᴏʟᴏɴɢ!*\n\n` +
-            `> 🎯 Target: @${targetNumber}\n` +
-            `> 📸 Sumber: ${source}`,
+            `✅ *¡FOTO DE PERFIL OBTENIDA!*\n\n` +
+            `> 🎯 Objetivo: @${targetNumber}\n` +
+            `> 📸 Fuente: ${source}`,
             { mentions: [targetJid] }
         )
     } catch (err) {
