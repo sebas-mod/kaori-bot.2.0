@@ -8,7 +8,7 @@ const pluginConfig = {
     name: 'backupsc',
     alias: ['backup', 'backupscript', 'backupsource'],
     category: 'owner',
-    description: 'Backup script bot dalam bentuk zip di root folder',
+    description: 'Respaldar el script del bot en formato zip en la carpeta raíz',
     usage: '.backupsc',
     example: '.backupsc',
     isOwner: true,
@@ -69,7 +69,7 @@ function shouldExclude(filePath, basePath) {
 async function handler(m, { sock }) {
     m.react('🕕')
     
-    await m.reply(`📦 *ʙᴀᴄᴋᴜᴘ sᴄʀɪᴘᴛ*\n\n> Memproses backup...\n> Mohon tunggu sebentar...`)
+    await m.reply(`📦 *BACKUP DEL SCRIPT*\n\n> Procesando backup...\n> Por favor espera un momento...`)
     
     try {
         const projectRoot = process.cwd()
@@ -107,11 +107,11 @@ async function handler(m, { sock }) {
                                 archive.file(fullPath, { name: relativePath })
                             }
                         } catch (e) {
-                            console.log(`[Backup] Skip: ${fullPath}`)
+                            console.log(`[Backup] Omitido: ${fullPath}`)
                         }
                     }
                 } catch (e) {
-                    console.log(`[Backup] Error reading: ${dirPath}`)
+                    console.log(`[Backup] Error leyendo: ${dirPath}`)
                 }
             }
             
@@ -129,14 +129,14 @@ async function handler(m, { sock }) {
             document: fs.readFileSync(zipFilePath),
             fileName: zipFileName,
             mimetype: 'application/zip',
-            caption: `✅ *ʙᴀᴄᴋᴜᴘ sᴇʟᴇsᴀɪ*\n\n` +
-                `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-                `┃ 📝 ɴᴀᴍᴀ: \`${zipFileName}\`\n` +
-                `┃ 📊 sɪᴢᴇ: \`${fileSizeMB} MB\`\n` +
-                `┃ 📅 ᴛᴀɴɢɢᴀʟ: \`${moment().tz('Asia/Jakarta').format('DD/MM/YYYY')}\`\n` +
-                `┃ 📂 ʟᴏᴋᴀsɪ: \`Root folder\`\n` +
+            caption: `✅ *BACKUP COMPLETADO*\n\n` +
+                `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+                `┃ 📝 Nombre: \`${zipFileName}\`\n` +
+                `┃ 📊 Tamaño: \`${fileSizeMB} MB\`\n` +
+                `┃ 📅 Fecha: \`${moment().tz('Asia/Jakarta').format('DD/MM/YYYY')}\`\n` +
+                `┃ 📂 Ubicación: \`Carpeta raíz\`\n` +
                 `╰┈┈⬡\n\n` +
-                `> Exclude: node_modules, .git, storage, logs`,
+                `> Excluye: node_modules, .git, storage, logs`,
             contextInfo: {
                 forwardingScore: 9999,
                 isForwarded: true,
@@ -150,7 +150,7 @@ async function handler(m, { sock }) {
         
         m.react('✅')
         
-        await m.reply(`📂 *ʟᴏᴋᴀsɪ ꜰɪʟᴇ*\n\n> \`${zipFilePath}\``)
+        await m.reply(`📂 *UBICACIÓN DEL ARCHIVO*\n\n> \`${zipFilePath}\``)
         
     } catch (error) {
         m.react('☢')
