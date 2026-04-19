@@ -152,8 +152,7 @@ Puedes usarme para buscar información, obtener datos o ayudarte con tareas simp
         
         txt += `╭┈┈⬡「 ${emoji} *${categoryName}* 」\n`
         for (const cmd of allCmds) {
-            const symbols = getCommandSymbols(cmd)
-            txt += `┃ ◦ *${prefix}${toSmallCaps(cmd)}*${symbols}\n`
+            txt += `┃ ◦ *${prefix}${toSmallCaps(cmd)}*\n`
         }
         txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
     }
