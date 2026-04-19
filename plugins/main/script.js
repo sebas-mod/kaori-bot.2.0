@@ -6,7 +6,7 @@ const pluginConfig = {
     name: 'script',
     alias: ['sc', 'sourcecode', 'source'],
     category: 'main',
-    description: 'Dapatkan source code bot',
+    description: 'Obtén el código fuente del bot',
     usage: '.script',
     example: '.script',
     isOwner: false,
@@ -37,12 +37,12 @@ async function handler(m, { sock }) {
         await sock.sendMessage(m.chat, {
             productMessage: {
                 title: `${botName}`,
-                description: `Source code WhatsApp Bot ${botName}\n\nFitur:\n• Multi-device support\n• 500+ Commands\n• Anti-spam & Anti-link\n• Game & RPG System\n• Panel Management\n• Auto-update`,
+                description: `Código fuente del bot de WhatsApp ${botName}\n\nCaracterísticas:\n• Soporte multi-dispositivo\n• 500+ comandos\n• Anti-spam y anti-link\n• Sistema de juegos y RPG\n• Gestión de panel\n• Auto-actualización`,
                 thumbnail: thumbBuffer ? { url: thumbPath } : undefined,
                 productId: 'SCRIPT001',
                 retailerId: botName,
                 url: scriptUrl,
-                body: `Dapatkan script ${botName} sekarang!`,
+                body: `¡Obtén el script de ${botName} ahora!`,
                 footer: footer,
                 priceAmount1000: scriptPrice * 1000,
                 currencyCode: 'IDR',
@@ -50,7 +50,7 @@ async function handler(m, { sock }) {
                     {
                         name: 'cta_url',
                         buttonParamsJson: JSON.stringify({
-                            display_text: '📦 Download di GitHub',
+                            display_text: '📦 Descargar en GitHub',
                             url: scriptUrl
                         })
                     }
@@ -73,12 +73,12 @@ async function handler(m, { sock }) {
         await m.reply(
             `📦 *${botName} sᴄʀɪᴘᴛ*\n\n` +
             `╭┈┈⬡「 📋 *ɪɴꜰᴏ* 」\n` +
-            `┃ 📝 ɴᴀᴍᴀ: ${botName}\n` +
-            `┃ 💰 ʜᴀʀɢᴀ: ${config.script?.price ? `Rp ${config.script.price.toLocaleString('id-ID')}` : 'FREE'}\n` +
-            `┃ 🔗 ɢɪᴛʜᴜʙ: ${scriptUrl}\n` +
-            `┃ 📢 sᴀʟᴜʀᴀɴ: ${saluranUrl}\n` +
+            `┃ 📝 Nombre: ${botName}\n` +
+            `┃ 💰 Precio: ${config.script?.price ? `Rp ${config.script.price.toLocaleString('id-ID')}` : 'GRATIS'}\n` +
+            `┃ 🔗 GitHub: ${scriptUrl}\n` +
+            `┃ 📢 Canal: ${saluranUrl}\n` +
             `╰┈┈⬡\n\n` +
-            `> Hubungi owner untuk info lebih lanjut`
+            `> Contacta al owner para más información`
         )
     }
 }
