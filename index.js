@@ -416,7 +416,7 @@ async function main() {
         startSewaChecker(sock);
         initScheduler(config, sock);
         //initAutoJpmScheduler(sock);
-        initSholatScheduler(sock);
+        //initSholatScheduler(sock);
         try {
           const { initSahurCron } = require('./plugins/religi/autosahur');
           initSahurCron(sock);
