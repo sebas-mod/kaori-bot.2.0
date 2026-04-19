@@ -5,7 +5,7 @@ const pluginConfig = {
     name: 'stats',
     alias: ['botstats', 'status', 'stat'],
     category: 'main',
-    description: 'Menampilkan statistik bot',
+    description: 'Muestra las estadísticas del bot',
     usage: '.stats',
     example: '.stats',
     isOwner: false,
@@ -55,22 +55,22 @@ async function handler(m, { sock, db, uptime, config: botConfig }) {
         const totalGroups = Object.keys(groups).length
         const premiumUsers = Object.values(users).filter(u => u.premium).length
 
-        const statsText = `📊 *ʙᴏᴛ sᴛᴀᴛɪsᴛɪᴄs*\n\n` +
+        const statsText = `📊 *ᴇsᴛᴀᴅíꜱᴛɪᴄᴀꜱ ᴅᴇʟ ʙᴏᴛ*\n\n` +
             `\`\`\`━━━ ɪɴꜰᴏ ━━━\`\`\`\n` +
             `> *Bot:* ${botConfig?.bot?.name || 'Ourin-AI'}\n` +
-            `> *Version:* v${botConfig?.bot?.version || '1.0.0'}\n` +
+            `> *Versión:* v${botConfig?.bot?.version || '1.0.0'}\n` +
             `> *Uptime:* ${formatUptime(uptime)}\n\n` +
-            `\`\`\`━━━ ᴅᴀᴛᴀʙᴀsᴇ ━━━\`\`\`\n` +
-            `> 👥 Users: ${totalUsers}\n` +
+            `\`\`\`━━━ ʙᴀꜱᴇ ᴅᴇ ᴅᴀᴛᴏꜱ ━━━\`\`\`\n` +
+            `> 👥 Usuarios: ${totalUsers}\n` +
             `> 💎 Premium: ${premiumUsers}\n` +
-            `> 👥 Groups: ${totalGroups}\n\n` +
-            `\`\`\`━━━ sʏsᴛᴇᴍ ━━━\`\`\`\n` +
-            `> *Platform:* ${os.platform()} ${os.arch()}\n` +
+            `> 👥 Grupos: ${totalGroups}\n\n` +
+            `\`\`\`━━━ sɪsᴛᴇᴍᴀ ━━━\`\`\`\n` +
+            `> *Plataforma:* ${os.platform()} ${os.arch()}\n` +
             `> *Node:* ${process.version}\n` +
-            `> *CPU Load:* ${cpuUsage}%\n` +
-            `> *RAM Used:* ${formatBytes(usedMem)} / ${formatBytes(totalMem)}\n` +
+            `> *Carga CPU:* ${cpuUsage}%\n` +
+            `> *RAM usada:* ${formatBytes(usedMem)} / ${formatBytes(totalMem)}\n` +
             `> *Heap:* ${formatBytes(memUsed.heapUsed)} / ${formatBytes(memUsed.heapTotal)}\n\n` +
-            `> _Last updated: ${require('moment-timezone')().tz('Asia/Jakarta').format('HH:mm:ss')}_`
+            `> _Última actualización: ${require('moment-timezone')().tz('Asia/Jakarta').format('HH:mm:ss')}_`
 
         await m.reply(statsText)
 
