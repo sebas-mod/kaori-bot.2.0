@@ -1,38 +1,40 @@
 const pluginConfig = {
     name: 'cekcupu',
     alias: ['cupu', 'noob'],
-    category: 'cek',
-    description: 'Cek tingkat kecupuan kamu',
-    usage: '.cekcupu <nama>',
+    category: 'chequeo',
+    description: 'Verifica qué tan noob eres',
+    usage: '.cekcupu <nombre>',
     example: '.cekcupu Budi',
     isOwner: false,
     isPremium: false,
     isGroup: false,
     isPrivate: false,
     cooldown: 5,
-    energi: 0,
+    energia: 0,
     isEnabled: true
 }
 
 async function handler(m) {
-        const percent = Math.floor(Math.random() * 101)
+    const percent = Math.floor(Math.random() * 101)
     const mentioned = m.mentionedJid[0] || m.sender
                     
     let desc = ''
-    if (percent >= 90) desc = 'CUPU PARAH! NOOB DETECTED! 🤡'
-    else if (percent >= 70) desc = 'Masih newbie nih~ 😅'
-    else if (percent >= 50) desc = 'Biasa aja lah 🤔'
-    else if (percent >= 30) desc = 'Cukup jago! 💪'
-    else desc = 'PRO PLAYER! GG! 🏆'
+    if (percent >= 90) desc = '¡SÚPER NOOB! ¡DETECTADO! 🤡'
+    else if (percent >= 70) desc = 'Todavía eres principiante 😅'
+    else if (percent >= 50) desc = 'Normal 🤔'
+    else if (percent >= 30) desc = 'Bastante bueno 💪'
+    else desc = '¡PRO PLAYER! ¡GG! 🏆'
     
-    let txt = mentioned === m.sender ? `Hai @${mentioned.split('@')[0]}
+    let txt = mentioned === m.sender 
+    ? `Hola @${mentioned.split('@')[0]}
     
-Tingkat kecupuan kamu *${percent}%*
-\`\`\`${desc}\`\`\`` : `Kamu ingin ngecek tingkat kecupuan @${mentioned.split('@')[0]} yak? 
+Tu nivel de noob es *${percent}%*
+\`\`\`${desc}\`\`\`` 
+    : `¿Quieres comprobar el nivel de noob de @${mentioned.split('@')[0]}?
     
-Tingkat kecupuan dia sebesar *${percent}%*
+Su nivel es *${percent}%*
 \`\`\`${desc}\`\`\``
-    
+
     await m.reply(txt, { mentions: [mentioned] })
 }
 
