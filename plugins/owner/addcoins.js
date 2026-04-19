@@ -1,7 +1,7 @@
 const { getDatabase } = require('../../src/lib/ourin-database')
 
 const pluginConfig = {
-    name: 'coins',
+    name: 'addcoins',
     alias: ['sumarcoins', 'agregarcoins', 'addcoins'],
     category: 'owner',
     description: 'Agregar coins a un usuario',
