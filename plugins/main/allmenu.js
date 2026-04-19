@@ -56,7 +56,7 @@ function getCommandSymbols(cmdName) {
 }
 
 function getContextInfo(botConfig, m, thumbBuffer) {
-    const saluranId = botConfig.saluran?.id || '120363208449943317@newsletter'
+    const saluranId = botConfig.saluran?.id || ''
     const saluranName = botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI'
     const saluranLink = botConfig.saluran?.link || ''
     
