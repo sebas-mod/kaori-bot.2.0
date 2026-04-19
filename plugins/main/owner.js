@@ -5,7 +5,7 @@ const pluginConfig = {
     name: 'owner',
     alias: ['creator', 'dev', 'developer'],
     category: 'main',
-    description: 'Menampilkan kontak owner bot',
+    description: 'Muestra el contacto del owner del bot',
     usage: '.owner',
     example: '.owner',
     isOwner: false,
@@ -38,18 +38,18 @@ async function handler(m, { sock, config: botConfig }) {
             
             cards.push({
                 image: { url: ppUrl },
-                body: `Owner ke ${ownerNumbers.indexOf(number) + 1}
+                body: `Owner número ${ownerNumbers.indexOf(number) + 1}
                 
-Rules:
-- Jangan spam
-- Jangan VidCall/Call Sembarangan
-- Jangan jadiin bahan bug/banned`,
+Reglas:
+- No hacer spam
+- No hacer videollamadas/llamadas innecesarias
+- No usar para bugs/baneos`,
                 footer: botName,
                 buttons: [
                     {
                         name: 'cta_url',
                         buttonParamsJson: JSON.stringify({
-                            display_text: '💬 Chat Owner',
+                            display_text: '💬 Chatear con Owner',
                             url: `https://wa.me/${cleanNumber}`
                         })
                     }
@@ -58,12 +58,12 @@ Rules:
         }
         
         await sock.sendMessage(m.chat, {
-            text: `Hallo *${m.pushName}*
+            text: `Hola *${m.pushName}*
                 
-Kamu ingin mengetahui owner dari bot ini yak?
+¿Quieres conocer al owner de este bot?
 
-dibawah ini adalah owner dari bot kami: ${botName}`,
-            title: 'Owner Info',
+Aquí abajo están los owners de nuestro bot: ${botName}`,
+            title: 'Info del Owner',
             footer: botName,
             cards
         }, { quoted: m.raw })
@@ -85,23 +85,23 @@ END:VCARD`
         
         await sock.sendMessage(m.chat, {
             contacts: {
-                displayName: `${ownerName} - ${botName} Owners`,
+                displayName: `${ownerName} - Owners de ${botName}`,
                 contacts
             }
         }, { quoted: m.raw })
         
     } else {
-        const ownerText = `👑 *ᴏᴡɴᴇʀ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ*
+        const ownerText = `👑 *INFORMACIÓN DEL OWNER*
 
-╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」
-┃ ㊗ ɴᴀᴍᴀ: *${ownerName}*
-┃ ㊗ ʙᴏᴛ: *${botName}*
-┃ ㊗ sᴛᴀᴛᴜs: *🟢 Online*
+╭┈┈⬡「 📋 *DETALLES* 」
+┃ ㊗ Nombre: *${ownerName}*
+┃ ㊗ Bot: *${botName}*
+┃ ㊗ Estado: *🟢 Online*
 ╰┈┈⬡
 
-> _Jika ada pertanyaan atau kendala,_
-> _silakan hubungi owner di atas!_
-> _📞 Contact card di bawah._`
+> _Si tienes preguntas o problemas,_
+> _contacta al owner de arriba!_
+> _📞 Tarjeta de contacto abajo._`
         
         await m.reply(ownerText)
         
