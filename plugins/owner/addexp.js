@@ -2,11 +2,11 @@ const { getDatabase } = require('../../src/lib/ourin-database')
 
 const pluginConfig = {
     name: 'addexp',
-    alias: ['tambahexp', 'giveexp', 'addxp'],
+    alias: ['sumarexp', 'darexp', 'addxp'],
     category: 'owner',
-    description: 'Tambah exp user (max 9 Miliar)',
-    usage: '.addexp <jumlah> @user',
-    example: '.addexp 10000 @user',
+    description: 'Agregar exp a un usuario (máx 9 mil millones)',
+    usage: '.addexp <cantidad> @usuario',
+    example: '.addexp 10000 @usuario',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -46,16 +46,16 @@ async function handler(m, { sock }) {
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `⭐ *ᴀᴅᴅ ᴇxᴘ*\n\n` +
-            `> \`.addexp <jumlah>\` - ke diri sendiri\n` +
-            `> \`.addexp <jumlah> @user\` - ke user\n` +
-            `> Max: 9.000.000.000 (9B)\n\n` +
-            `\`Contoh: ${m.prefix}addexp 10000\``
+            `⭐ *ADD EXP*\n\n` +
+            `> \`.addexp <cantidad>\` - para uno mismo\n` +
+            `> \`.addexp <cantidad> @usuario\` - para otro usuario\n` +
+            `> Máx: 9.000.000.000 (9B)\n\n` +
+            `\`Ejemplo: ${m.prefix}addexp 10000\``
         )
     }
     
     if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah exp harus lebih dari 0`)
+        return m.reply(`❌ *ERROR*\n\n> La cantidad de exp debe ser mayor a 0`)
     }
     
     if (amount > MAX_EXP) {
@@ -69,7 +69,7 @@ async function handler(m, { sock }) {
     m.react('✅')
     
     await m.reply(
-        `✅ Berhasil menambahkan exp *${formatNumber(amount)}* ke *@${targetJid.split('@')[0]}*`,
+        `✅ Se agregó correctamente *${formatNumber(amount)}* de exp a *@${targetJid.split('@')[0]}*`,
         { mentions: [targetJid] }
     )
 }
