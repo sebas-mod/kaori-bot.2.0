@@ -3,19 +3,18 @@ const {
   disableAutoBackup,
   getBackupStatus,
   triggerManualBackup,
-  formatInterval,
 } = require("../../src/lib/ourin-auto-backup");
 const timeHelper = require("../../src/lib/ourin-time");
 const config = require("../../config");
 const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
-  name: "autobackup",
-  alias: ["backup", "ab"],
+  name: "backup",
+  alias: ["autobackup", "bk"],
   category: "owner",
-  description: "Kelola sistem auto backup",
-  usage: ".autobackup <on/off/status/now> [interval]",
-  example: ".autobackup on 5h",
+  description: "Sistema de backup automático",
+  usage: ".backup <on/off/status/now> [intervalo]",
+  example: ".backup on 5h",
   isOwner: true,
   isPremium: false,
   isGroup: false,
@@ -31,117 +30,88 @@ async function handler(m, { sock }) {
 
   if (!action) {
     const status = getBackupStatus();
-    const ownerNum = config.owner?.number?.[0] || "Tidak diset";
+    const ownerNum = config.owner?.number?.[0] || "No definido";
 
-    let txt = `🗂️ *ᴀᴜᴛᴏ ʙᴀᴄᴋᴜᴘ sʏsᴛᴇᴍ*\n\n`;
-    txt += `╭┈┈⬡「 📊 *sᴛᴀᴛᴜs* 」\n`;
-    txt += `┃ 🔘 Status: ${status.enabled ? "✅ *ON*" : "❌ *OFF*"}\n`;
-    txt += `┃ ⏱️ Interval: ${status.interval}\n`;
-    txt += `┃ 📅 Last Backup: ${status.lastBackup ? timeHelper.fromTimestamp(status.lastBackup, "DD MMMM YYYY HH:mm:ss") : "-"}\n`;
-    txt += `┃ #️⃣ Total: ${status.backupCount} backup\n`;
-    txt += `┃ 📤 Dikirim ke: ${ownerNum}\n`;
-    txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`;
+    let txt = `🗂️ *AUTO BACKUP*\n\n`;
+    txt += `Estado: ${status.enabled ? "✅ ON" : "❌ OFF"}\n`;
+    txt += `Intervalo: ${status.interval}\n`;
+    txt += `Último: ${status.lastBackup ? timeHelper.fromTimestamp(status.lastBackup, "DD/MM/YYYY HH:mm:ss") : "-"}\n`;
+    txt += `Total: ${status.backupCount}\n`;
+    txt += `Enviado a: ${ownerNum}\n\n`;
 
-    txt += `*ᴄᴀʀᴀ ᴘᴀᴋᴀɪ:*\n`;
-    txt += `> \`${m.prefix}autobackup on <interval>\`\n`;
-    txt += `> \`${m.prefix}autobackup off\`\n`;
-    txt += `> \`${m.prefix}autobackup status\`\n`;
-    txt += `> \`${m.prefix}autobackup now\`\n\n`;
+    txt += `Uso:\n`;
+    txt += `> ${m.prefix}backup on <tiempo>\n`;
+    txt += `> ${m.prefix}backup off\n`;
+    txt += `> ${m.prefix}backup status\n`;
+    txt += `> ${m.prefix}backup now\n\n`;
 
-    txt += `*ꜰᴏʀᴍᴀᴛ ɪɴᴛᴇʀᴠᴀʟ:*\n`;
-    txt += `> • \`5m\` = 5 menit\n`;
-    txt += `> • \`1h\` = 1 jam\n`;
-    txt += `> • \`6h\` = 6 jam\n`;
-    txt += `> • \`1d\` = 1 hari\n\n`;
-
-    txt += `*ᴄᴏɴᴛᴏʜ:*\n`;
-    txt += `> \`${m.prefix}autobackup on 6h\` - backup setiap 6 jam`;
+    txt += `Ejemplo:\n`;
+    txt += `> ${m.prefix}backup on 6h`;
 
     return m.reply(txt);
   }
 
   switch (action) {
-    case "on":
-    case "enable":
-    case "start": {
+    case "on": {
       const interval = args[1];
 
       if (!interval) {
         return m.reply(
-          `⚠️ *ɪɴᴛᴇʀᴠᴀʟ ᴅɪʙᴜᴛᴜʜᴋᴀɴ*\n\n` +
-            `> \`${m.prefix}autobackup on <interval>\`\n\n` +
-            `*ᴄᴏɴᴛᴏʜ:*\n` +
-            `> \`${m.prefix}autobackup on 30m\` - tiap 30 menit\n` +
-            `> \`${m.prefix}autobackup on 6h\` - tiap 6 jam\n` +
-            `> \`${m.prefix}autobackup on 1d\` - tiap 1 hari`,
+          `⚠️ Falta intervalo\n\n` +
+          `Ejemplo:\n` +
+          `> ${m.prefix}backup on 30m\n` +
+          `> ${m.prefix}backup on 6h\n` +
+          `> ${m.prefix}backup on 1d`
         );
       }
 
       const result = enableAutoBackup(interval, sock);
 
       if (!result.success) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> ${result.error}`);
+        return m.reply(`❌ Error: ${result.error}`);
       }
 
-      const ownerNum = config.owner?.number?.[0] || "Owner #1";
+      const ownerNum = config.owner?.number?.[0] || "Owner";
 
       m.react("✅");
       return m.reply(
-        `✅ *ᴀᴜᴛᴏ ʙᴀᴄᴋᴜᴘ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*\n\n` +
-          `╭┈┈⬡「 ⚙️ *sᴇᴛᴛɪɴɢs* 」\n` +
-          `┃ ⏱️ Interval: ${result.interval}\n` +
-          `┃ 📤 Dikirim ke: ${ownerNum}\n` +
-          `┃ 📦 Exclude: node_modules, .git, storages, dll\n` +
-          `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-          `> Backup pertama akan dikirim dalam ${result.interval}`,
+        `✅ Backup automático activado\n\n` +
+        `Intervalo: ${result.interval}\n` +
+        `Destino: ${ownerNum}\n\n` +
+        `Se enviará cada ${result.interval}`
       );
     }
 
-    case "off":
-    case "disable":
-    case "stop": {
+    case "off": {
       disableAutoBackup();
 
       m.react("✅");
-      return m.reply(
-        `❌ *ᴀᴜᴛᴏ ʙᴀᴄᴋᴜᴘ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ*\n\n` +
-          `> Backup otomatis sudah dihentikan.\n` +
-          `> Gunakan \`${m.prefix}autobackup on <interval>\` untuk mengaktifkan kembali.`,
-      );
+      return m.reply(`❌ Backup automático desactivado`);
     }
 
-    case "status":
-    case "info": {
+    case "status": {
       const status = getBackupStatus();
-      const ownerNum = config.owner?.number?.[0] || "Tidak diset";
+      const ownerNum = config.owner?.number?.[0] || "No definido";
 
-      let txt = `🗂️ *sᴛᴀᴛᴜs ᴀᴜᴛᴏ ʙᴀᴄᴋᴜᴘ*\n\n`;
-      txt += `╭┈┈⬡「 📊 *ɪɴꜰᴏ* 」\n`;
-      txt += `┃ 🔘 Enabled: ${status.enabled ? "✅ Ya" : "❌ Tidak"}\n`;
-      txt += `┃ ⏱️ Interval: ${status.interval}\n`;
-      txt += `┃ 🔄 Running: ${status.isRunning ? "✅ Ya" : "❌ Tidak"}\n`;
-      txt += `┃ 📅 Last: ${status.lastBackup ? timeHelper.fromTimestamp(status.lastBackup, "DD MMMM YYYY HH:mm:ss") : "-"}\n`;
-      txt += `┃ #️⃣ Total: ${status.backupCount} backup\n`;
-      txt += `┃ 📤 Target: ${ownerNum}\n`;
-      txt += `╰┈┈┈┈┈┈┈┈⬡`;
+      let txt = `📊 *ESTADO BACKUP*\n\n`;
+      txt += `Activo: ${status.enabled ? "Sí" : "No"}\n`;
+      txt += `Intervalo: ${status.interval}\n`;
+      txt += `En ejecución: ${status.isRunning ? "Sí" : "No"}\n`;
+      txt += `Último: ${status.lastBackup ? timeHelper.fromTimestamp(status.lastBackup, "DD/MM/YYYY HH:mm:ss") : "-"}\n`;
+      txt += `Total: ${status.backupCount}\n`;
+      txt += `Destino: ${ownerNum}`;
 
       return m.reply(txt);
     }
 
-    case "now":
-    case "manual":
-    case "trigger": {
+    case "now": {
       m.react("🕕");
-      await m.reply(
-        `🕕 *ᴍᴇᴍʙᴜᴀᴛ ʙᴀᴄᴋᴜᴘ...*\n\n> Mohon tunggu, sedang membuat backup...`,
-      );
+      await m.reply(`⏳ Creando backup...`);
 
       try {
         await triggerManualBackup(sock);
         m.react("✅");
-        return m.reply(
-          `✅ *ʙᴀᴄᴋᴜᴘ sᴇʟᴇsᴀɪ*\n\n> Backup telah dikirim ke owner!`,
-        );
+        return m.reply(`✅ Backup enviado al owner`);
       } catch (error) {
         m.react('☢');
         m.reply(te(m.prefix, m.command, m.pushName));
@@ -150,9 +120,9 @@ async function handler(m, { sock }) {
 
     default:
       return m.reply(
-        `⚠️ *ᴀᴄᴛɪᴏɴ ᴛɪᴅᴀᴋ ᴠᴀʟɪᴅ*\n\n` +
-          `> Pilih: \`on\`, \`off\`, \`status\`, atau \`now\`\n` +
-          `> Contoh: \`${m.prefix}autobackup on 6h\``,
+        `⚠️ Opción inválida\n\n` +
+        `Usa: on / off / status / now\n` +
+        `Ejemplo: ${m.prefix}backup on 6h`
       );
   }
 }
