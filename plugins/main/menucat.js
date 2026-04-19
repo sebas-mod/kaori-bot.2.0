@@ -1,190 +1,268 @@
-const config = require('../../config')
-const { getCommandsByCategory, getCategories } = require('../../src/lib/ourin-plugins')
-const { getDatabase } = require('../../src/lib/ourin-database')
 const fs = require('fs')
 const path = require('path')
+const config = require('../../config')
+const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
-    name: 'menucat',
-    alias: ['mc', 'category', 'cat'],
+    name: 'carifitur',
+    alias: ['searchcmd', 'findcmd', 'cari', 'search', 'cf'],
     category: 'main',
-    description: 'Menampilkan commands dalam kategori tertentu',
-    usage: '.menucat <kategori>',
-    example: '.menucat tools',
+    description: 'Buscar funciones por palabra clave con detalles completos',
+    usage: '.carifitur <keyword>',
+    example: '.carifitur sticker',
     isOwner: false,
     isPremium: false,
     isGroup: false,
     isPrivate: false,
     cooldown: 3,
-    energi: 0,
+    energia: 0,
     isEnabled: true
 }
 
-const CATEGORY_EMOJIS = {
-    owner: '👑', main: '🏠', utility: '🔧', fun: '🎮', group: '👥',
-    download: '📥', search: '🔍', tools: '🛠️', sticker: '🖼️',
-    ai: '🤖', game: '🎯', media: '🎬', info: 'ℹ️', religi: '☪️',
-    panel: '🖥️', user: '📊', jpm: '📢', pushkontak: '📱', ephoto: '🎨',
-    store: '🛒'
-}
-
-function toMonoUpperBold(text) {
-    const chars = {
-        'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚',
-        'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡',
-        'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨',
-        'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭'
-    }
-    return text.toUpperCase().split('').map(c => chars[c] || c).join('')
-}
-
-function toSmallCaps(text) {
-    const smallCaps = {
-        'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ꜰ', 'g': 'ɢ',
-        'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ',
-        'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ',
-        'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ'
-    }
-    return text.toLowerCase().split('').map(c => smallCaps[c] || c).join('')
-}
-
-let cachedThumb = null
-try {
-    const thumbPath = path.join(process.cwd(), 'assets', 'images', 'ourin2.jpg')
-    if (fs.existsSync(thumbPath)) cachedThumb = fs.readFileSync(thumbPath)
-} catch (e) {}
-
-function getContextInfo() {
-    const saluranId = config.saluran?.id || '120363208449943317@newsletter'
-    const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
-    const botName = config.bot?.name || 'Ourin-AI'
+function levenshteinDistance(str1, str2) {
+    const m = str1.length
+    const n = str2.length
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0))
     
-    return {
-        forwardingScore: 9999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-            newsletterJid: saluranId,
-            newsletterName: saluranName,
-            serverMessageId: 127
-        },
-        externalAdReply: {
-            title: `Kategori Menu`,
-            body: botName,
-            sourceUrl: config.saluran?.link || '',
-            mediaType: 1,
-            renderLargerThumbnail: false,
-            thumbnail: cachedThumb
+    for (let i = 0; i <= m; i++) dp[i][0] = i
+    for (let j = 0; j <= n; j++) dp[0][j] = j
+    
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1]
+            } else {
+                dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+            }
         }
     }
+    return dp[m][n]
+}
+
+function getSimilarity(str1, str2) {
+    if (typeof str1 !== 'string' || typeof str2 !== 'string') return 0
+    const maxLen = Math.max(str1.length, str2.length)
+    if (maxLen === 0) return 1
+    const distance = levenshteinDistance(str1.toLowerCase(), str2.toLowerCase())
+    return (maxLen - distance) / maxLen
+}
+
+function matchesKeyword(text, keyword) {
+    if (!text || !keyword) return false
+    if (typeof text !== 'string' || typeof keyword !== 'string') return false
+    const textLower = text.toLowerCase()
+    const keywordLower = keyword.toLowerCase()
+    
+    if (textLower.includes(keywordLower)) return true
+    if (keywordLower.includes(textLower)) return true
+    
+    const words = textLower.split(/\s+/)
+    for (const word of words) {
+        if (word.includes(keywordLower) || keywordLower.includes(word)) return true
+    }
+    
+    const similarity = getSimilarity(textLower, keywordLower)
+    if (similarity >= 0.6) return true
+    
+    return false
+}
+
+function loadAllPlugins() {
+    const plugins = []
+    const pluginsDir = path.join(__dirname, '..')
+    
+    try {
+        const categories = fs.readdirSync(pluginsDir).filter(f => {
+            const stat = fs.statSync(path.join(pluginsDir, f))
+            return stat.isDirectory()
+        })
+        
+        for (const category of categories) {
+            const categoryPath = path.join(pluginsDir, category)
+            const files = fs.readdirSync(categoryPath).filter(f => f.endsWith('.js'))
+            
+            for (const file of files) {
+                try {
+                    const plugin = require(path.join(categoryPath, file))
+                    if (plugin.config && plugin.config.name) {
+                        plugins.push({
+                            name: Array.isArray(plugin.config.name) ? plugin.config.name[0] : plugin.config.name,
+                            alias: plugin.config.alias || [],
+                            category: plugin.config.category || category,
+                            description: plugin.config.description || 'Sin descripción',
+                            usage: plugin.config.usage || '',
+                            example: plugin.config.example || '',
+                            isEnabled: plugin.config.isEnabled !== false,
+                            isPremium: plugin.config.isPremium || false,
+                            isOwner: plugin.config.isOwner || false,
+                            cooldown: plugin.config.cooldown || 0,
+                            energia: plugin.config.energi || 0,
+                            isCase: false
+                        })
+                    }
+                } catch {}
+            }
+        }
+    } catch {}
+    
+    try {
+        const { getCaseCommands } = require('../../case/ourin')
+        const caseCommands = getCaseCommands()
+        
+        const caseAliases = {
+            'cping': ['cspeed', 'clatency'],
+            'listallcase': ['lcase', 'caselist', 'allcase'],
+            'listallplugin': ['lplugin', 'pluginlist', 'allplugin']
+        }
+        
+        const caseDescriptions = {
+            'cping': 'Verificar ping del sistema case',
+            'listallcase': 'Ver lista de todos los comandos case',
+            'listallplugin': 'Ver lista de todos los comandos plugin'
+        }
+        
+        for (const [category, commands] of Object.entries(caseCommands)) {
+            for (const cmd of commands) {
+                plugins.push({
+                    name: cmd,
+                    alias: caseAliases[cmd] || [],
+                    category: category,
+                    description: caseDescriptions[cmd] || 'Comando case',
+                    usage: `.${cmd}`,
+                    example: `.${cmd}`,
+                    isEnabled: true,
+                    isPremium: false,
+                    isOwner: false,
+                    cooldown: 5,
+                    energia: 0,
+                    isCase: true
+                })
+            }
+        }
+    } catch {}
+    
+    return plugins
 }
 
 async function handler(m, { sock }) {
-    const prefix = config.command?.prefix || '.'
-    const args = m.args || []
-    const categoryArg = args[0]?.toLowerCase()
+    const keyword = m.text
     
-    const categories = getCategories()
-    const commandsByCategory = getCommandsByCategory()
+    if (!keyword) {
+        return m.reply(
+            `🔍 *BUSCAR FUNCIÓN*\n\n` +
+            `╭┈┈⬡「 📋 *CÓMO USAR* 」\n` +
+            `┃ \`${m.prefix}carifitur <keyword>\`\n` +
+            `╰┈┈⬡\n\n` +
+            `> Ejemplo:\n` +
+            `\`${m.prefix}carifitur sticker\`\n` +
+            `\`${m.prefix}carifitur download\`\n` +
+            `\`${m.prefix}carifitur game\``
+        )
+    }
     
-    const { getCasesByCategory } = require('../../case/ourin')
-    const casesByCategory = getCasesByCategory()
+    m.react('🕕')
     
-    if (!categoryArg) {
-        const db = getDatabase()
-        const groupData = m.isGroup ? (db.getGroup(m.chat) || {}) : {}
-        const botMode = groupData.botMode || 'md'
+    try {
+        const allPlugins = loadAllPlugins()
+        const matches = []
         
-        let modeExcludeMap = {
-            md: ['panel', 'pushkontak', 'store'],
-            store: ['panel', 'pushkontak', 'jpm', 'ephoto', 'cpanel'],
-            pushkontak: ['panel', 'store', 'jpm', 'ephoto', 'cpanel'],
-            cpanel: ['pushkontak', 'store', 'jpm', 'ephoto']
-        }
-        
-        try {
-            const botmodePlugin = require('../group/botmode')
-            if (botmodePlugin && botmodePlugin.MODES) {
-                const modes = botmodePlugin.MODES
-                modeExcludeMap = {}
-                for (const [key, val] of Object.entries(modes)) {
-                    if (val.excludeCategories) modeExcludeMap[key] = val.excludeCategories
-                    // Handle allow list by converting to exclude list if needed, or rely on logic below
+        for (const plugin of allPlugins) {
+            if (!plugin.isEnabled) continue
+            
+            let isMatch = false
+            let matchScore = 0
+            let matchReason = ''
+            
+            if (matchesKeyword(plugin.name, keyword)) {
+                isMatch = true
+                matchScore = Math.max(matchScore, getSimilarity(plugin.name, keyword) * 1.2)
+                matchReason = 'nombre'
+            }
+            
+            for (const alias of plugin.alias) {
+                if (matchesKeyword(alias, keyword)) {
+                    isMatch = true
+                    matchScore = Math.max(matchScore, getSimilarity(alias, keyword) * 1.1)
+                    matchReason = matchReason || 'alias'
                 }
             }
-        } catch (e) {}
+            
+            if (matchesKeyword(plugin.description, keyword)) {
+                isMatch = true
+                matchScore = Math.max(matchScore, getSimilarity(plugin.description, keyword) * 0.8)
+                matchReason = matchReason || 'descripción'
+            }
+            
+            if (matchesKeyword(plugin.category, keyword)) {
+                isMatch = true
+                matchScore = Math.max(matchScore, getSimilarity(plugin.category, keyword) * 0.7)
+                matchReason = matchReason || 'categoría'
+            }
+            
+            if (isMatch) {
+                matches.push({ ...plugin, score: matchScore, matchReason })
+            }
+        }
         
-        const excludeCategories = modeExcludeMap[botMode] || modeExcludeMap.md
+        matches.sort((a, b) => b.score - a.score)
         
-        let txt = `📂 *${toMonoUpperBold('DAFTAR KATEGORI')}*\n\n`
-        txt += `> Ketik \`${prefix}menucat <kategori>\`\n\n`
+        if (matches.length === 0) {
+            m.react('❌')
+            return m.reply(`🔍 *RESULTADO DE BÚSQUEDA*\n\n> No se encontraron funciones con la palabra clave \`${keyword}\``)
+        }
         
-        const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'cek', 'economy', 'user', 'canvas', 'random', 'premium', 'jpm', 'pushkontak', 'panel', 'ephoto', 'store']
+        const saluranId = config.saluran?.id || '120363208449943317@newsletter'
+        const saluranName = config.saluran?.name || config.bot?.name || 'Ourin-AI'
         
-        const allCats = [...new Set([...categories, ...Object.keys(casesByCategory)])]
-        const sortedCats = allCats.sort((a, b) => {
-            const indexA = categoryOrder.indexOf(a)
-            const indexB = categoryOrder.indexOf(b)
-            return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB)
+        let text = `🔍 *RESULTADO DE BÚSQUEDA: "${keyword}"*\n`
+        text += `> Se encontraron *${matches.length}* funciones\n`
+        text += `> Elige uno de los comandos abajo:\n\n`
+        
+        const topMatches = matches.slice(0, 15)
+        
+        for (let i = 0; i < Math.min(5, topMatches.length); i++) {
+            const p = topMatches[i]
+            const badges = []
+            if (p.isPremium) badges.push('💎')
+            if (p.isOwner) badges.push('👑')
+            
+            text += `*${i + 1}. ${m.prefix}${p.name}* ${badges.join('')}\n`
+            text += `📁 Categoría: \`${p.category}\`\n`
+            text += `📝 ${p.description.slice(0, 50)}${p.description.length > 50 ? '...' : ''}\n`
+            if (p.usage) text += `💡 Uso: \`${p.usage}\`\n`
+            if (p.cooldown > 0) text += `⏱️ Cooldown: ${p.cooldown}s\n`
+            text += `\n`
+        }
+        
+        if (topMatches.length > 5) {
+            text += `_+${topMatches.length - 5} resultados más disponibles_`
+        }
+        
+        const buttons = topMatches.slice(0, 10).map((p, i) => ({
+            title: `${m.prefix}${p.name}`,
+            description: `${p.category} • ${p.description.slice(0, 40)}`,
+            id: `${m.prefix}${p.name}`
+        }))
+        
+        m.react('✅')
+        
+        await sock.sendButton(m.chat, fs.readFileSync('./assets/images/ourin.jpg'), text, m, {
+            buttons: [{
+                name: 'single_select',
+                buttonParamsJson: JSON.stringify({
+                    title: '📋 Elegir Comando',
+                    sections: [{
+                        title: `Resultados para "${keyword}"`,
+                        rows: buttons
+                    }]
+                })
+            }]
         })
         
-        txt += `╭┈┈⬡「 📋 *${toMonoUpperBold('KATEGORI')}* 」\n`
-        for (const cat of sortedCats) {
-            if (cat === 'owner' && !m.isOwner) continue
-            if (excludeCategories.includes(cat.toLowerCase())) continue
-            const pluginCmds = commandsByCategory[cat] || []
-            const caseCmds = casesByCategory[cat] || []
-            const totalCmds = pluginCmds.length + caseCmds.length
-            if (totalCmds === 0) continue
-            
-            const emoji = CATEGORY_EMOJIS[cat] || '📁'
-            txt += `┃ ${emoji} ${toMonoUpperBold(cat)} ┃ \`${totalCmds}\` cmds\n`
-        }
-        txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-        txt += `_Contoh: \`${prefix}menucat tools\`_`
-        
-        return sock.sendMessage(m.chat, {
-            text: txt,
-            contextInfo: getContextInfo()
-        }, { quoted: m })
+    } catch (error) {
+        m.react('☢')
+        m.reply(te(m.prefix, m.command, m.pushName))
     }
-    
-    const allCategories = [...new Set([...categories, ...Object.keys(casesByCategory)])]
-    const matchedCat = allCategories.find(c => c.toLowerCase() === categoryArg)
-    
-    if (!matchedCat) {
-        return m.reply(`❌ *ᴋᴀᴛᴇɢᴏʀɪ ᴛɪᴅᴀᴋ ᴅɪᴛᴇᴍᴜᴋᴀɴ*\n\n> Kategori \`${categoryArg}\` tidak ada.\n> Ketik \`${prefix}menucat\` untuk list kategori.`)
-    }
-    
-    if (matchedCat === 'owner' && !m.isOwner) {
-        return m.reply(`❌ *ᴀᴋsᴇs ᴅɪᴛᴏʟᴀᴋ*\n\n> Kategori ini hanya untuk owner.`)
-    }
-    
-    const pluginCommands = commandsByCategory[matchedCat] || []
-    const caseCommands = casesByCategory[matchedCat] || []
-    const allCommands = [...pluginCommands, ...caseCommands]
-    
-    if (allCommands.length === 0) {
-        return m.reply(`❌ *ᴋᴏsᴏɴɢ*\n\n> Kategori \`${matchedCat}\` tidak memiliki command.`)
-    }
-    
-    const emoji = CATEGORY_EMOJIS[matchedCat] || '📁'
-    
-    let txt = `╭┈┈⬡「 ${emoji} *${toMonoUpperBold(matchedCat)}* 」\n`
-    
-    for (const cmd of allCommands) {
-        txt += `┃ \`${prefix}${toSmallCaps(cmd)}\`\n`
-    }
-    
-    txt += `╰┈┈┈┈┈┈┈┈⬡\n\n`
-    txt += `Total: \`${allCommands.length}\` commands\n`
-    if (caseCommands.length > 0) {
-        txt += `(${pluginCommands.length} plugin + ${caseCommands.length} case)`
-    }
-    
-    await sock.sendMessage(m.chat, {
-        text: txt,
-        contextInfo: getContextInfo()
-    }, { quoted: m })
 }
 
 module.exports = {
