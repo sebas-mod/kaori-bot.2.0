@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'exec',
     alias: ['>', 'run', 'execute'],
     category: 'owner',
-    description: 'Jalankan kode JS dari pesan yang di-reply (Owner Only)',
-    usage: '.> (reply pesan berisi kode)',
+    description: 'Ejecutar código JS desde un mensaje respondido (Solo Owner)',
+    usage: '.> (responder mensaje con código)',
     example: '.> (reply)',
     isOwner: true,
     isPremium: false,
@@ -20,7 +20,7 @@ const pluginConfig = {
 
 async function handler(m, { sock, store }) {
     if (!config.isOwner(m.sender)) {
-        return m.reply('❌ *Owner Only!*')
+        return m.reply('❌ *¡Solo para el Owner!*')
     }
     
     let code = null
@@ -35,13 +35,13 @@ async function handler(m, { sock, store }) {
     
     if (!code) {
         return m.reply(
-            `⚙️ *ᴇxᴇᴄ*\n\n` +
-            `> Reply pesan berisi kode JavaScript!\n\n` +
-            `*Atau:*\n` +
-            `> .> <code>\n\n` +
-            `*Contoh:*\n` +
-            `> Reply pesan: \`return m.chat\`\n` +
-            `> Lalu ketik: .>`
+            `⚙️ *EXEC*\n\n` +
+            `> ¡Responde a un mensaje que contenga código JavaScript!\n\n` +
+            `*O también:*\n` +
+            `> .> <código>\n\n` +
+            `*Ejemplo:*\n` +
+            `> Responde al mensaje: \`return m.chat\`\n` +
+            `> Luego escribe: .>`
         )
     }
     
@@ -82,21 +82,21 @@ async function handler(m, { sock, store }) {
     }
     
     if (output.length > 3000) {
-        output = output.slice(0, 3000) + '\n\n... (truncated)'
+        output = output.slice(0, 3000) + '\n\n... (recortado)'
     }
     
-    const status = isError ? '❌ Error' : '✅ Success'
+    const status = isError ? '❌ Error' : '✅ Éxito'
     const type = isError ? result?.name || 'Error' : typeof result
     
     const codePreview = code.length > 100 ? code.slice(0, 100) + '...' : code
     
     await m.reply(
-        `⚙️ *ᴇxᴇᴄ ʀᴇsᴜʟᴛ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴄᴏᴅᴇ* 」\n` +
+        `⚙️ *RESULTADO EXEC*\n\n` +
+        `╭┈┈⬡「 📋 *CÓDIGO* 」\n` +
         `┃ \`${codePreview}\`\n` +
-        `├┈┈⬡「 📊 *ʀᴇsᴜʟᴛ* 」\n` +
+        `├┈┈⬡「 📊 *RESULTADO* 」\n` +
         `┃ ${status}\n` +
-        `┃ Type: ${type}\n` +
+        `┃ Tipo: ${type}\n` +
         `╰┈┈┈┈┈┈┈┈⬡\n\n` +
         `\`\`\`${output}\`\`\``
     )
