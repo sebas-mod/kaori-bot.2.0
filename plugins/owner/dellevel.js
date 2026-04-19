@@ -3,11 +3,11 @@ const { calculateLevel, getRole } = require('../user/level')
 
 const pluginConfig = {
     name: 'dellevel',
-    alias: ['kuranglevel', 'removelevel', 'dellvl'],
+    alias: ['reducirnivel', 'removernivel', 'dellvl'],
     category: 'owner',
-    description: 'Kurangi level user (via exp)',
-    usage: '.dellevel <jumlah> @user',
-    example: '.dellevel 5 @user',
+    description: 'Reducir el nivel del usuario (a través del exp)',
+    usage: '.dellevel <cantidad> @usuario',
+    example: '.dellevel 5 @usuario',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -38,12 +38,12 @@ async function handler(m, { sock }) {
     
     if (!targetJid || levels <= 0) {
         return m.reply(
-            `📊 *ᴅᴇʟ ʟᴇᴠᴇʟ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴜsᴀɢᴇ* 」\n` +
-            `┃ > \`.dellevel <jumlah>\` - ke diri sendiri\n` +
-            `┃ > \`.dellevel <jumlah> @user\` - ke orang lain\n` +
+            `📊 *REDUCIR NIVEL*\n\n` +
+            `╭┈┈⬡「 📋 *USO* 」\n` +
+            `┃ > \`.dellevel <cantidad>\` - a ti mismo\n` +
+            `┃ > \`.dellevel <cantidad> @usuario\` - a otro usuario\n` +
             `╰┈┈┈┈┈┈┈┈⬡\n\n` +
-            `> Contoh: \`${m.prefix}dellevel 5\``
+            `> Ejemplo: \`${m.prefix}dellevel 5\``
         )
     }
     
@@ -59,12 +59,12 @@ async function handler(m, { sock }) {
     m.react('✅')
     
     await m.reply(
-        `✅ *ʟᴇᴠᴇʟ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 User: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ Kurang: *-${levels} Level*\n` +
-        `┃ 🚄 Exp Removed: *-${expToRemove.toLocaleString('id-ID')}*\n` +
-        `┃ 📊 Level: *${oldLevel} → ${newLevel}*\n` +
+        `✅ *NIVEL REDUCIDO*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLE* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Reducción: *-${levels} Nivel*\n` +
+        `┃ 🚄 Exp eliminado: *-${expToRemove.toLocaleString('es-ES')}*\n` +
+        `┃ 📊 Nivel: *${oldLevel} → ${newLevel}*\n` +
         `┃ ${getRole(newLevel)}\n` +
         `╰┈┈┈┈┈┈┈┈⬡`,
         { mentions: [targetJid] }
