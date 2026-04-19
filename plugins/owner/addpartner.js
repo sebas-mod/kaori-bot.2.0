@@ -5,8 +5,8 @@ const pluginConfig = {
     name: 'addpartner',
     alias: ['delpartner', 'listpartner'],
     category: 'owner',
-    description: 'Kelola daftar partner bot',
-    usage: '.addpartner <nomor/@tag> [hari]\n.delpartner <nomor/@tag>\n.listpartner\n.cekpartner <nomor/@tag>',
+    description: 'Gestionar la lista de partners del bot',
+    usage: '.addpartner <número/@tag> [días]\n.delpartner <número/@tag>\n.listpartner\n.cekpartner <número/@tag>',
     example: '.addpartner 6281234567890 30',
     isOwner: true,
     isPremium: false,
@@ -32,30 +32,36 @@ async function handler(m, { sock }) {
     const db = getDatabase()
     const cmd = m.command?.toLowerCase()
     if (!db.data.partner) db.data.partner = []
+
     if (cmd === 'addpartner') {
         const target = extractNumber(m)
         if (!target) {
             return m.reply(
-                `🤝 *ᴀᴅᴅ ᴘᴀʀᴛɴᴇʀ*\n\n` +
-                `> Cara pakai:\n` +
-                `> \`${m.prefix}addpartner @tag [hari]\`\n` +
+                `🤝 *AGREGAR PARTNER*\n\n` +
+                `> Cómo usar:\n` +
+                `> \`${m.prefix}addpartner @tag [días]\`\n` +
                 `> \`${m.prefix}addpartner 6281xxx 30\`\n\n` +
-                `> Default: 30 hari`
+                `> Por defecto: 30 días`
             )
         }
+
         let targetNumber = target.replace(/@.+/g, '')
         if (targetNumber.startsWith('08')) {
             targetNumber = '62' + targetNumber.slice(1)
         }
+
         if (config.isOwner(targetNumber)) {
-            return m.reply(`⚠️ @${targetNumber} sudah menjadi owner!`, { mentions: [target] })
+            return m.reply(`⚠️ @${targetNumber} ya es owner!`, { mentions: [target] })
         }
+
         const existingIndex = db.data.partner.findIndex(p => p.id === targetNumber)
         const days = parseInt(m.args?.find(a => /^\d+$/.test(a) && a.length <= 4)) || 30
-        const pushName = m.quoted?.pushName || m.pushName || 'Unknown'
+        const pushName = m.quoted?.pushName || m.pushName || 'Desconocido'
         const now = Date.now()
+
         let newExpired
         let message = ''
+
         if (existingIndex !== -1) {
             const currentExpired = db.data.partner[existingIndex].expired || now
             const baseTime = currentExpired > now ? currentExpired : now
@@ -63,7 +69,7 @@ async function handler(m, { sock }) {
             
             db.data.partner[existingIndex].expired = newExpired
             db.data.partner[existingIndex].name = pushName
-            message = `Partner diperpanjang`
+            message = `Partner extendido`
         } else {
             newExpired = now + (days * 24 * 60 * 60 * 1000)
             db.data.partner.push({
@@ -72,15 +78,19 @@ async function handler(m, { sock }) {
                 name: pushName,
                 addedAt: now
             })
-            message = `Berhasil ditambahkan`
+            message = `Agregado correctamente`
         }
 
         db.save()
 
-        const expDate = new Date(newExpired).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+        const expDate = new Date(newExpired).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        })
 
         await m.reply(
-            `✅ Berhasil ${existingIndex !== -1 ? 'memperpanjang' : 'menambahkan'} partner @${targetNumber} selama *${days} hari*\nExpired: *${expDate}*`,
+            `✅ ${existingIndex !== -1 ? 'Se extendió' : 'Se agregó'} el partner @${targetNumber} por *${days} días*\nExpira: *${expDate}*`,
             { mentions: [target] }
         )
         return
@@ -89,8 +99,9 @@ async function handler(m, { sock }) {
     if (cmd === 'delpartner') {
         const target = extractNumber(m)
         if (!target) {
-            return m.reply(`⚠️ Tag atau reply user yang ingin dihapus dari partner.`)
+            return m.reply(`⚠️ Etiqueta o responde al usuario que quieres eliminar de partners.`)
         }
+
         let targetNumber = target.replace(/@.+/g, '')
         if (targetNumber.startsWith('08')) {
             targetNumber = '62' + targetNumber.slice(1)
@@ -101,9 +112,9 @@ async function handler(m, { sock }) {
         
         if (db.data.partner.length < initialLength) {
             db.save()
-            await m.reply(`✅ Berhasil menghapus @${targetNumber} dari partner`, { mentions: [target] })
+            await m.reply(`✅ Se eliminó @${targetNumber} de partners`, { mentions: [target] })
         } else {
-            return m.reply(`⚠️ User tersebut bukan partner.`)
+            return m.reply(`⚠️ Ese usuario no es partner.`)
         }
         return
     }
@@ -111,19 +122,26 @@ async function handler(m, { sock }) {
     if (cmd === 'listpartner') {
         const partners = db.data.partner
         if (!partners.length) {
-            return m.reply(`🤝 *ᴅᴀꜰᴛᴀʀ ᴘᴀʀᴛɴᴇʀ*\n\n> Belum ada partner.`)
+            return m.reply(`🤝 *LISTA DE PARTNERS*\n\n> No hay partners aún.`)
         }
 
-        let txt = `🤝 *DAFTAR PARTNER*\n\n`
+        let txt = `🤝 *LISTA DE PARTNERS*\n\n`
         const mentions = []
+
         partners.forEach((p, i) => {
             const num = p.id
-            const expDate = new Date(p.expired).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+            const expDate = new Date(p.expired).toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            })
             const remaining = Math.ceil((p.expired - Date.now()) / (1000 * 60 * 60 * 24))
-            txt += `${i + 1}. @${num} — ${expDate} (${remaining > 0 ? remaining + 'd' : 'Expired'})\n`
+
+            txt += `${i + 1}. @${num} — ${expDate} (${remaining > 0 ? remaining + 'd' : 'Expirado'})\n`
             mentions.push(`${num}@s.whatsapp.net`)
         })
-        txt += `\nTotal: *${partners.length}* partner`
+
+        txt += `\nTotal: *${partners.length}* partners`
         await m.reply(txt, { mentions })
         return
     }
