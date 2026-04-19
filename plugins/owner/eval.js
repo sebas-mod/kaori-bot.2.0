@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'eval',
     alias: ['$', 'ev', 'evaluate', '=>'],
     category: 'owner',
-    description: 'Jalankan kode JavaScript (Owner Only)',
-    usage: '=> <code> atau .$ <code>',
+    description: 'Ejecutar código JavaScript (Solo Owner)',
+    usage: '=> <código> o .$ <código>',
     example: '=> m.chat',
     isOwner: true,
     isPremium: false,
@@ -22,16 +22,16 @@ const pluginConfig = {
 
 async function handler(m, { sock, store }) {
     if (!config.isOwner(m.sender)) {
-        return m.reply('❌ *Owner Only!*')
+        return m.reply('❌ *¡Solo para el Owner!*')
     }
     
     const code = m.fullArgs?.trim() || m.text?.trim()
     
     if (!code) {
         return m.reply(
-            `⚙️ *ᴇᴠᴀʟ*\n\n` +
-            `> Masukkan kode JavaScript!\n\n` +
-            `*Contoh:*\n` +
+            `⚙️ *EVAL*\n\n` +
+            `> Ingresa código JavaScript!\n\n` +
+            `*Ejemplo:*\n` +
             `> .$ 1 + 1\n` +
             `> .$ m.chat\n` +
             `> .$ db.getUser(m.sender)`
@@ -66,17 +66,17 @@ async function handler(m, { sock, store }) {
     }
     
     if (output.length > 3000) {
-        output = output.slice(0, 3000) + '\n\n... (truncated)'
+        output = output.slice(0, 3000) + '\n\n... (recortado)'
     }
     
-    const status = isError ? '❌ Error' : '✅ Success'
+    const status = isError ? '❌ Error' : '✅ Éxito'
     const type = isError ? result?.name || 'Error' : typeof result
     
     await m.reply(
-        `⚙️ *ᴇᴠᴀʟ ʀᴇsᴜʟᴛ*\n\n` +
-        `╭┈┈⬡「 📋 *ɪɴғᴏ* 」\n` +
+        `⚙️ *RESULTADO EVAL*\n\n` +
+        `╭┈┈⬡「 📋 *INFO* 」\n` +
         `┃ ${status}\n` +
-        `┃ Type: ${type}\n` +
+        `┃ Tipo: ${type}\n` +
         `╰┈┈┈┈┈┈┈┈⬡\n\n` +
         `\`\`\`${output}\`\`\``
     )
