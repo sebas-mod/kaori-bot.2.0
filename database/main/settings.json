@@ -52,7 +52,7 @@
   "globalCustomReplies": [],
   "panelCreateLastUsed": 1775377733441,
   "autoJoinGc": false,
-  "autoSholat": true,
+  "autoSholat": false,
   "errorLog": [
     {
       "cmd": "unknown",
