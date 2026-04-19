@@ -6,7 +6,7 @@ const pluginConfig = {
     name: 'clearsessions',
     alias: ['clearsession', 'delsession', 'delsessions'],
     category: 'owner',
-    description: 'Menghapus semua session di storage/sessions/',
+    description: 'Eliminar todas las sesiones en storage/sessions/',
     usage: '.clearsessions',
     example: '.clearsessions',
     isOwner: true,
@@ -22,7 +22,7 @@ async function handler(m)  {
     const sessionsPath = path.join(process.cwd(), 'storage', 'sessions')
     
     if (!fs.existsSync(sessionsPath)) {
-        return m.reply(`❌ Folder sessions tidak ditemukan!`)
+        return m.reply(`❌ ¡Carpeta sessions no encontrada!`)
     }
     
     m.react('🗑️')
@@ -31,7 +31,7 @@ async function handler(m)  {
         const files = fs.readdirSync(sessionsPath)
         
         if (files.length === 0) {
-            return m.reply(`📁 Folder sessions sudah kosong!`)
+            return m.reply(`📁 ¡La carpeta sessions ya está vacía!`)
         }
         
         let deleted = 0
@@ -57,16 +57,16 @@ async function handler(m)  {
         
         m.react('✅')
         await m.reply(
-            `╭┈┈⬡「 🗑️ *ᴄʟᴇᴀʀ sᴇssɪᴏɴs* 」
+            `╭┈┈⬡「 🗑️ *ʟɪᴍᴘɪᴀʀ sᴇssɪᴏɴᴇs* 」
 ┃
-┃ ㊗ ᴅᴇʟᴇᴛᴇᴅ: *${deleted}* file
-┃ ㊗ sᴋɪᴘᴘᴇᴅ: *${skipped}* file
-┃ ㊗ ɴᴏᴛᴇ: creds.json tidak dihapus
+┃ ㊗ ᴇʟɪᴍɪɴᴀᴅᴏs: *${deleted}* archivos
+┃ ㊗ ᴏᴍɪᴛɪᴅᴏs: *${skipped}* archivos
+┃ ㊗ ɴᴏᴛᴀ: creds.json no se elimina
 ┃
 ╰┈┈⬡
 
-> _Session files berhasil dibersihkan!_
-> _Restart bot jika diperlukan._`
+> _¡Archivos de sesión limpiados con éxito!_
+> _Reinicia el bot si es necesario._`
         )
         
     } catch (error) {
