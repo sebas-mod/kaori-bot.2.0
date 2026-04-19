@@ -5,8 +5,8 @@ const pluginConfig = {
     name: 'ban',
     alias: ['addban', 'block'],
     category: 'owner',
-    description: 'Memblokir user dari menggunakan bot',
-    usage: '.ban <nomor/@tag>',
+    description: 'Bloquear a un usuario para que no use el bot',
+    usage: '.ban <número/@tag>',
     example: '.ban 6281234567890',
     isOwner: true,
     isPremium: false,
@@ -29,7 +29,7 @@ async function handler(m, { sock }) {
     }
     
     if (!targetNumber) {
-        return m.reply(`🚫 *ʙᴀɴ ᴜsᴇʀ*\n\n> Masukkan nomor atau tag user\n\n\`Contoh: ${m.prefix}ban 6281234567890\``)
+        return m.reply(`🚫 *BAN DE USUARIO*\n\n> Ingresa un número o etiqueta al usuario\n\n\`Ejemplo: ${m.prefix}ban 6281234567890\``)
     }
     
     if (targetNumber.startsWith('0')) {
@@ -37,11 +37,11 @@ async function handler(m, { sock }) {
     }
     
     if (config.isOwner(targetNumber)) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak dapat ban owner`)
+        return m.reply(`❌ *ERROR*\n\n> No se puede banear al owner`)
     }
     
     if (config.isBanned(targetNumber)) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Nomor \`${targetNumber}\` sudah dibanned`)
+        return m.reply(`❌ *ERROR*\n\n> El número \`${targetNumber}\` ya está baneado`)
     }
     
     config.bannedUsers.push(targetNumber)
@@ -52,11 +52,11 @@ async function handler(m, { sock }) {
     m.react('🚫')
     
     await m.reply(
-        `🚫 *ᴜsᴇʀ ᴅɪʙᴀɴɴᴇᴅ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 📱 ɴᴏᴍᴏʀ: \`${targetNumber}\`\n` +
-        `┃ 🚫 sᴛᴀᴛᴜs: \`Banned\`\n` +
-        `┃ 📊 ᴛᴏᴛᴀʟ: \`${config.bannedUsers.length}\` ᴜsᴇʀ\n` +
+        `🚫 *USUARIO BANEADO*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 📱 Número: \`${targetNumber}\`\n` +
+        `┃ 🚫 Estado: \`Baneado\`\n` +
+        `┃ 📊 Total: \`${config.bannedUsers.length}\` usuarios\n` +
         `╰┈┈⬡`
     )
 }
