@@ -5,8 +5,8 @@ const pluginConfig = {
     name: ['block', 'blokir'],
     alias: [],
     category: 'owner',
-    description: 'Blokir nomor WhatsApp',
-    usage: '.block <nomor/reply/mention>',
+    description: 'Bloquear un número de WhatsApp',
+    usage: '.block <número/reply/mention>',
     example: '.block 628xxx',
     isOwner: true,
     cooldown: 5,
@@ -23,7 +23,7 @@ async function handler(m, { sock }) {
         targetJid = m.quoted.sender || m.quoted.participant
     } else if (m.args[0]) {
         let num = m.args[0].replace(/[^0-9]/g, '')
-        if (!num) return m.reply('❌ Nomor tidak valid.')
+        if (!num) return m.reply('❌ Número no válido.')
         targetJid = num + '@s.whatsapp.net'
     } else if (!m.isGroup) {
         targetJid = m.chat
@@ -31,26 +31,26 @@ async function handler(m, { sock }) {
 
     if (!targetJid) {
         return m.reply(
-            '⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n' +
-            '> `.block 628xxx` — Blokir via nomor\n' +
-            '> `.block` (reply pesan) — Blokir pengirim\n' +
-            '> `.block @mention` — Blokir yang di-mention\n' +
-            '> `.block` (di private chat) — Blokir user ini'
+            '⚠️ *CÓMO USAR*\n\n' +
+            '> `.block 628xxx` — Bloquear por número\n' +
+            '> `.block` (respondiendo mensaje) — Bloquear remitente\n' +
+            '> `.block @mention` — Bloquear usuario mencionado\n' +
+            '> `.block` (en chat privado) — Bloquear este usuario'
         )
     }
 
     const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net'
     if (targetJid === botJid) {
-        return m.reply('❌ Tidak bisa blokir nomor bot sendiri.')
+        return m.reply('❌ No puedes bloquear al propio bot.')
     }
 
     try {
         await sock.updateBlockStatus(targetJid, 'block')
         m.react('🚫')
         return m.reply(
-            `🚫 *ɴᴏᴍᴏʀ ᴅɪʙʟᴏᴋɪʀ*\n\n` +
-            `> Target: @${targetJid.split('@')[0]}\n` +
-            `> Gunakan \`.unblock\` untuk membuka blokir`,
+            `🚫 *NÚMERO BLOQUEADO*\n\n` +
+            `> Objetivo: @${targetJid.split('@')[0]}\n` +
+            `> Usa \`.unblock\` para quitar el bloqueo`,
             { mentions: [targetJid] }
         )
     } catch (err) {
