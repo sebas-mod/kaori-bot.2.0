@@ -7,7 +7,7 @@ const pluginConfig = {
     name: 'rules',
     alias: ['aturanbot', 'botrules'],
     category: 'main',
-    description: 'Menampilkan rules/aturan bot',
+    description: 'Muestra las reglas del bot',
     usage: '.rules',
     example: '.rules',
     isOwner: false,
@@ -19,17 +19,17 @@ const pluginConfig = {
     isEnabled: true
 }
 
-const DEFAULT_BOT_RULES = `📜 *ᴀᴛᴜʀᴀɴ ʙᴏᴛ*
+const DEFAULT_BOT_RULES = `📜 *ʀᴇɢʟᴀs ᴅᴇʟ ʙᴏᴛ*
 
-┃ 1️⃣ Jangan spam command
-┃ 2️⃣ Gunakan fitur dengan bijak
-┃ 3️⃣ Dilarang menyalahgunakan bot
-┃ 4️⃣ Hormati sesama pengguna
-┃ 5️⃣ Report bug ke owner
-┃ 6️⃣ Jangan request fitur aneh
-┃ 7️⃣ Bot bukan 24/7, ada maintenance
+┃ 1️⃣ No hagas spam de comandos
+┃ 2️⃣ Usa las funciones con responsabilidad
+┃ 3️⃣ Prohibido abusar del bot
+┃ 4️⃣ Respeta a otros usuarios
+┃ 5️⃣ Reporta errores al owner
+┃ 6️⃣ No pidas funciones absurdas
+┃ 7️⃣ El bot no es 24/7, puede haber mantenimiento
 
-_Pelanggaran dapat mengakibatkan banned!_`
+_Las infracciones pueden resultar en un baneo!_`
 
 async function handler(m, { sock, config: botConfig }) {
     const db = getDatabase()
