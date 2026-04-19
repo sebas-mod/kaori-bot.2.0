@@ -4,9 +4,9 @@ const pluginConfig = {
     name: 'delexp',
     alias: ['kurangexp', 'removeexp', 'delxp'],
     category: 'owner',
-    description: 'Kurangi exp user',
-    usage: '.delexp <jumlah> @user',
-    example: '.delexp 5000 @user',
+    description: 'Reducir la experiencia (exp) de un usuario',
+    usage: '.delexp <cantidad> @usuario',
+    example: '.delexp 5000 @usuario',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -44,21 +44,21 @@ async function handler(m, { sock }) {
     
     if (!targetJid || amount <= 0) {
         return m.reply(
-            `⭐ *ᴅᴇʟ ᴇxᴘ*\n\n` +
-            `> \`.delexp <jumlah>\` - dari diri sendiri\n` +
-            `> \`.delexp <jumlah> @user\` - dari user\n\n` +
-            `\`Contoh: ${m.prefix}delexp 5000\``
+            `⭐ *ELIMINAR EXP*\n\n` +
+            `> \`.delexp <cantidad>\` - de ti mismo\n` +
+            `> \`.delexp <cantidad> @usuario\` - de otro usuario\n\n` +
+            `\`Ejemplo: ${m.prefix}delexp 5000\``
         )
     }
     
     if (amount <= 0) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Jumlah harus lebih dari 0`)
+        return m.reply(`❌ *ERROR*\n\n> La cantidad debe ser mayor a 0`)
     }
     
     const user = db.getUser(targetJid)
     
     if (!user) {
-        return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> User tidak ditemukan di database`)
+        return m.reply(`❌ *ERROR*\n\n> Usuario no encontrado en la base de datos`)
     }
     
     const newExp = db.updateExp(targetJid, -amount)
@@ -66,11 +66,11 @@ async function handler(m, { sock }) {
     m.react('✅')
     
     await m.reply(
-        `✅ *ᴇxᴘ ᴅɪᴋᴜʀᴀɴɢɪ*\n\n` +
-        `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
-        `┃ 👤 ᴜsᴇʀ: @${targetJid.split('@')[0]}\n` +
-        `┃ ➖ ᴋᴜʀᴀɴɢ: *-${formatNumber(amount)}*\n` +
-        `┃ ⭐ sɪsᴀ: *${formatNumber(newExp)}*\n` +
+        `✅ *EXP REDUCIDA*\n\n` +
+        `╭┈┈⬡「 📋 *DETALLES* 」\n` +
+        `┃ 👤 Usuario: @${targetJid.split('@')[0]}\n` +
+        `┃ ➖ Reducido: *-${formatNumber(amount)}*\n` +
+        `┃ ⭐ Restante: *${formatNumber(newExp)}*\n` +
         `╰┈┈⬡`,
         { mentions: [targetJid] }
     )
