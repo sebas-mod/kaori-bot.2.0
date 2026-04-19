@@ -4,7 +4,7 @@ const pluginConfig = {
     name: 'backupdb',
     alias: ['dbbackup', 'backupstore', 'storebackup'],
     category: 'owner',
-    description: 'Backup database/store dan kirim ke owner',
+    description: 'Respaldar base de datos/store y enviarlo al owner',
     usage: '.backupdb',
     isOwner: true,
     isGroup: false,
@@ -13,17 +13,17 @@ const pluginConfig = {
 
 async function handler(m, { sock }) {
     const backupContents = [
-        '📁 database/*.json (semua file JSON)',
-        '📁 database/cpanel/* (data cPanel)',
-        '📄 storage/database.json (main database)',
-        '📄 db.json (root database)',
-        '📄 database/main/*.json (main database)',
-        '📋 backup_metadata.json (info schema)'
+        '📁 database/*.json (todos los archivos JSON)',
+        '📁 database/cpanel/* (datos de cPanel)',
+        '📄 storage/database.json (base de datos principal)',
+        '📄 db.json (base de datos raíz)',
+        '📄 database/main/*.json (base de datos principal)',
+        '📋 backup_metadata.json (info del esquema)'
     ]
     
     await m.reply(
-        `🕕 *Membuat backup database...*\n\n` +
-        `╭┈┈⬡「 📦 *ᴀᴘᴀ ʏᴀɴɢ ᴅɪ-ʙᴀᴄᴋᴜᴘ* 」\n` +
+        `🕕 *Creando backup de la base de datos...*\n\n` +
+        `╭┈┈⬡「 📦 *QUÉ SE RESPALDA* 」\n` +
         backupContents.map(c => `┃ ${c}`).join('\n') +
         `\n╰┈┈┈┈┈┈┈┈⬡`
     )
@@ -32,15 +32,15 @@ async function handler(m, { sock }) {
     
     if (result.success) {
         await m.reply(
-            `✅ *Backup Berhasil!*\n\n` +
-            `📦 Size: ${result.size}\n` +
-            `📁 Files: ${result.files}\n` +
-            `🔖 Schema: v${SCHEMA_VERSION}\n\n` +
-            `> Type-safe backup, kompatibel dengan update mendatang.\n` +
-            `> Backup telah dikirim ke owner utama.`
+            `✅ *¡Backup exitoso!*\n\n` +
+            `📦 Tamaño: ${result.size}\n` +
+            `📁 Archivos: ${result.files}\n` +
+            `🔖 Esquema: v${SCHEMA_VERSION}\n\n` +
+            `> Backup seguro por tipos, compatible con futuras actualizaciones.\n` +
+            `> El backup ha sido enviado al owner principal.`
         )
     } else {
-        await m.reply(`❌ Backup gagal: ${result.error}`)
+        await m.reply(`❌ Error en el backup: ${result.error}`)
     }
 }
 
