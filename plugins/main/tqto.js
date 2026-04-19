@@ -6,7 +6,7 @@ const pluginConfig = {
     name: 'tqto',
     alias: ['thanksto', 'credits', 'kredit'],
     category: 'main',
-    description: 'Menampilkan daftar kontributor bot',
+    description: 'Mostrar la lista de contribuyentes del bot',
     usage: '.tqto',
     example: '.tqto',
     isOwner: false,
@@ -24,63 +24,63 @@ async function handler(m, { sock }) {
     const developer = config.bot?.developer || 'Lucky Archz'
     
     const credits = [
-        { name: 'hyuuSATAN', role: 'Lead Staff', icon: '👨‍💻' },
-        { name: 'Zann', role: 'Developer', icon: '👨‍💻' },
-        { name: 'Senz Offc', role: 'Asisstant Developer', icon: '👨‍💻' },
-        { name: 'Ell', role: 'Asisstant Developer', icon: '👨‍💻' },
+        { name: 'hyuuSATAN', role: 'Líder del Staff', icon: '👨‍💻' },
+        { name: 'Zann', role: 'Desarrollador', icon: '👨‍💻' },
+        { name: 'Senz Offc', role: 'Desarrollador Asistente', icon: '👨‍💻' },
+        { name: 'Ell', role: 'Desarrollador Asistente', icon: '👨‍💻' },
         { name: 'Mobbc', role: 'Staff', icon: '👨‍💻' },
-        { name: 'Sanxz', role: 'Tangan Kanan', icon: '👨‍💻' },
-        { name: 'Dinz', role: 'Tangan Kanan', icon: '👨‍💻' },
-        { name: 'Forone Store', role: 'Tangan Kanan', icon: '🛒' },
-        { name: 'Rakaa', role: 'Tangan Kanan', icon: '🛒' },
-        { name: 'Sabila', role: 'Tangan Kanan', icon: '👩‍💻' },
-        { name: 'Syura Store', role: 'Tangan Kanan', icon: '👩‍💻' },
-        { name: 'Lyoraaa', role: 'Owner', icon: '👩‍💻' },
-        { name: 'Danzzz', role: 'Owner', icon: '👨‍💻' },
-        { name: 'Muzan', role: 'Owner', icon: '👨‍💻' },
-        { name: 'Gray', role: 'Owner', icon: '👨‍💻' },
-        { name: 'Baim', role: 'Moderator', icon: '👨‍💻' },
-        { name: 'Vadel', role: 'Moderator', icon: '👨‍💻' },
-        { name: 'Fahmi', role: 'Moderator', icon: '👨‍💻' },
-        { name: 'panceo', role: 'Partner', icon: '🛒' },
-        { name: 'Dashxz', role: 'Partner', icon: '🛒' },
-        { name: 'This JanzZ', role: 'Partner', icon: '🛒' },
-        { name: 'Ahmad', role: 'Partner', icon: '🛒' },
-        { name: 'nopal', role: 'Partner', icon: '🛒' },
-        { name: 'tuadit', role: 'Partner', icon: '🛒' },
-        { name: 'andry', role: 'Partner', icon: '🛒' },
-        { name: 'kingdanz', role: 'Partner', icon: '🛒' },
-        { name: 'patih', role: 'Partner', icon: '🛒' },
-        { name: 'Ryuu', role: 'Partner', icon: '🛒' },
-        { name: 'Pororo', role: 'Partner', icon: '🛒' },
-        { name: 'Janzz', role: 'Partner', icon: '🛒' },
-        { name: 'Morvic', role: 'Partner', icon: '🛒' },
-        { name: 'zylnzee', role: 'Partner', icon: '🛒' },
-        { name: 'Farhan', role: 'Partner', icon: '🛒' },
-        { name: 'Alizz', role: 'Partner', icon: '🛒' },
-        { name: 'Kiram', role: 'Partner', icon: '🛒' },
-        { name: 'Minerva', role: 'Partner', icon: '🛒' },
-        { name: 'Riam', role: 'Partner', icon: '🛒' },
-        { name: 'Febri', role: 'Partner', icon: '🛒' },
-        { name: 'Kuze', role: 'Partner', icon: '🛒' },
-        { name: 'Oscar Dani', role: 'Partner', icon: '🛒' },
-        { name: 'Udun', role: 'Partner', icon: '🛒' },
-        { name: 'Zanspiw', role: 'Youtuber', icon: '🌐' },
-        { name: 'Danzz Nano', role: 'Youtuber', icon: '🌐' },
-        { name: 'Youtuber Lain yang udah review', role: 'Youtuber', icon: '🌐' },
-        { name: 'Kalian Semua', role: 'Best', icon: '🌐' },
-        { name: 'Open Source Community', role: 'Libraries & Tools', icon: '🌐' },
+        { name: 'Sanxz', role: 'Mano derecha', icon: '👨‍💻' },
+        { name: 'Dinz', role: 'Mano derecha', icon: '👨‍💻' },
+        { name: 'Forone Store', role: 'Mano derecha', icon: '🛒' },
+        { name: 'Rakaa', role: 'Mano derecha', icon: '🛒' },
+        { name: 'Sabila', role: 'Mano derecha', icon: '👩‍💻' },
+        { name: 'Syura Store', role: 'Mano derecha', icon: '👩‍💻' },
+        { name: 'Lyoraaa', role: 'Propietario', icon: '👩‍💻' },
+        { name: 'Danzzz', role: 'Propietario', icon: '👨‍💻' },
+        { name: 'Muzan', role: 'Propietario', icon: '👨‍💻' },
+        { name: 'Gray', role: 'Propietario', icon: '👨‍💻' },
+        { name: 'Baim', role: 'Moderador', icon: '👨‍💻' },
+        { name: 'Vadel', role: 'Moderador', icon: '👨‍💻' },
+        { name: 'Fahmi', role: 'Moderador', icon: '👨‍💻' },
+        { name: 'panceo', role: 'Socio', icon: '🛒' },
+        { name: 'Dashxz', role: 'Socio', icon: '🛒' },
+        { name: 'This JanzZ', role: 'Socio', icon: '🛒' },
+        { name: 'Ahmad', role: 'Socio', icon: '🛒' },
+        { name: 'nopal', role: 'Socio', icon: '🛒' },
+        { name: 'tuadit', role: 'Socio', icon: '🛒' },
+        { name: 'andry', role: 'Socio', icon: '🛒' },
+        { name: 'kingdanz', role: 'Socio', icon: '🛒' },
+        { name: 'patih', role: 'Socio', icon: '🛒' },
+        { name: 'Ryuu', role: 'Socio', icon: '🛒' },
+        { name: 'Pororo', role: 'Socio', icon: '🛒' },
+        { name: 'Janzz', role: 'Socio', icon: '🛒' },
+        { name: 'Morvic', role: 'Socio', icon: '🛒' },
+        { name: 'zylnzee', role: 'Socio', icon: '🛒' },
+        { name: 'Farhan', role: 'Socio', icon: '🛒' },
+        { name: 'Alizz', role: 'Socio', icon: '🛒' },
+        { name: 'Kiram', role: 'Socio', icon: '🛒' },
+        { name: 'Minerva', role: 'Socio', icon: '🛒' },
+        { name: 'Riam', role: 'Socio', icon: '🛒' },
+        { name: 'Febri', role: 'Socio', icon: '🛒' },
+        { name: 'Kuze', role: 'Socio', icon: '🛒' },
+        { name: 'Oscar Dani', role: 'Socio', icon: '🛒' },
+        { name: 'Udun', role: 'Socio', icon: '🛒' },
+        { name: 'Zanspiw', role: 'YouTuber', icon: '🌐' },
+        { name: 'Danzz Nano', role: 'YouTuber', icon: '🌐' },
+        { name: 'Otros YouTubers que ya hicieron review', role: 'YouTuber', icon: '🌐' },
+        { name: 'Todos ustedes', role: 'Mejores', icon: '🌐' },
+        { name: 'Comunidad Open Source', role: 'Librerías y Herramientas', icon: '🌐' },
 
     ]
     
     const specialThanks = [
-        'Semua tester dan bug reporter',
-        'User yang memberikan feedback',
-        'Komunitas WhatsApp Bot Indonesia'
+        'Todos los testers y reportadores de bugs',
+        'Usuarios que dan feedback',
+        'Comunidad de WhatsApp Bot Indonesia'
     ]
     
     let txt = `✨ *ᴛʜᴀɴᴋs ᴛᴏ*\n\n`
-    txt += `> Terima kasih kepada semua yang berkontribusi!\n\n`
+    txt += `> ¡Gracias a todos los que contribuyeron!\n\n`
     
     txt += `╭─「 👥 *ᴄᴏɴᴛʀɪʙᴜᴛᴏʀs* 」\n`
     credits.forEach((c, i) => {
@@ -98,11 +98,11 @@ async function handler(m, { sock }) {
     
     txt += `╭─「 📋 *ɪɴꜰᴏ ʙᴏᴛ* 」\n`
     txt += `┃ 🤖 \`ɴᴀᴍᴀ\`: *${botName}*\n`
-    txt += `┃ 📦 \`ᴠᴇʀsɪ\`: *${version}*\n`
-    txt += `┃ 👨‍💻 \`ᴅᴇᴠ\`: *${developer}*\n`
+    txt += `┃ 📦 \`ᴠᴇʀsɪóɴ\`: *${version}*\n`
+    txt += `┃ 👨‍💻 \`ᴅᴇsᴀʀʀᴏʟʟᴀᴅᴏʀ\`: *${developer}*\n`
     txt += `╰───────────────\n\n`
     
-    txt += `> Made with ❤️ by the team`
+    txt += `> Hecho con ❤️ por el equipo`
     
     const saluranId = config.saluran?.id || '120363208449943317@newsletter'
     const saluranName = config.saluran?.name || botName
@@ -125,7 +125,7 @@ async function handler(m, { sock }) {
         },
         externalAdReply: {
             title: `✨ Thanks To - ${botName}`,
-            body: `v${version} • Credits & Contributors`,
+            body: `v${version} • Créditos y Contribuidores`,
             sourceUrl: saluranLink,
             mediaType: 1,
             showAdAttribution: false,
@@ -145,7 +145,7 @@ async function handler(m, { sock }) {
         },
         message: {
             extendedTextMessage: {
-                text: `✨ ${botName} Credits`,
+                text: `✨ ${botName} Créditos`,
                 contextInfo: {
                     isForwarded: true,
                     forwardingScore: 9999,
