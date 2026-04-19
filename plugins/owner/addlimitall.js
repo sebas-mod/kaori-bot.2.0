@@ -3,11 +3,11 @@ const { getDatabase } = require('../../src/lib/ourin-database')
 const te = require('../../src/lib/ourin-error')
 
 const pluginConfig = {
-    name: 'addenergiall',
-    alias: ['addenergianall', 'bonusenergiall'],
+    name: 'addlimitcoins',
+    alias: ['addenergiaall', 'addlimitcoins'],
     category: 'owner',
-    description: 'Menambahkan limit/energi ke semua member grup',
-    usage: '.addenergiall <jumlah>',
+    description: 'Agregar límite/energía a todos los miembros del grupo',
+    usage: '.addenergiall <cantidad>',
     example: '.addenergiall 50',
     isOwner: true,
     isPremium: false,
@@ -23,14 +23,14 @@ async function handler(m, { sock }) {
         const amount = parseInt(m.args[0])
         
         if (isNaN(amount) || amount <= 0) {
-            return m.reply(`⚠️ *ᴄᴀʀᴀ ᴘᴀᴋᴀɪ*\n\n> Masukkan jumlah limit yang ingin ditambahkan.\n\n\`Contoh: ${m.prefix}addlimitall 50\``)
+            return m.reply(`⚠️ *USO*\n\n> Ingresa la cantidad de límite que deseas agregar.\n\n\`Ejemplo: ${m.prefix}addlimitall 50\``)
         }
         
         const groupMeta = m.groupMetadata
         const participants = groupMeta.participants || []
         
         if (participants.length === 0) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member di grup ini`)
+            return m.reply(`❌ *ERROR*\n\n> No hay miembros en este grupo`)
         }
         
         m.react('🕕')
@@ -50,7 +50,7 @@ async function handler(m, { sock }) {
         await db.save()
         m.react('⚡')
         await m.reply(
-           `✅ Berhasil menambahkan limit ke semua member ( Total *${successCount}* Member ) di grup *${gb?.subject}*`,
+           `✅ Se agregó correctamente el límite a todos los miembros ( Total *${successCount}* miembros ) en el grupo *${gb?.subject}*`,
             )
         
     } catch (error) {
