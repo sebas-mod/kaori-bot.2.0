@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'addprem',
     alias: ['addpremium', 'setprem', 'delprem', 'delpremium', 'listprem', 'premlist'],
     category: 'owner',
-    description: 'Kelola premium users',
-    usage: '.addprem <nomor/@tag> [hari]\n.delprem <nomor/@tag>\n.listprem\n.cekprem <nomor/@tag>',
+    description: 'Gestionar usuarios premium',
+    usage: '.addprem <número/@tag> [días]\n.delprem <número/@tag>\n.listprem\n.cekprem <número/@tag>',
     example: '.addprem 6281234567890 30',
     isOwner: true,
     isPremium: false,
@@ -19,7 +19,7 @@ const pluginConfig = {
 }
 
 function formatDate(ts) {
-    return new Date(ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+    return new Date(ts).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 function extractTarget(m) {
@@ -43,9 +43,9 @@ async function handler(m, { sock, jadibotId, isJadibot }) {
         if (isJadibot && jadibotId) {
             const jbPremiums = getJadibotPremiums(jadibotId)
             if (jbPremiums.length === 0) {
-                return m.reply(`💎 Belum ada premium di jadibot ini\nGunakan \`${m.prefix}addprem\` untuk menambah`)
+                return m.reply(`💎 No hay usuarios premium en este jadibot\nUsa \`${m.prefix}addprem\` para agregar`)
             }
-            let txt = `💎 *DAFTAR PREMIUM JADIBOT* — ${jadibotId}\n\n`
+            let txt = `💎 *LISTA PREMIUM JADIBOT* — ${jadibotId}\n\n`
             jbPremiums.forEach((p, i) => {
                 const num = typeof p === 'string' ? p : p.jid
                 txt += `${i + 1}. \`${num}\`\n`
@@ -55,16 +55,16 @@ async function handler(m, { sock, jadibotId, isJadibot }) {
         }
 
         if (db.data.premium.length === 0) {
-            return m.reply(`💎 Belum ada premium terdaftar`)
+            return m.reply(`💎 No hay usuarios premium registrados`)
         }
-        let txt = `💎 *DAFTAR PREMIUM*\n\n`
+        let txt = `💎 *LISTA PREMIUM*\n\n`
         const now = Date.now()
         db.data.premium.forEach((p, i) => {
             const num = typeof p === 'string' ? p : p.id
             const remaining = typeof p === 'object' && p.expired
                 ? Math.ceil((p.expired - now) / (1000 * 60 * 60 * 24))
                 : null
-            const status = remaining === null ? 'Permanent' : (remaining > 0 ? remaining + 'd' : 'Expired')
+            const status = remaining === null ? 'Permanente' : (remaining > 0 ? remaining + 'd' : 'Expirado')
             txt += `${i + 1}. \`${num}\` — ${status}\n`
         })
         txt += `\nTotal: *${db.data.premium.length}* premium`
@@ -74,7 +74,7 @@ async function handler(m, { sock, jadibotId, isJadibot }) {
     let targetNumber = extractTarget(m)
 
     if (!targetNumber) {
-        return m.reply(`💎 *${isAdd ? 'ADD' : 'DEL'} PREMIUM*\n\nMasukkan nomor atau tag user\n\`Contoh: ${m.prefix}${cmd} 6281234567890\``)
+        return m.reply(`💎 *${isAdd ? 'AGREGAR' : 'ELIMINAR'} PREMIUM*\n\nIngresa el número o etiqueta al usuario\n\`Ejemplo: ${m.prefix}${cmd} 6281234567890\``)
     }
 
     if (targetNumber.startsWith('0')) {
@@ -82,23 +82,23 @@ async function handler(m, { sock, jadibotId, isJadibot }) {
     }
 
     if (targetNumber.length < 10 || targetNumber.length > 15) {
-        return m.reply(`❌ Format nomor tidak valid`)
+        return m.reply(`❌ Formato de número inválido`)
     }
 
     if (isJadibot && jadibotId) {
         if (isAdd) {
             if (addJadibotPremium(jadibotId, targetNumber)) {
                 m.react('💎')
-                return m.reply(`✅ Berhasil menambahkan *${targetNumber}* sebagai premium jadibot`)
+                return m.reply(`✅ Se agregó correctamente *${targetNumber}* como premium del jadibot`)
             } else {
-                return m.reply(`❌ \`${targetNumber}\` sudah premium di Jadibot ini`)
+                return m.reply(`❌ \`${targetNumber}\` ya es premium en este Jadibot`)
             }
         } else if (isDel) {
             if (removeJadibotPremium(jadibotId, targetNumber)) {
                 m.react('✅')
-                return m.reply(`✅ Berhasil menghapus *${targetNumber}* dari premium jadibot`)
+                return m.reply(`✅ Se eliminó correctamente *${targetNumber}* del jadibot`)
             } else {
-                return m.reply(`❌ \`${targetNumber}\` bukan premium di Jadibot ini`)
+                return m.reply(`❌ \`${targetNumber}\` no es premium en este Jadibot`)
             }
         }
         return
@@ -110,7 +110,7 @@ async function handler(m, { sock, jadibotId, isJadibot }) {
         )
 
         const days = parseInt(m.args?.find(a => /^\d+$/.test(a) && a.length <= 4)) || 30
-        const pushName = m.quoted?.pushName || m.pushName || 'Unknown'
+        const pushName = m.quoted?.pushName || m.pushName || 'Desconocido'
         const now = Date.now()
 
         let newExpired
@@ -157,14 +157,14 @@ async function handler(m, { sock, jadibotId, isJadibot }) {
         db.save()
 
         m.react('💎')
-        return m.reply(`✅ Berhasil ${existingIndex !== -1 ? 'memperpanjang' : 'menambahkan'} premium *${targetNumber}* selama *${days} hari*\nExpired: *${formatDate(newExpired)}*`)
+        return m.reply(`✅ Se ${existingIndex !== -1 ? 'extendió' : 'agregó'} el premium a *${targetNumber}* por *${days} días*\nExpira: *${formatDate(newExpired)}*`)
     } else if (isDel) {
         const index = db.data.premium.findIndex(p =>
             typeof p === 'string' ? p === targetNumber : p.id === targetNumber
         )
 
         if (index === -1) {
-            return m.reply(`❌ *${targetNumber}* bukan premium`)
+            return m.reply(`❌ *${targetNumber}* no es premium`)
         }
 
         db.data.premium.splice(index, 1)
@@ -178,7 +178,7 @@ async function handler(m, { sock, jadibotId, isJadibot }) {
 
         db.save()
         m.react('✅')
-        return m.reply(`✅ Berhasil menghapus *${targetNumber}* dari premium`)
+        return m.reply(`✅ Se eliminó correctamente *${targetNumber}* de premium`)
     }
 }
 
