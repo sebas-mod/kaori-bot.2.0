@@ -8,7 +8,7 @@ const pluginConfig = {
     name: 'cekschedule',
     alias: ['cekscheduler', 'schedulerstatus', 'schedstatus'],
     category: 'owner',
-    description: 'Melihat status semua scheduler bot',
+    description: 'Ver el estado de todos los schedulers del bot',
     usage: '.cekschedule',
     example: '.cekschedule',
     isOwner: true,
@@ -26,37 +26,37 @@ async function handler(m, { sock }) {
         const db = getDatabase();
         const sholatEnabled = db.setting('autoSholat') || false;
 
-        let text = `📊 *sᴄʜᴇᴅᴜʟᴇʀ sᴛᴀᴛᴜs*\n\n`;
+        let text = `📊 *ᴇsᴛᴀᴅᴏ ᴅᴇʟ sᴄʜᴇᴅᴜʟᴇʀ*\n\n`;
 
         for (const sched of status.schedulers) {
             const statusIcon = sched.running ? '✅' : '❌';
             text += `${statusIcon} *${sched.name}*\n`;
-            text += `   └ Key: \`${sched.key}\`\n`;
+            text += `   └ Clave: \`${sched.key}\`\n`;
             text += `   └ ${sched.description}\n`;
 
             if (sched.lastRun && sched.lastRun !== '-' && sched.lastRun !== 'Never') {
-                text += `   └ Last: ${sched.lastRun}\n`;
+                text += `   └ Última ejecución: ${sched.lastRun}\n`;
             }
 
             if (sched.stats) {
                 if (sched.stats.totalResets) {
-                    text += `   └ Total Resets: ${sched.stats.totalResets}\n`;
+                    text += `   └ Total reinicios: ${sched.stats.totalResets}\n`;
                 }
                 if (sched.stats.activeMessages !== undefined) {
-                    text += `   └ Active: ${sched.stats.activeMessages} | Sent: ${sched.stats.totalSent}\n`;
+                    text += `   └ Activos: ${sched.stats.activeMessages} | Enviados: ${sched.stats.totalSent}\n`;
                 }
             }
             text += `\n`;
         }
 
         const sholatIcon = sholatEnabled ? '✅' : '❌';
-        text += `${sholatIcon} *Sholat Scheduler*\n`;
-        text += `   └ Key: \`sholat\`\n`;
-        text += `   └ Notifikasi waktu sholat (real-time)\n`;
+        text += `${sholatIcon} *Scheduler de Sholat*\n`;
+        text += `   └ Clave: \`sholat\`\n`;
+        text += `   └ Notificaciones de horarios de oración (tiempo real)\n`;
 
         if (sholatEnabled) {
             const kotaSetting = db.setting('autoSholatKota') || { id: '1301', nama: 'KOTA JAKARTA' };
-            text += `   └ Lokasi: ${kotaSetting.nama}\n`;
+            text += `   └ Ubicación: ${kotaSetting.nama}\n`;
 
             try {
                 const { schedule } = await getTodaySchedule(kotaSetting.id);
@@ -80,19 +80,19 @@ async function handler(m, { sock }) {
                     nextTime = times.imsak;
                 }
 
-                text += `   └ Next: ${nextSholat} (${nextTime} WIB)\n`;
+                text += `   └ Próximo: ${nextSholat} (${nextTime} WIB)\n`;
             } catch {
-                text += `   └ _Gagal memuat jadwal_\n`;
+                text += `   └ _Error al cargar el horario_\n`;
             }
         }
 
         text += `\n`;
         text += `━━━━━━━━━━━━━━━━━━━\n`;
-        text += `✅ Aktif: ${status.summary.totalActive + (sholatEnabled ? 1 : 0)}\n`;
-        text += `❌ Nonaktif: ${status.summary.totalInactive + (!sholatEnabled ? 1 : 0)}\n\n`;
+        text += `✅ Activos: ${status.summary.totalActive + (sholatEnabled ? 1 : 0)}\n`;
+        text += `❌ Inactivos: ${status.summary.totalInactive + (!sholatEnabled ? 1 : 0)}\n\n`;
 
-        text += `> Gunakan \`.stopschedule <key>\` untuk stop\n`;
-        text += `> Gunakan \`.startschedule <key>\` untuk start`;
+        text += `> Usa \`.stopschedule <clave>\` para detener\n`;
+        text += `> Usa \`.startschedule <clave>\` para iniciar`;
 
         await m.reply(text);
     } catch (error) {
