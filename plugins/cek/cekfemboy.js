@@ -5,16 +5,16 @@ const te = require('../../src/lib/ourin-error')
 const pluginConfig = {
     name: 'cekfemboy',
     alias: ['femboy'],
-    category: 'cek',
-    description: 'Cek seberapa femboy kamu',
-    usage: '.cekfemboy <nama>',
+    category: 'chequeo',
+    description: 'Verifica qué tan femboy eres',
+    usage: '.cekfemboy <nombre>',
     example: '.cekfemboy Budi',
     isOwner: false,
     isPremium: false,
     isGroup: false,
     isPrivate: false,
     cooldown: 5,
-    energi: 0,
+    energia: 0,
     isEnabled: true
 }
 
@@ -29,12 +29,12 @@ async function handler(m, { sock }) {
             buffer = await fetchBuffer(result.gif)
         } catch (e) {}
         
-        let txt = mentioned === m.sender ? `Hai @${mentioned.split('@')[0]}
+        let txt = mentioned === m.sender ? `Hola @${mentioned.split('@')[0]}
     
-Tingkat kefemboyan kamu *${percent}%*
-\`\`\`${desc}\`\`\`` : `Kamu ingin ngecek tingkat kefemboyan @${mentioned.split('@')[0]} yak? 
+Nivel de femboy tuyo *${percent}%*
+\`\`\`${desc}\`\`\`` : `¿Quieres comprobar el nivel de femboy de @${mentioned.split('@')[0]}?
     
-Tingkat kefemboyan dia sebesar *${percent}%*
+Su nivel de femboy es *${percent}%*
 \`\`\`${desc}\`\`\``
     
     await m.reply(txt, { mentions: [mentioned] })
