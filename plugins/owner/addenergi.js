@@ -1,12 +1,12 @@
 const { getDatabase } = require('../../src/lib/ourin-database')
 
 const pluginConfig = {
-    name: 'addenergi',
-    alias: ['tambahenergi', 'giveenergi', 'addenergy'],
+    name: 'coins',
+    alias: ['sumarcoins', 'agregarcoins', 'addcoins'],
     category: 'owner',
-    description: 'Tambah energi user',
-    usage: '.addenergi <jumlah> @user',
-    example: '.addenergi 100 @user',
+    description: 'Agregar coins a un usuario',
+    usage: '.coins <cantidad> @usuario',
+    example: '.coins 100 @usuario',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -17,7 +17,7 @@ const pluginConfig = {
 }
 
 function formatNumber(num) {
-    if (num === -1) return '∞ Unlimited'
+    if (num === -1) return '∞ Ilimitado'
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
@@ -53,43 +53,45 @@ async function handler(m, { sock }) {
 
     if (!targetJid || (!isUnlimited && amount <= 0)) {
         return m.reply(
-            `⚡ *ᴀᴅᴅ ᴇɴᴇʀɢɪ*\n\n` +
-            `> \`.addenergi <jumlah>\` - ke diri sendiri\n` +
-            `> \`.addenergi <jumlah> @user\` - ke user\n` +
-            `> \`.addenergi --unlimited\` - unlimited\n\n` +
-            `\`Contoh: ${m.prefix}addenergi 100\``
+            `🪙 *ADD COINS*\n\n` +
+            `> \`.coins <cantidad>\` - para uno mismo\n` +
+            `> \`.coins <cantidad> @usuario\` - para otro usuario\n` +
+            `> \`.coins --unlimited\` - ilimitado\n\n` +
+            `\`Ejemplo: ${m.prefix}coins 100\``
         )
     }
 
     const user = db.getUser(targetJid) || db.setUser(targetJid)
     const config = require('../../config')
-    const effectiveUnlimited = user.energi === -1 ||
-        (config.isOwner(targetJid) && (config.energi?.owner ?? -1) === -1) ||
-        (config.isPremium(targetJid) && (config.energi?.premium ?? -1) === -1)
+    const effectiveUnlimited = user.coins === -1 ||
+        (config.isOwner(targetJid) && (config.coins?.owner ?? -1) === -1) ||
+        (config.isPremium(targetJid) && (config.coins?.premium ?? -1) === -1)
 
     if (!isUnlimited && effectiveUnlimited) {
         return m.reply(
-            `⚡ *INFORMASI*\n` +
-            `@${targetJid.split('@')[0]} sudah memiliki energi *∞ Unlimited*\n` +
-            `Tidak perlu menambahkan energi lagi`,
+            `🪙 *INFORMACIÓN*\n` +
+            `@${targetJid.split('@')[0]} ya tiene coins *∞ Ilimitados*\n` +
+            `No es necesario agregar más`,
             { mentions: [targetJid] }
         )
     }
 
     if (isUnlimited) {
-        db.setUser(targetJid, { energi: -1 })
+        db.setUser(targetJid, { coins: -1 })
 
         m.react('✅')
         await m.reply(
-            `✅ *Energi @${targetJid.split('@')[0]} sekarang unlimited / tidak terbatas*`,
+            `✅ *Los coins de @${targetJid.split('@')[0]} ahora son ilimitados*`,
             { mentions: [targetJid] }
         )
     } else {
-        const newEnergi = db.updateEnergi(targetJid, amount)
+        const newCoins = db.updateCoins
+            ? db.updateCoins(targetJid, amount)
+            : ((user.coins = (user.coins || 0) + amount), user.coins)
 
         m.react('✅')
         await m.reply(
-            `✅ Energi *@${targetJid.split('@')[0]}* berhasil di tambahkan sebanyak *${formatNumber(amount)}*!\nSekarang dia mempunyai *${formatNumber(newEnergi)}* energi`,
+            `✅ Coins de *@${targetJid.split('@')[0]}* agregados: *${formatNumber(amount)}*!\nAhora tiene *${formatNumber(newCoins)}* coins`,
             { mentions: [targetJid] }
         )
     }
