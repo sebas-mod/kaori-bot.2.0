@@ -6,9 +6,9 @@ const pluginConfig = {
     name: 'addpremall',
     alias: ['addpremiumall', 'setpremall'],
     category: 'owner',
-    description: 'Menambahkan semua member grup ke premium',
-    usage: '.addprem all',
-    example: '.addprem all',
+    description: 'Agregar a todos los miembros del grupo al premium',
+    usage: '.addpremall',
+    example: '.addpremall',
     isOwner: true,
     isPremium: false,
     isGroup: true,
@@ -24,7 +24,7 @@ async function handler(m, { sock }) {
         const participants = groupMeta.participants || []
         
         if (participants.length === 0) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member di grup ini`)
+            return m.reply(`❌ *ERROR*\n\n> No hay miembros en este grupo`)
         }
         
         m.react('🕕')
@@ -44,6 +44,7 @@ async function handler(m, { sock }) {
                 alreadyPremCount++
                 continue
             }  
+
             db.data.premium.push(number)
             
             const jid = number + '@s.whatsapp.net'
@@ -56,6 +57,7 @@ async function handler(m, { sock }) {
             db.setUser(jid, user)
             db.updateExp(jid, 200000)
             db.updateKoin(jid, 20000)
+
             addedCount++
         }
         
@@ -63,14 +65,14 @@ async function handler(m, { sock }) {
         
         m.react('💎')
         await m.reply(
-            `💎 *ᴀᴅᴅ ᴘʀᴇᴍɪᴜᴍ ᴀʟʟ*\n\n` +
-            `╭┈┈⬡「 📋 *ʜᴀsɪʟ* 」\n` +
-            `┃ 👥 ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀ: \`${participants.length}\`\n` +
-            `┃ ✅ ᴅɪᴛᴀᴍʙᴀʜᴋᴀɴ: \`${addedCount}\`\n` +
-            `┃ ⏭️ sᴜᴅᴀʜ ᴘʀᴇᴍɪᴜᴍ: \`${alreadyPremCount}\`\n` +
-            `┃ 💎 ᴛᴏᴛᴀʟ ᴘʀᴇᴍɪᴜᴍ: \`${db.data.premium.length}\`\n` +
+            `💎 *AGREGAR PREMIUM A TODOS*\n\n` +
+            `╭┈┈⬡「 📋 *RESULTADO* 」\n` +
+            `┃ 👥 TOTAL MIEMBROS: \`${participants.length}\`\n` +
+            `┃ ✅ AGREGADOS: \`${addedCount}\`\n` +
+            `┃ ⏭️ YA ERAN PREMIUM: \`${alreadyPremCount}\`\n` +
+            `┃ 💎 TOTAL PREMIUM: \`${db.data.premium.length}\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Grup: ${groupMeta.subject}`
+            `> Grupo: ${groupMeta.subject}`
         )
         
     } catch (error) {
