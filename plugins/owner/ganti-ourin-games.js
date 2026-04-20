@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'ganti-ourin-games.jpg',
     alias: ['gantigames', 'setouringames'],
     category: 'owner',
-    description: 'Ganti gambar ourin-games.jpg (thumbnail games)',
-    usage: '.ganti-ourin-games.jpg (reply/kirim gambar)',
+    description: 'Cambiar la imagen ourin-games.jpg (thumbnail de juegos)',
+    usage: '.ganti-ourin-games.jpg (responder/enviar imagen)',
     example: '.ganti-ourin-games.jpg',
     isOwner: true,
     isPremium: false,
@@ -22,7 +22,11 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🖼️ *ɢᴀɴᴛɪ ᴏᴜʀɪɴ-ɢᴀᴍᴇs.ᴊᴘɢ*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin-games.jpg`)
+        return m.reply(
+            `🖼️ *CAMBIAR OURIN-GAMES.JPG*\n\n` +
+            `> Envía o responde con una imagen para reemplazarla\n` +
+            `> Archivo: assets/images/ourin-games.jpg`
+        )
     }
     
     try {
@@ -34,7 +38,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin-games.jpg')
@@ -46,7 +50,10 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin-games.jpg telah diganti`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> La imagen ourin-games.jpg fue reemplazada correctamente`
+        )
         
     } catch (error) {
         m.reply(te(m.prefix, m.command, m.pushName))
