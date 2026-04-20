@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'disableplugin',
     alias: ['dplugin', 'plugindisable', 'offplugin'],
     category: 'owner',
-    description: 'Menonaktifkan plugin tertentu',
-    usage: '.disableplugin <nama_plugin>',
+    description: 'Desactivar un plugin específico',
+    usage: '.disableplugin <nombre_plugin>',
     example: '.disableplugin sticker',
     isOwner: true,
     isPremium: false,
@@ -57,9 +57,9 @@ async function handler(m, { sock }) {
     
     if (!pluginName) {
         return m.reply(
-            `🔌 *ᴅɪsᴀʙʟᴇ ᴘʟᴜɢɪɴ*\n\n` +
-            `> Masukkan nama plugin yang ingin dinonaktifkan\n\n` +
-            `*Contoh:*\n` +
+            `🔌 *DESACTIVAR PLUGIN*\n\n` +
+            `> Ingresa el nombre del plugin que quieres desactivar\n\n` +
+            `*Ejemplo:*\n` +
             `> \`${m.prefix}disableplugin sticker\`\n` +
             `> \`${m.prefix}disableplugin tiktok\``
         )
@@ -68,13 +68,13 @@ async function handler(m, { sock }) {
     const found = findPluginFile(pluginName)
     
     if (!found) {
-        return m.reply(`❌ Plugin *${pluginName}* tidak ditemukan!`)
+        return m.reply(`❌ Plugin *${pluginName}* no encontrado!`)
     }
     
     const { filePath, plugin, category, file } = found
     
     if (plugin.config.isEnabled === false) {
-        return m.reply(`⚠️ Plugin *${pluginName}* sudah dinonaktifkan!`)
+        return m.reply(`⚠️ El plugin *${pluginName}* ya está desactivado!`)
     }
     
     try {
@@ -90,14 +90,14 @@ async function handler(m, { sock }) {
         delete require.cache[require.resolve(filePath)]
         
         await m.reply(
-            `✅ *ᴘʟᴜɢɪɴ ᴅɪsᴀʙʟᴇᴅ*\n\n` +
-            `╭┈┈⬡「 📋 *ᴅᴇᴛᴀɪʟ* 」\n` +
+            `✅ *PLUGIN DESACTIVADO*\n\n` +
+            `╭┈┈⬡「 📋 *DETALLE* 」\n` +
             `┃ 📦 Plugin: *${plugin.config.name}*\n` +
-            `┃ 📁 Category: *${category}*\n` +
-            `┃ 📄 File: *${file}*\n` +
-            `┃ 🔴 Status: *Disabled*\n` +
+            `┃ 📁 Categoría: *${category}*\n` +
+            `┃ 📄 Archivo: *${file}*\n` +
+            `┃ 🔴 Estado: *Desactivado*\n` +
             `╰┈┈⬡\n\n` +
-            `> Restart bot atau gunakan hot reload untuk apply.`
+            `> Reinicia el bot o usa hot reload para aplicar los cambios.`
         )
         
     } catch (error) {
