@@ -6,7 +6,7 @@ const pluginConfig = {
     name: 'delpremall',
     alias: ['delpremiumall', 'removepremall'],
     category: 'owner',
-    description: 'Menghapus semua member grup dari premium',
+    description: 'Eliminar todos los miembros del grupo del premium',
     usage: '.delprem all',
     example: '.delprem all',
     isOwner: true,
@@ -24,7 +24,7 @@ async function handler(m, { sock }) {
         const participants = groupMeta.participants || []
         
         if (participants.length === 0) {
-            return m.reply(`❌ *ɢᴀɢᴀʟ*\n\n> Tidak ada member di grup ini`)
+            return m.reply(`❌ *ERROR*\n\n> No hay miembros en este grupo`)
         }
         
         m.react('🕕')
@@ -62,14 +62,14 @@ async function handler(m, { sock }) {
         m.react('🗑️')
         
         await m.reply(
-            `🗑️ *ᴅᴇʟ ᴘʀᴇᴍɪᴜᴍ ᴀʟʟ*\n\n` +
-            `╭┈┈⬡「 📋 *ʜᴀsɪʟ* 」\n` +
-            `┃ 👥 ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀ: \`${participants.length}\`\n` +
-            `┃ ✅ ᴅɪʜᴀᴘᴜs: \`${removedCount}\`\n` +
-            `┃ ⏭️ ʙᴜᴋᴀɴ ᴘʀᴇᴍɪᴜᴍ: \`${notPremCount}\`\n` +
-            `┃ 💎 sɪsᴀ ᴘʀᴇᴍɪᴜᴍ: \`${db.data.premium.length}\`\n` +
+            `🗑️ *ELIMINAR PREMIUM (TODOS)*\n\n` +
+            `╭┈┈⬡「 📋 *RESULTADO* 」\n` +
+            `┃ 👥 Total miembros: \`${participants.length}\`\n` +
+            `┃ ✅ Eliminados: \`${removedCount}\`\n` +
+            `┃ ⏭️ No eran premium: \`${notPremCount}\`\n` +
+            `┃ 💎 Premium restantes: \`${db.data.premium.length}\`\n` +
             `╰┈┈⬡\n\n` +
-            `> Grup: ${groupMeta.subject}`
+            `> Grupo: ${groupMeta.subject}`
         )
         
     } catch (error) {
