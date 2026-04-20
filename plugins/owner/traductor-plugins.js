@@ -22,7 +22,6 @@ const pluginConfig = {
 
 const FOLDER_SKIP = new Set(['node_modules', '.git', 'backup', 'session', 'tmp'])
 const DICTIONARY_PATH = path.join(process.cwd(), 'assets', 'json', 'translation-es.json')
-
 const WORD_MAP = [
     ['tidak ada', 'no hay'],
     ['selamat datang', 'bienvenido'],
@@ -495,11 +494,17 @@ async function handler(m) {
             return m.reply(`No encontre archivos para traducir con: \`${args.join(' ')}\``)
         }
 
-        await m.reply(`Estoy completando el diccionario y traduciendo ${targets.length} archivo(s). Esto puede tardar si faltan muchas frases.`)
+        await m.reply(`🧠 Estoy completando el diccionario y preparando la traduccion de ${targets.length} archivo(s). Esto puede tardar si faltan muchas frases.`)
 
         const completed = await fillMissingTranslations(targets, phraseMap)
         phraseMap = completed.phraseMap
         savePhraseMap(phraseMap)
+
+        await m.reply(
+            `✅ Diccionario actualizado.\n\n` +
+            `> Frases nuevas agregadas: ${completed.translatedCount}\n` +
+            `> Ahora voy a aplicar la traduccion en los plugins...`
+        )
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
         const backupRoot = path.join(process.cwd(), 'backup', 'translate-plugins', timestamp)
@@ -536,7 +541,7 @@ async function handler(m) {
         }
 
         let replyText =
-            `Traduccion completada.\n\n` +
+            `🎉 Traduccion completada.\n\n` +
             `> Frases agregadas al diccionario: ${completed.translatedCount}\n` +
             `> Archivos cambiados: ${changedFiles}\n` +
             `> Cadenas ajustadas: ${totalStringChanges}\n` +
