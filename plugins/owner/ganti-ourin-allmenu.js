@@ -6,8 +6,8 @@ const pluginConfig = {
     name: 'ganti-ourin-allmenu.jpg',
     alias: ['gantiallemenu', 'setourinallmenu'],
     category: 'owner',
-    description: 'Ganti gambar ourin-allmenu.jpg (thumbnail allmenu)',
-    usage: '.ganti-ourin-allmenu.jpg (reply/kirim gambar)',
+    description: 'Cambiar la imagen ourin-allmenu.jpg (thumbnail del allmenu)',
+    usage: '.ganti-ourin-allmenu.jpg (responder/enviar imagen)',
     example: '.ganti-ourin-allmenu.jpg',
     isOwner: true,
     isPremium: false,
@@ -22,7 +22,11 @@ async function handler(m, { sock }) {
     const isImage = m.isImage || (m.quoted && m.quoted.type === 'imageMessage')
     
     if (!isImage) {
-        return m.reply(`🖼️ *ɢᴀɴᴛɪ ᴏᴜʀɪɴ-ᴀʟʟᴍᴇɴᴜ.ᴊᴘɢ*\n\n> Kirim/reply gambar untuk mengganti\n> File: assets/images/ourin-allmenu.jpg`)
+        return m.reply(
+            `🖼️ *CAMBIAR OURIN-ALLMENU.JPG*\n\n` +
+            `> Envía o responde con una imagen para reemplazarla\n` +
+            `> Archivo: assets/images/ourin-allmenu.jpg`
+        )
     }
     
     try {
@@ -34,7 +38,7 @@ async function handler(m, { sock }) {
         }
         
         if (!buffer) {
-            return m.reply(`❌ Gagal mendownload gambar`)
+            return m.reply(`❌ Error al descargar la imagen`)
         }
         
         const targetPath = path.join(process.cwd(), 'assets', 'images', 'ourin-allmenu.jpg')
@@ -46,7 +50,10 @@ async function handler(m, { sock }) {
         
         fs.writeFileSync(targetPath, buffer)
         
-        m.reply(`✅ *ʙᴇʀʜᴀsɪʟ*\n\n> Gambar ourin-allmenu.jpg telah diganti`)
+        m.reply(
+            `✅ *ÉXITO*\n\n` +
+            `> La imagen ourin-allmenu.jpg fue reemplazada correctamente`
+        )
         
     } catch (error) {
         m.reply(te(m.prefix, m.command, m.pushName))
