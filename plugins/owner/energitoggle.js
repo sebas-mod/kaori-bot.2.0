@@ -5,8 +5,8 @@ const pluginConfig = {
     name: ['disableenergi', 'enableenergi'],
     alias: ['offenergi', 'onenergi'],
     category: 'owner',
-    description: 'Enable/disable sistem energi',
-    usage: '.disableenergi atau .enableenergi',
+    description: 'Activar/desactivar el sistema de energía',
+    usage: '.disableenergi o .enableenergi',
     example: '.disableenergi',
     isOwner: true,
     cooldown: 5,
@@ -25,8 +25,8 @@ async function handler(m) {
     m.react(isEnable ? '⚡' : '🔌')
     return m.reply(
         isEnable
-            ? '⚡ *sɪsᴛᴇᴍ ᴇɴᴇʀɢɪ ᴅɪᴀᴋᴛɪꜰᴋᴀɴ*\n\n> Setiap command sekarang memerlukan energi.'
-            : '🔌 *sɪsᴛᴇᴍ ᴇɴᴇʀɢɪ ᴅɪɴᴏɴᴀᴋᴛɪꜰᴋᴀɴ*\n\n> Command tidak lagi membutuhkan energi.'
+            ? '⚡ *SISTEMA DE ENERGÍA ACTIVADO*\n\n> Ahora cada comando requiere energía.'
+            : '🔌 *SISTEMA DE ENERGÍA DESACTIVADO*\n\n> Los comandos ya no requieren energía.'
     )
 }
 
