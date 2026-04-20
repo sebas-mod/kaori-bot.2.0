@@ -6,7 +6,7 @@ const pluginConfig = {
     name: 'setmenu',
     alias: ['menuvariant', 'menustyle'],
     category: 'owner',
-    description: 'Mengatur variant tampilan menu',
+    description: 'Configurar la variante de visualización del menú',
     usage: '.setmenu <v1-v13>',
     example: '.setmenu v8',
     isOwner: true,
@@ -19,20 +19,20 @@ const pluginConfig = {
 };
 
 const VARIANTS = {
-    v1: { id: 1, name: 'Simple', desc: 'Image biasa tanpa contextInfo' },
-    v2: { id: 2, name: 'Standard', desc: 'Image + full contextInfo (default)' },
-    v3: { id: 3, name: 'Document', desc: 'Document + jpegThumbnail + verified quoted' },
-    v4: { id: 4, name: 'Video', desc: 'Video + contextInfo + verified quoted' },
-    v5: { id: 5, name: 'Button', desc: 'Image + buttons (single_select & quick_reply)' },
-    v6: { id: 6, name: 'Document Premium', desc: 'Document + jpegThumbnail 1280x450 + full contextInfo' },
-    v7: { id: 7, name: 'Carousel', desc: 'Swipeable cards per kategori (modern)' },
-    v8: { id: 8, name: 'Minimalist', desc: 'Image + ftroli quoted + fresh design' },
-    v9: { id: 9, name: 'NativeFlow', desc: 'Interactive + limited_time_offer + bottom_sheet + single_select' },
-    v10: { id: 10, name: 'NativeFlow', desc: 'OURINNNNNNNNNN' },
-    v11: { id: 11, name: 'Document Interactive', desc: 'Document + nativeFlowMessage + limited_time_offer + cta buttons' },
-    v12: { id: 12, name: 'MENU VERSI 12', desc: 'XXXXXX' },
-    v13: { id: 13, name: 'Canvas Thumbnail', desc: 'Document style V6 + Canvas Banner Thumbnail' },
-    v14: { id: 14, name: 'MENU VERSI 14', desc: 'XXXXXX' }
+    v1: { id: 1, name: 'Simple', desc: 'Imagen básica sin contextInfo' },
+    v2: { id: 2, name: 'Estándar', desc: 'Imagen + contextInfo completo (por defecto)' },
+    v3: { id: 3, name: 'Documento', desc: 'Documento + jpegThumbnail + quoted verificado' },
+    v4: { id: 4, name: 'Video', desc: 'Video + contextInfo + quoted verificado' },
+    v5: { id: 5, name: 'Botones', desc: 'Imagen + botones (single_select & quick_reply)' },
+    v6: { id: 6, name: 'Documento Premium', desc: 'Documento + jpegThumbnail 1280x450 + contextInfo completo' },
+    v7: { id: 7, name: 'Carrusel', desc: 'Tarjetas deslizables por categoría (moderno)' },
+    v8: { id: 8, name: 'Minimalista', desc: 'Imagen + ftroli quoted + diseño moderno' },
+    v9: { id: 9, name: 'Flujo Nativo', desc: 'Interactivo + oferta limitada + bottom_sheet + selección única' },
+    v10: { id: 10, name: 'Flujo Nativo', desc: 'OURINNNNNNNNNN' },
+    v11: { id: 11, name: 'Documento Interactivo', desc: 'Documento + nativeFlowMessage + oferta limitada + botones CTA' },
+    v12: { id: 12, name: 'MENÚ VERSIÓN 12', desc: 'XXXXXX' },
+    v13: { id: 13, name: 'Miniatura Canvas', desc: 'Estilo documento V6 + banner canvas' },
+    v14: { id: 14, name: 'MENÚ VERSIÓN 14', desc: 'XXXXXX' }
 };
 
 async function handler(m, { sock, db }) {
@@ -42,7 +42,7 @@ async function handler(m, { sock, db }) {
     if (variant) {
         const selected = VARIANTS[variant];
         if (!selected) {
-            await m.reply(`❌ Variant tidak valid!\n\nGunakan: v1 s/d v14`);
+            await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v14`);
             return;
         }
 
@@ -50,7 +50,7 @@ async function handler(m, { sock, db }) {
         await db.save();
 
         await m.reply(
-            `✅ Menu variant diubah ke *V${selected.id}*\n\n` +
+            `✅ Variante del menú cambiada a *V${selected.id}*\n\n` +
             `> *${selected.name}*\n` +
             `> _${selected.desc}_`
         );
@@ -66,19 +66,19 @@ async function handler(m, { sock, db }) {
     }));
 
     const bodyText =
-        `🎨 *sᴇᴛ ᴍᴇɴᴜ ᴠᴀʀɪᴀɴᴛ*\n\n` +
-        `> Variant aktif: *V${current}*\n` +
-        `> _${VARIANTS[`v${current}`]?.name || 'Unknown'}_\n\n` +
-        `> Pilih variant dari daftar di bawah`;
+        `🎨 *CONFIGURAR VARIANTE DEL MENÚ*\n\n` +
+        `> Variante actual: *V${current}*\n` +
+        `> _${VARIANTS[`v${current}`]?.name || 'Desconocido'}_\n\n` +
+        `> Selecciona una variante de la lista`;
 
     try {
         const interactiveButtons = [
             {
                 name: 'single_select',
                 buttonParamsJson: JSON.stringify({
-                    title: '🎨 ᴘɪʟɪʜ ᴠᴀʀɪᴀɴᴛ',
+                    title: '🎨 ELEGIR VARIANTE',
                     sections: [{
-                        title: 'ᴅᴀꜰᴛᴀʀ ᴠᴀʀɪᴀɴᴛ ᴍᴇɴᴜ',
+                        title: 'LISTA DE VARIANTES DE MENÚ',
                         rows
                     }]
                 })
@@ -100,8 +100,8 @@ async function handler(m, { sock, db }) {
                             text: config.bot?.name || 'Ourin-AI'
                         }),
                         header: proto.Message.InteractiveMessage.Header.fromObject({
-                            title: '🎨 Menu Variant',
-                            subtitle: `${Object.keys(VARIANTS).length} variant tersedia`,
+                            title: '🎨 Variante del Menú',
+                            subtitle: `${Object.keys(VARIANTS).length} variantes disponibles`,
                             hasMediaAttachment: false
                         }),
                         nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
@@ -124,13 +124,13 @@ async function handler(m, { sock, db }) {
 
         await sock.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
     } catch {
-        let txt = `🎨 *sᴇᴛ ᴍᴇɴᴜ ᴠᴀʀɪᴀɴᴛ*\n\n`;
-        txt += `> Variant saat ini: *V${current}*\n\n`;
+        let txt = `🎨 *CONFIGURAR VARIANTE DEL MENÚ*\n\n`;
+        txt += `> Variante actual: *V${current}*\n\n`;
         for (const [key, val] of Object.entries(VARIANTS)) {
             const mark = val.id === current ? ' ✓' : '';
             txt += `> *${key.toUpperCase()}*${mark} — _${val.desc}_\n`;
         }
-        txt += `\n_Gunakan: \`.setmenu v1\` dst._`;
+        txt += `\n_Usa: \`.setmenu v1\` etc._`;
         await m.reply(txt);
     }
 }
