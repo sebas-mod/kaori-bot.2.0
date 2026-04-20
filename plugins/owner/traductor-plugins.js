@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const axios = require('axios')
 const { hotReloadPlugin } = require('../../src/lib/ourin-plugins')
 const te = require('../../src/lib/ourin-error')
 
@@ -21,6 +22,7 @@ const pluginConfig = {
 
 const FOLDER_SKIP = new Set(['node_modules', '.git', 'backup', 'session', 'tmp'])
 const DICTIONARY_PATH = path.join(process.cwd(), 'assets', 'json', 'translation-es.json')
+
 const WORD_MAP = [
     ['tidak ada', 'no hay'],
     ['selamat datang', 'bienvenido'],
@@ -146,6 +148,18 @@ function loadPhraseMap() {
     } catch {
         return []
     }
+}
+
+function savePhraseMap(phraseMap) {
+    const phrases = [...phraseMap]
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([from, to]) => ({ from, to }))
+
+    fs.mkdirSync(path.dirname(DICTIONARY_PATH), { recursive: true })
+    fs.writeFileSync(
+        DICTIONARY_PATH,
+        JSON.stringify({ phrases }, null, 2)
+    )
 }
 
 function applyDictionary(text, phraseMap) {
@@ -301,6 +315,51 @@ function translateJavaScriptStrings(code, phraseMap) {
     }
 }
 
+function extractQuotedStrings(code) {
+    const results = new Set()
+
+    for (let i = 0; i < code.length; i++) {
+        const char = code[i]
+
+        if (char !== '\'' && char !== '"' && char !== '`') continue
+
+        const quote = char
+        let buffer = ''
+        let escaped = false
+
+        for (i = i + 1; i < code.length; i++) {
+            const current = code[i]
+
+            if (escaped) {
+                buffer += current
+                escaped = false
+                continue
+            }
+
+            if (current === '\\') {
+                buffer += current
+                escaped = true
+                continue
+            }
+
+            if (current === quote) {
+                break
+            }
+
+            buffer += current
+        }
+
+        if (quote === '`') {
+            const clean = buffer.replace(/\$\{[\s\S]*?\}/g, ' ')
+            if (shouldTranslateString(clean)) results.add(clean.trim())
+        } else if (shouldTranslateString(buffer)) {
+            results.add(buffer.trim())
+        }
+    }
+
+    return [...results]
+}
+
 function collectPluginFiles(dir, results = []) {
     const entries = fs.readdirSync(dir, { withFileTypes: true })
     for (const entry of entries) {
@@ -354,10 +413,67 @@ function ensureBackup(filePath, backupRoot, projectRoot) {
     fs.copyFileSync(filePath, backupPath)
 }
 
+async function translateTextOnline(text) {
+    const response = await axios.get('https://translate.googleapis.com/translate_a/single', {
+        params: {
+            client: 'gtx',
+            sl: 'id',
+            tl: 'es',
+            dt: 't',
+            q: text
+        },
+        timeout: 30000
+    })
+
+    if (!Array.isArray(response.data) || !Array.isArray(response.data[0])) {
+        throw new Error('Respuesta invalida del traductor')
+    }
+
+    return response.data[0]
+        .map((part) => Array.isArray(part) ? part[0] : '')
+        .join('')
+        .trim()
+}
+
+async function fillMissingTranslations(targets, phraseMap) {
+    const existing = new Map(phraseMap)
+    const pending = new Set()
+
+    for (const filePath of targets) {
+        const original = fs.readFileSync(filePath, 'utf8')
+        extractQuotedStrings(original).forEach((text) => {
+            const saved = existing.get(text)
+            if (!saved || saved.trim() === text.trim()) {
+                pending.add(text)
+            }
+        })
+    }
+
+    let translatedCount = 0
+
+    for (const text of pending) {
+        try {
+            const translated = await translateTextOnline(text)
+            if (translated) {
+                existing.set(text, translated)
+                translatedCount++
+            }
+        } catch {
+            const fallback = applyWordMap(text)
+            existing.set(text, fallback || text)
+        }
+    }
+
+    return {
+        phraseMap: [...existing.entries()],
+        translatedCount
+    }
+}
+
 async function handler(m) {
     const pluginsDir = path.join(process.cwd(), 'plugins')
     const args = m.args || []
-    const phraseMap = loadPhraseMap()
+    let phraseMap = loadPhraseMap()
 
     if (!args.length) {
         return m.reply(
@@ -368,20 +484,22 @@ async function handler(m) {
             `> ${m.prefix}traducir-plugins main/menu\n` +
             `> ${m.prefix}traducir-plugins menu\n` +
             `> ${m.prefix}traducir-plugins all\n\n` +
-            `Nota: usa el diccionario en assets/json/translation-es.json y crea backup antes de cambiar archivos.`
+            `Nota: completa el diccionario automaticamente y crea backup antes de cambiar archivos.`
         )
     }
 
     try {
-        if (!phraseMap.length) {
-            return m.reply(`No pude cargar el diccionario: \`assets/json/translation-es.json\``)
-        }
-
         const targets = resolveTargets(pluginsDir, args)
 
         if (!targets.length) {
             return m.reply(`No encontre archivos para traducir con: \`${args.join(' ')}\``)
         }
+
+        await m.reply(`Estoy completando el diccionario y traduciendo ${targets.length} archivo(s). Esto puede tardar si faltan muchas frases.`)
+
+        const completed = await fillMissingTranslations(targets, phraseMap)
+        phraseMap = completed.phraseMap
+        savePhraseMap(phraseMap)
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
         const backupRoot = path.join(process.cwd(), 'backup', 'translate-plugins', timestamp)
@@ -419,6 +537,7 @@ async function handler(m) {
 
         let replyText =
             `Traduccion completada.\n\n` +
+            `> Frases agregadas al diccionario: ${completed.translatedCount}\n` +
             `> Archivos cambiados: ${changedFiles}\n` +
             `> Cadenas ajustadas: ${totalStringChanges}\n` +
             `> Backup: ${path.relative(process.cwd(), backupRoot).replace(/\\/g, '/')}\n\n`
