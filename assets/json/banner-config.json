@@ -1,0 +1,20 @@
+{
+  "menu": {
+    "banner": "https://tu-dominio.com/menu-banner.jpg",
+    "creator": "https://tu-dominio.com/menu-creator.jpg",
+    "creatorName": "Tu nombre",
+    "audio": ""
+  },
+  "welcome": {
+    "banner": "",
+    "creator": "",
+    "creatorName": "",
+    "audio": ""
+  },
+  "bye": {
+    "banner": "",
+    "creator": "",
+    "creatorName": "",
+    "audio": ""
+  }
+}
