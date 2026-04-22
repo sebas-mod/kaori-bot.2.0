@@ -1,8 +1,8 @@
 {
   "menu": {
-    "banner": "https://tu-dominio.com/menu-banner.jpg",
+    "banner": "https://imagenes-one.vercel.app/banner.jpg",
     "creator": "https://tu-dominio.com/menu-creator.jpg",
-    "creatorName": "Tu nombre",
+    "creatorName": "sebas-MD",
     "audio": ""
   },
   "welcome": {
