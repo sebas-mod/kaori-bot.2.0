@@ -2,6 +2,7 @@ const config = require('../../config');
 const { formatUptime, getTimeGreeting } = require('../../src/lib/ourin-formatter');
 const { getCommandsByCategory, getCategories } = require('../../src/lib/ourin-plugins');
 const { getDatabase } = require('../../src/lib/ourin-database');
+const { getBanner } = require('../../src/lib/banner-config');
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
@@ -196,6 +197,204 @@ function getVerifiedQuoted(botConfig) {
                     'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:XL;ttname,;;;\nFN:ttname\nitem1.TEL;waid=13135550002:+1 (313) 555-0002\nitem1.X-ABLabel:Móvil\nEND:VCARD`,
                 sendEphemeral: true
             }}}  
+}
+
+function getMenuVisibility(botMode = 'md') {
+    let modeAllowedMap = {
+        md: null,
+        store: ['main', 'group', 'sticker', 'owner', 'store'],
+        pushkontak: ['main', 'group', 'sticker', 'owner', 'pushkontak'],
+        cpanel: ['main', 'group', 'sticker', 'owner', 'tools', 'panel']
+    };
+
+    let modeExcludeMap = {
+        md: ['panel', 'pushkontak', 'store'],
+        store: null,
+        pushkontak: null,
+        cpanel: null
+    };
+
+    try {
+        const botmodePlugin = require('../group/botmode');
+        if (botmodePlugin && botmodePlugin.MODES) {
+            const modes = botmodePlugin.MODES;
+            modeAllowedMap = {};
+            modeExcludeMap = {};
+            for (const [key, val] of Object.entries(modes)) {
+                modeAllowedMap[key] = val.allowedCategories;
+                modeExcludeMap[key] = val.excludeCategories;
+            }
+        }
+    } catch (e) {}
+
+    return {
+        allowedCategories: modeAllowedMap[botMode],
+        excludeCategories: modeExcludeMap[botMode] || []
+    };
+}
+
+async function getBufferFromUrl(url) {
+    if (!url) return null;
+    try {
+        const response = await axios.get(url, {
+            responseType: 'arraybuffer'
+        });
+        return Buffer.from(response.data);
+    } catch {
+        return null;
+    }
+}
+
+async function sendMenuPersonalizado(m, { sock, botConfig, db, uptime, botMode }) {
+    const bannerCfg = getBanner('menu');
+    const prefix = botConfig.command?.prefix || '.';
+    const categories = getCategories();
+    const commandsByCategory = getCommandsByCategory();
+    const user = db.getUser(m.sender);
+    const { getCasesByCategory } = require('../../case/ourin');
+    const casesByCategory = getCasesByCategory();
+
+    const categoryOrder = ['owner', 'main', 'utility', 'tools', 'fun', 'game', 'download', 'search', 'sticker', 'media', 'ai', 'group', 'religi', 'info', 'cek', 'economy', 'user', 'canvas', 'random', 'premium', 'ephoto', 'jpm', 'pushkontak', 'panel', 'store'];
+
+    const sortedCategories = [...categories].sort((a, b) => {
+        const indexA = categoryOrder.indexOf(a);
+        const indexB = categoryOrder.indexOf(b);
+        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    });
+
+    const { allowedCategories, excludeCategories } = getMenuVisibility(botMode);
+
+    let totalCommands = 0;
+    for (const category of categories) {
+        totalCommands += (commandsByCategory[category] || []).length;
+        totalCommands += (casesByCategory[category] || []).length;
+    }
+
+    const rows = sortedCategories
+        .filter(category => !(category === 'owner' && !m.isOwner))
+        .filter(category => !(allowedCategories && !allowedCategories.includes(category.toLowerCase())))
+        .filter(category => !(excludeCategories && excludeCategories.includes(category.toLowerCase())))
+        .map(category => {
+            const pluginCmds = commandsByCategory[category] || [];
+            const caseCmds = casesByCategory[category] || [];
+            const totalCategory = pluginCmds.length + caseCmds.length;
+            return totalCategory > 0 ? {
+                title: `${CATEGORY_EMOJIS[category] || '📁'} ${category.toUpperCase()}`,
+                description: `${totalCategory} comandos`,
+                id: `${prefix}menucat ${category}`
+            } : null;
+        })
+        .filter(Boolean);
+
+    const caption =
+`${getTimeGreeting()} *@${m.pushName || 'Usuario'}*
+
+╭─〔 INFO DEL BOT 〕
+│ Nombre: ${botConfig.bot?.name || 'Ourin-AI'}
+│ Version: v${botConfig.bot?.version || '1.0.0'}
+│ Prefijo: ${prefix}
+│ Tiempo activo: ${formatUptime(uptime)}
+│ Total comandos: ${totalCommands}
+│ Tu rol: ${m.isOwner ? 'Owner' : m.isPremium ? 'Premium' : 'Usuario'}
+│ Limite: ${m.isOwner || m.isPremium ? '∞' : (user?.limit ?? 25)}
+│ Creador: ${bannerCfg.creatorName || botConfig.owner?.name || 'Creador'}
+╰──────────────
+
+Selecciona abajo la categoria que quieres abrir.`;
+
+    try {
+        const { prepareWAMessageMedia } = require('ourin');
+        const bannerBuffer = await getBufferFromUrl(bannerCfg.banner);
+
+        let headerMedia = null;
+        if (bannerBuffer) {
+            headerMedia = await prepareWAMessageMedia(
+                { image: bannerBuffer },
+                { upload: sock.waUploadToServer }
+            );
+        }
+
+        const buttons = [
+            {
+                name: 'single_select',
+                buttonParamsJson: JSON.stringify({
+                    title: '📂 Ver categorias',
+                    sections: [{
+                        title: 'MENU POR CATEGORIAS',
+                        rows
+                    }]
+                })
+            },
+            {
+                name: 'quick_reply',
+                buttonParamsJson: JSON.stringify({
+                    display_text: '📋 Todos los menus',
+                    id: `${prefix}allmenu`
+                })
+            }
+        ];
+
+        const msg = generateWAMessageFromContent(m.chat, {
+            viewOnceMessage: {
+                message: {
+                    messageContextInfo: {
+                        deviceListMetadata: {},
+                        deviceListMetadataVersion: 2
+                    },
+                    interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+                        body: proto.Message.InteractiveMessage.Body.fromObject({
+                            text: caption
+                        }),
+                        footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                            text: `${botConfig.bot?.name || 'Ourin-AI'} | ${rows.length} categorias`
+                        }),
+                        header: proto.Message.InteractiveMessage.Header.fromObject({
+                            title: `${botConfig.bot?.name || 'Ourin-AI'} MENU`,
+                            subtitle: bannerCfg.creatorName || botConfig.owner?.name || 'Creador',
+                            hasMediaAttachment: !!headerMedia,
+                            ...(headerMedia || {})
+                        }),
+                        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                            buttons
+                        }),
+                        contextInfo: {
+                            mentionedJid: [m.sender],
+                            forwardingScore: 9999,
+                            isForwarded: true,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: botConfig.saluran?.id || '',
+                                newsletterName: botConfig.saluran?.name || botConfig.bot?.name || 'Ourin-AI',
+                                serverMessageId: 127
+                            }
+                        }
+                    })
+                }
+            }
+        }, {
+            userJid: m.sender,
+            quoted: getVerifiedQuoted(botConfig)
+        });
+
+        await sock.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
+    } catch (error) {
+        const fallbackText =
+`${caption}
+
+${rows.map(row => `> ${row.title} - ${row.description}\n> ${row.id}`).join('\n\n')}`;
+
+        if (bannerCfg.banner) {
+            await sock.sendMessage(m.chat, {
+                image: { url: bannerCfg.banner },
+                caption: fallbackText,
+                contextInfo: getContextInfo(botConfig, m, null, true)
+            }, { quoted: getVerifiedQuoted(botConfig) });
+        } else {
+            await sock.sendMessage(m.chat, {
+                text: fallbackText,
+                contextInfo: getContextInfo(botConfig, m, null, true)
+            }, { quoted: getVerifiedQuoted(botConfig) });
+        }
+    }
 }
 
 async function handler(m, { sock, config: botConfig, db, uptime }) {
@@ -1978,6 +2177,10 @@ ${categories.map(cat => `│ *${m.prefix}menucat ${cat}*`).join('\n')}
                         key: {participant: '0@s.whatsapp.net', ...(m.chat ? {remoteJid: `status@broadcast`} : {})}, message: {locationMessage: {name: `${namaOwner}`,jpegThumbnail: ""}}
                     } });
                 }
+                break;
+
+            case 15:
+                await sendMenuPersonalizado(m, { sock, botConfig, db, uptime, botMode });
                 break;
 
             default:
