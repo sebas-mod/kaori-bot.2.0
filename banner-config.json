@@ -5,6 +5,13 @@
     "creatorName": "sebas-MD",
     "audio": ""
   },
+
+"allmenu": {
+  "banner": "https://tu-link.com/allmenu-banner.jpg",
+  "creator": "",
+  "creatorName": "Tu nombre",
+  "audio": ""
+}, 
   "welcome": {
     "banner": "",
     "creator": "",
