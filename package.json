@@ -1,13 +1,13 @@
 {
   "name": "ourin-md",
   "version": "2.3.0",
-  "description": "WhatsApp Multi-Device Bot dengan sistem plugin modular",
+  "description": "Bot de WhatsApp Multi-Dispositivo con sistema de plugins modular",
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=development node index.js",
     "dev": "NODE_ENV=development node index.js",
     "win:start": "set NODE_ENV=development&& node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no se especificó ninguna prueba\" && exit 1",
     "translate:base": "node tools/translate-project.js --scope base",
     "translate:plugins": "node tools/translate-project.js --scope plugins",
     "translate:plugin": "node tools/translate-project.js --scope plugin"
@@ -16,7 +16,7 @@
     "whatsapp",
     "bot",
     "baileys",
-    "multi-device",
+    "multi-dispositivo",
     "plugin"
   ],
   "author": "Zann",
