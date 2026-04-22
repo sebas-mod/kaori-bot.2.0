@@ -1,5 +1,4 @@
 const config = require('../../config');
-const { getDatabase } = require('../../src/lib/ourin-database');
 const { generateWAMessageFromContent, proto } = require('ourin');
 
 const pluginConfig = {
@@ -7,8 +6,8 @@ const pluginConfig = {
     alias: ['menuvariant', 'menustyle'],
     category: 'owner',
     description: 'Configurar la variante de visualización del menú',
-    usage: '.setmenu <v1-v13>',
-    example: '.setmenu v8',
+    usage: '.setmenu <v1-v15>',
+    example: '.setmenu v15',
     isOwner: true,
     isPremium: false,
     isGroup: false,
@@ -20,19 +19,20 @@ const pluginConfig = {
 
 const VARIANTS = {
     v1: { id: 1, name: 'Simple', desc: 'Imagen básica sin contextInfo' },
-    v2: { id: 2, name: 'Estándar', desc: 'Imagen + contextInfo completo (por defecto)' },
+    v2: { id: 2, name: 'Estándar', desc: 'Imagen + contextInfo completo' },
     v3: { id: 3, name: 'Documento', desc: 'Documento + jpegThumbnail + quoted verificado' },
     v4: { id: 4, name: 'Video', desc: 'Video + contextInfo + quoted verificado' },
-    v5: { id: 5, name: 'Botones', desc: 'Imagen + botones (single_select & quick_reply)' },
-    v6: { id: 6, name: 'Documento Premium', desc: 'Documento + jpegThumbnail 1280x450 + contextInfo completo' },
-    v7: { id: 7, name: 'Carrusel', desc: 'Tarjetas deslizables por categoría (moderno)' },
-    v8: { id: 8, name: 'Minimalista', desc: 'Imagen + ftroli quoted + diseño moderno' },
-    v9: { id: 9, name: 'Flujo Nativo', desc: 'Interactivo + oferta limitada + bottom_sheet + selección única' },
-    v10: { id: 10, name: 'Flujo Nativo', desc: 'OURINNNNNNNNNN' },
-    v11: { id: 11, name: 'Documento Interactivo', desc: 'Documento + nativeFlowMessage + oferta limitada + botones CTA' },
-    v12: { id: 12, name: 'MENÚ VERSIÓN 12', desc: 'XXXXXX' },
-    v13: { id: 13, name: 'Miniatura Canvas', desc: 'Estilo documento V6 + banner canvas' },
-    v14: { id: 14, name: 'MENÚ VERSIÓN 14', desc: 'XXXXXX' }
+    v5: { id: 5, name: 'Botones', desc: 'Imagen + botones' },
+    v6: { id: 6, name: 'Documento Premium', desc: 'Documento + jpegThumbnail + contextInfo' },
+    v7: { id: 7, name: 'Carrusel', desc: 'Tarjetas deslizables por categoría' },
+    v8: { id: 8, name: 'Minimalista', desc: 'Imagen + diseño moderno' },
+    v9: { id: 9, name: 'Flujo Nativo', desc: 'Interactivo con botones nativos' },
+    v10: { id: 10, name: 'Flujo Nativo 2', desc: 'Producto interactivo' },
+    v11: { id: 11, name: 'Documento Interactivo', desc: 'Documento + nativeFlowMessage' },
+    v12: { id: 12, name: 'Menú Versión 12', desc: 'Diseño alternativo' },
+    v13: { id: 13, name: 'Miniatura Canvas', desc: 'Banner canvas personalizado' },
+    v14: { id: 14, name: 'Menú Versión 14', desc: 'Diseño alternativo 14' },
+    v15: { id: 15, name: 'Banner URL', desc: 'Menú personalizado que lee el banner desde banner-config.json' }
 };
 
 async function handler(m, { sock, db }) {
@@ -42,7 +42,7 @@ async function handler(m, { sock, db }) {
     if (variant) {
         const selected = VARIANTS[variant];
         if (!selected) {
-            await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v14`);
+            await m.reply(`❌ ¡Variante no válida!\n\nUsa: v1 hasta v15`);
             return;
         }
 
@@ -130,7 +130,7 @@ async function handler(m, { sock, db }) {
             const mark = val.id === current ? ' ✓' : '';
             txt += `> *${key.toUpperCase()}*${mark} — _${val.desc}_\n`;
         }
-        txt += `\n_Usa: \`.setmenu v1\` etc._`;
+        txt += `\n_Usa: \`.setmenu v15\`_`;
         await m.reply(txt);
     }
 }
