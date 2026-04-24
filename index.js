@@ -1,52 +1,6 @@
+
+
 require('./src/lib/ourin-agent').initializeAgent()
-
-const Module = require('module');
-const originalRequire = Module.prototype.require;
-let isSharpFailed = false;
-
-Module.prototype.require = function(request) {
-  if (request === 'sharp') {
-    try {
-      return originalRequire.call(this, request);
-    } catch (e) {
-      if (!isSharpFailed) {
-        console.warn("\n⚠️ [OURIN-WARN] El módulo 'sharp' no es compatible en este sistema (Termux/Android).");
-        console.warn("⚠️ Las funciones que requieren 'sharp' usarán JIMP/FFmpeg como alternativa.\n");
-        isSharpFailed = true;
-      }
-      const dummySharp = function(input) {
-        let _w = null, _h = null, _fmt = null;
-        const chain = {
-          resize: (w, h) => { _w = w; _h = h; return chain; },
-          webp: () => { throw new Error("WebP no es compatible con el fallback de JIMP. Usando FFmpeg."); },
-          jpeg: () => { _fmt = 'jpeg'; return chain; },
-          png: () => { _fmt = 'png'; return chain; },
-          toBuffer: async () => {
-            try {
-              const jimp = originalRequire.call(this, 'jimp');
-              if (Buffer.isBuffer(input) || typeof input === 'string') {
-                const img = await jimp.read(input);
-                if (_w || _h) img.resize(_w || jimp.AUTO, _h || jimp.AUTO);
-                if (_fmt === 'png') return await img.getBufferAsync(jimp.MIME_PNG);
-                if (_fmt === 'jpeg') return await img.getBufferAsync(jimp.MIME_JPEG);
-                return await img.getBufferAsync(jimp.MIME_JPEG);
-              }
-            } catch (err) {}
-            return Buffer.isBuffer(input) ? input : Buffer.from([]);
-          }
-        };
-        return chain;
-      };
-      dummySharp.cache = () => {};
-      dummySharp.concurrency = () => {};
-      dummySharp.counters = () => {};
-      dummySharp.disableCache = () => {};
-      dummySharp.format = { webp: 'webp', jpeg: 'jpeg', png: 'png' };
-      return dummySharp;
-    }
-  }
-  return originalRequire.call(this, request);
-};
 
 const LOG_NOISE = new Set([
   'Closing', 'prekey', '_chains', 'registrationId',
@@ -83,17 +37,16 @@ const {
 const { startAutoBackup } = require("./src/lib/ourin-backup");
 const { handleAntiTagSW } = require("./src/lib/ourin-group-protection");
 const { initSholatScheduler } = require("./src/lib/ourin-sholat-scheduler");
+const { initAutoJpmScheduler } = require("./src/lib/ourin-auto-jpm");
 const { startMemoryMonitor } = require("./src/lib/ourin-memory-monitor");
 const { startTempCleaner } = require("./src/lib/ourin-temp-cleaner");
 const { startDailyPruner } = require("./src/lib/ourin-data-pruner");
-
 try {
   const { startOrderPoller } = require("./src/lib/ourin-order-poller");
 } catch {}
 try {
   const { startOtpPoller } = require("./src/lib/ourin-otp-poller");
 } catch {}
-
 const {
   logger,
   c,
@@ -106,30 +59,30 @@ const {
 } = require("./src/lib/ourin-logger");
 
 /**
- * Tiempo de inicio para calcular el tiempo de arranque
+ * Waktu start untuk menghitung boot time
  */
 const startTime = Date.now();
 
 /**
- * Watcher para recarga automática de plugins en modo desarrollo
+ * Watcher untuk auto-reload plugins di dev mode
  */
 let pluginWatcher = null;
 const reloadDebounce = new Map();
 
 /**
- * Caché de archivos para mejorar precisión del watcher
+ * Cache untuk file stat (mtimeMs dan size) agar debounce watcher lebih akurat
  */
 const fileStatCache = new Map();
 
 /**
- * Iniciar watcher de plugins
+ * Memulai file watcher untuk dev mode
  */
 function startDevWatcher(pluginsPath) {
   if (pluginWatcher) {
     pluginWatcher.close();
   }
 
-  logger.system("dev", "recarga en caliente de plugins activa");
+  logger.system("dev", "hot reload plugin aktif");
 
   pluginWatcher = fs.watch(
     pluginsPath,
@@ -153,7 +106,7 @@ function startDevWatcher(pluginsPath) {
           const { unloadPlugin } = require("./src/lib/ourin-plugins");
           const result = unloadPlugin(pluginName);
           if (result.success) {
-            logger.warn("plugin", `eliminado ${filename}`);
+            logger.warn("plugin", `removed ${filename}`);
           }
           return;
         }
@@ -163,7 +116,7 @@ function startDevWatcher(pluginsPath) {
           const cached = fileStatCache.get(fullPath);
           
           const changed = !cached || cached.mtimeMs !== stats.mtimeMs || cached.size !== stats.size;
-          if (!changed) return;
+          if (!changed) return; // Prevent double trigger from text editor saving
           
           fileStatCache.set(fullPath, {
             mtimeMs: stats.mtimeMs,
@@ -173,11 +126,13 @@ function startDevWatcher(pluginsPath) {
           const { hotReloadPlugin } = require("./src/lib/ourin-plugins");
           const result = hotReloadPlugin(fullPath);
           
-          if (!result.success) {
-             logger.error("plugin", `falló recarga: ${filename}: ${result.error}`);
+          if (result.success) {
+            // logger.success("Reloaded", result.name);
+          } else {
+             logger.error("plugin", `reload failed: ${filename}: ${result.error}`);
           }
         } catch (error) {
-          logger.error("plugin", `falló recarga: ${filename}: ${error.message}`);
+          logger.error("plugin", `reload failed: ${filename}: ${error.message}`);
         }
       }, 500);
 
@@ -185,55 +140,272 @@ function startDevWatcher(pluginsPath) {
     },
   );
 
-  logger.debug("dev", `observando ${pluginsPath}`);
+  logger.debug("dev", `watching ${pluginsPath}`);
 }
 
 /**
- * Anti-crash
+ * Watcher untuk src/lib dengan hot reload
  */
-function setupAntiCrash() {
-  process.on("uncaughtException", (error) => {
-    logErrorBox("excepción no capturada", error.message)
-    logger.system("sistema", "el bot sigue en ejecución")
+let srcWatcher = null;
+
+function startSrcWatcher(srcPath) {
+  if (srcWatcher) {
+    srcWatcher.close();
+  }
+
+  logger.system("dev", "hot reload src aktif");
+
+  srcWatcher = fs.watch(srcPath, { recursive: true }, (eventType, filename) => {
+    if (!filename || !filename.endsWith(".js")) return;
+
+    const existingTimeout = reloadDebounce.get("src_" + filename);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+    }
+
+    const timeout = setTimeout(() => {
+      reloadDebounce.delete("src_" + filename);
+
+      const fullPath = path.join(srcPath, filename);
+
+      if (!fs.existsSync(fullPath)) {
+        logger.warn("dev", `src file removed: ${filename}`);
+        return;
+      }
+
+      try {
+        // Clear cache untuk file tersebut
+        delete require.cache[require.resolve(fullPath)];
+        logger.success("dev", `src reloaded: ${filename}`);
+      } catch (error) {
+        logger.error("dev", `src reload failed: ${filename}: ${error.message}`);
+      }
+    }, 500);
+
+    reloadDebounce.set("src_" + filename, timeout);
   });
 
-  process.on("unhandledRejection", (reason) => {
-    logErrorBox("promesa no manejada", String(reason))
-    logger.system("sistema", "el bot sigue en ejecución")
+  logger.debug("dev", `watching ${srcPath}`);
+}
+
+/**
+ * Setup anti-crash handlers
+ */
+function setupAntiCrash() {
+  process.on("uncaughtException", (error, origin) => {
+    const ignoredErrors = [
+      'write EOF',
+      'ECONNRESET',
+      'EPIPE',
+      'ETIMEDOUT',
+      'ENOTFOUND',
+      'ECONNREFUSED',
+      'read ECONNRESET'
+    ];
+    
+    const isIgnored = ignoredErrors.some(msg => 
+      error.message?.includes(msg) || error.code === msg
+    );
+    
+    if (isIgnored) {
+      return;
+    }
+    
+    logErrorBox("uncaught exception", error.message)
+    if (config.dev?.debugLog) {
+      console.error(c.gray(error.stack))
+    }
+    logger.system("sistem", "bot masih berjalan")
+  });
+
+
+  process.on("unhandledRejection", (reason, promise) => {
+    logErrorBox("unhandled rejection", String(reason))
+    if (config.dev?.debugLog) {
+      console.error(c.gray("Promise:"), promise)
+    }
+    logger.system("sistem", "bot masih berjalan")
+  });
+
+  process.on("warning", (warning) => {
+    logger.warn("system", `${warning.name}: ${warning.message}`);
   });
 
   process.on("SIGINT", () => {
-    logger.system("sistema", "señal de detención recibida")
-    logger.info("base de datos", "guardando datos...")
+    console.log("");
+    logger.system("sistem", "sinyal berhenti diterima")
+    logger.info("database", "menyimpan data...")
+
+    try {
+      const { getDatabase } = require("./src/lib/ourin-database");
+      const db = getDatabase();
+      db.save();
+      logger.success("database", "data tersimpan");
+    } catch (error) {
+      logger.warn("database", `save failed: ${error.message}`);
+    }
+
+    logger.info("sistem", "bot berhenti");
     process.exit(0);
   });
 
-  logger.success("sistema", "anti-crash activado");
+  process.on("SIGTERM", () => {
+    console.log("");
+    logger.system("sistem", "sinyal hentikan diterima");
+    process.exit(0);
+  });
+
+  logger.success("sistem", "anti-crash aktif");
 }
 
 /**
- * Función principal
+ * Fungsi utama untuk memulai bot
  */
 async function main() {
   printBanner();
-
+  printStartup({
+    name: config.bot?.name || "Ourin-AI",
+    version: config.bot?.version || "1.0.0",
+    developer: config.bot?.developer || "Developer",
+    mode: config.mode || "public",
+  });
   setupAntiCrash();
 
-  const dbPath = path.join(process.cwd(), config.database?.path || "./database/main");
+  const dbPath = path.join(
+    process.cwd(),
+    config.database?.path || "./database/main",
+  );
   await initDatabase(dbPath);
+  const db = getDatabase();
 
-  logger.success("base de datos", "lista");
+  const savedMode = db.setting("botMode");
+  if (savedMode && (savedMode === "self" || savedMode === "public")) {
+    config.mode = savedMode;
+  }
+  const savedPremium = db.setting("premiumUsers");
+  if (Array.isArray(savedPremium)) config.premiumUsers = savedPremium;
+  const savedBanned = db.setting("bannedUsers");
+  if (Array.isArray(savedBanned)) config.bannedUsers = savedBanned;
+  if (config.backup?.enabled !== false) startAutoBackup(dbPath);
+
+  const pCount = (Array.isArray(savedPremium) ? savedPremium.length : 0);
+  const bCount = (Array.isArray(savedBanned) ? savedBanned.length : 0);
+  logger.success("database", `siap · mode: ${config.mode}, premium: ${pCount}, banned: ${bCount}`);
 
   const pluginsPath = path.join(process.cwd(), "plugins");
   const pluginCount = loadPlugins(pluginsPath);
-  logger.success("plugin", `${pluginCount} plugins cargados`);
+  logger.success("plugin", `${pluginCount} plugin dimuat`);
 
-  logger.info("whatsapp", "conectando...");
+  if (config.dev?.enabled && config.dev?.watchPlugins) {
+    startDevWatcher(pluginsPath);
+  }
+  if (config.dev?.enabled && config.dev?.watchSrc) {
+    const srcPath = path.join(process.cwd(), "src");
+    startSrcWatcher(srcPath);
+  }
 
-  await startConnection({});
+  initScheduler(config);
+
+  const bootTime = Date.now() - startTime;
+  logger.success("boot", `siap dalam ${bootTime}ms`);
+  divider();
+  logger.info("whatsapp", "menghubungkan...");
+  console.log("");
+
+  await startConnection({
+    onRawMessage: async (msg, sock) => {
+      try {
+        const db = getDatabase();
+        await handleAntiTagSW(msg, sock, db);
+      } catch (error) {}
+    },
+
+    onMessage: async (msg, sock) => {
+      try {
+        const handlerPromise = messageHandler(msg, sock);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Handler timeout")), 60000),
+        );
+        await Promise.race([handlerPromise, timeoutPromise]);
+      } catch (error) {
+        if (error.message !== "Handler timeout") {
+          logger.error("HANDLER", error.message);
+          if (config.dev?.debugLog) {
+            console.error(c.gray(error.stack));
+          }
+        }
+      }
+    },
+
+    onGroupUpdate: async (update, sock) => {
+      try {
+        await groupHandler(update, sock);
+      } catch (error) {
+        logger.error("GROUP", error.message);
+      }
+    },
+
+    onMessageUpdate: async (updates, sock) => {
+      try {
+        await messageUpdateHandler(updates, sock);
+      } catch (error) {
+        logger.error("MSG", error.message);
+      }
+    },
+
+    onGroupSettingsUpdate: async (update, sock) => {
+      try {
+        await groupSettingsHandler(update, sock);
+      } catch (error) {
+        logger.error("GROUP", error.message);
+      }
+    },
+
+    onConnectionUpdate: async (update, sock) => {
+      if (update.connection === "open") {
+        logConnection("connected", sock.user?.name || "Bot");
+        loadScheduledMessages(sock);
+        startGroupScheduleChecker(sock);
+        startSewaChecker(sock);
+        initScheduler(config, sock);
+        initAutoJpmScheduler(sock);
+        initSholatScheduler(sock);
+        try {
+          const { initSahurCron } = require('./plugins/religi/autosahur');
+          initSahurCron(sock);
+        } catch {}
+        try { if (startOrderPoller) startOrderPoller(sock); } catch {}
+        try {
+          const { startOtpPoller: _startOtp } = require('./src/lib/ourin-otp-poller');
+          _startOtp(sock);
+        } catch {}
+
+        try {
+            const { getAllJadibotSessions, restartJadibotSession } = require('./src/lib/ourin-jadibot-manager');
+            const sessions = getAllJadibotSessions();
+            if (sessions.length > 0) {
+                logger.info('JADIBOT', `Restoring ${sessions.length} session(s)`);
+                for (const session of sessions) {
+                    await restartJadibotSession(sock, session.id);
+                }
+            }
+        } catch (e) {
+            logger.error('JADIBOT', `Gagal memulihkan: ${e.message}`);
+        }
+
+        const devLabel = config.dev?.enabled ? ` ${c.yellow('• dev')}` : '';
+        startMemoryMonitor()
+        startTempCleaner()
+        startDailyPruner()
+        logger.success('siap', `semua sistem aktif${devLabel}`);
+        divider();
+      }
+    },
+  });
 }
 
 main().catch((error) => {
-  logErrorBox("Error fatal", error.message);
+  logErrorBox("Fatal Error", error.message);
+  console.error(c.gray(error.stack));
   process.exit(1);
 });
