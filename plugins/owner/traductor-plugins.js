@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const crypto = require('crypto')
 const axios = require('axios')
 const { hotReloadPlugin } = require('../../src/lib/ourin-plugins')
 const te = require('../../src/lib/ourin-error')
@@ -8,7 +9,7 @@ const pluginConfig = {
     name: 'traducir-plugins',
     alias: ['traducirplugin', 'traducirplugins', 'espanolizar'],
     category: 'owner',
-    description: 'Traduce textos visibles de plugins al espanol',
+    description: 'Traduce textos visibles de plugins al espanol y conserva el estado',
     usage: '.traducir-plugins <all|carpeta|carpeta/archivo|archivo>',
     example: '.traducir-plugins owner',
     isOwner: true,
@@ -22,6 +23,38 @@ const pluginConfig = {
 
 const FOLDER_SKIP = new Set(['node_modules', '.git', 'backup', 'session', 'tmp'])
 const DICTIONARY_PATH = path.join(process.cwd(), 'assets', 'json', 'translation-es.json')
+const STATE_PATH = path.join(process.cwd(), 'assets', 'json', 'translation-es-state.json')
+const CONFIG_PATH = path.join(process.cwd(), 'assets', 'json', 'translation-es-config.json')
+
+const DEFAULT_TRANSLATION_CONFIG = {
+    targetLanguage: 'es',
+    copyOnlyDirectories: ['.git', 'node_modules', 'assets', 'database'],
+    copyOnlyFiles: ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'],
+    textExtensions: ['.js', '.json', '.md', '.txt'],
+    protectedTerms: [
+        'WhatsApp',
+        'Baileys',
+        'Node.js',
+        'API',
+        'AI',
+        '.menu',
+        '.owner',
+        '.play',
+        '.help'
+    ],
+    commandPrefixes: ['.', '#', '!', '/', '\\'],
+    skipPatterns: [
+        '^https?://',
+        '^www\\.',
+        '^[A-Za-z]:\\\\',
+        '^[./~\\\\]',
+        '^[A-Za-z0-9_.-]+$'
+    ]
+}
+
+const SPANISH_HINTS = /\b(hola|adios|bienvenido|hasta|acceso|denegado|procesando|espera|datos|archivo|carpeta|plugin|mensaje|grupo|privado|premium|codigo|descripcion|uso|funcion|proceso|usuario|buscar|mostrar|nuevo|anterior|guardado|fecha|hora|nombre|menu|ajustes|version)\b/i
+const SOURCE_HINTS = /\b(tidak|selamat|sampai|akses|ditolak|sedang|silahkan|gagal|mengunduh|grup|khusus|daftar|pengaturan|fitur|pengguna|gunakan|hapus|ubah|simpan|waktu|tanggal|jam|coba|lagi|nanti|berhasil)\b/i
+
 const WORD_MAP = [
     ['tidak ada', 'no hay'],
     ['selamat datang', 'bienvenido'],
@@ -135,30 +168,144 @@ function escapeRegExp(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+function normalizeText(text) {
+    return String(text || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+}
+
+function hashText(text) {
+    return crypto.createHash('sha1').update(String(text || '')).digest('hex')
+}
+
+function looksAlreadySpanish(text) {
+    const value = String(text || '').trim()
+    if (!value) return false
+    if (/[áéíóúñ¿¡]/i.test(value)) return true
+    return SPANISH_HINTS.test(value) && !SOURCE_HINTS.test(value)
+}
+
+function looksLikeSourceLanguage(text) {
+    const value = String(text || '').trim()
+    if (!value) return false
+    return SOURCE_HINTS.test(value)
+}
+
 function loadPhraseMap() {
     try {
         const raw = fs.readFileSync(DICTIONARY_PATH, 'utf8')
         const parsed = JSON.parse(raw)
         if (!Array.isArray(parsed?.phrases)) return []
 
-        return parsed.phrases
-            .filter((item) => item && typeof item.from === 'string' && typeof item.to === 'string')
-            .map((item) => [item.from, item.to])
+        const unique = new Map()
+        for (const item of parsed.phrases) {
+            if (!item || typeof item.from !== 'string' || typeof item.to !== 'string') continue
+            const from = item.from.trim()
+            const to = item.to.trim()
+            if (!from || !to) continue
+            if (normalizeText(from) === normalizeText(to) && looksAlreadySpanish(from)) continue
+            unique.set(normalizeText(from), [from, to])
+        }
+
+        return [...unique.values()]
     } catch {
         return []
     }
 }
 
 function savePhraseMap(phraseMap) {
-    const phrases = [...phraseMap]
-        .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([from, to]) => ({ from, to }))
+    const unique = new Map()
+
+    for (const [from, to] of phraseMap) {
+        if (!from || !to) continue
+        if (normalizeText(from) === normalizeText(to) && looksAlreadySpanish(from)) continue
+        unique.set(normalizeText(from), { from: from.trim(), to: to.trim() })
+    }
+
+    const phrases = [...unique.values()].sort((a, b) => a.from.localeCompare(b.from))
 
     fs.mkdirSync(path.dirname(DICTIONARY_PATH), { recursive: true })
-    fs.writeFileSync(
-        DICTIONARY_PATH,
-        JSON.stringify({ phrases }, null, 2)
-    )
+    fs.writeFileSync(DICTIONARY_PATH, JSON.stringify({ phrases }, null, 2))
+}
+
+function loadTranslationState() {
+    try {
+        const raw = fs.readFileSync(STATE_PATH, 'utf8')
+        const parsed = JSON.parse(raw)
+        if (!parsed || typeof parsed !== 'object') return { files: {} }
+        if (!parsed.files || typeof parsed.files !== 'object') parsed.files = {}
+        return parsed
+    } catch {
+        return { files: {} }
+    }
+}
+
+function saveTranslationState(state) {
+    fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true })
+    fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2))
+}
+
+function loadTranslationConfig() {
+    try {
+        const raw = fs.readFileSync(CONFIG_PATH, 'utf8')
+        const parsed = JSON.parse(raw)
+        return {
+            ...DEFAULT_TRANSLATION_CONFIG,
+            ...parsed,
+            protectedTerms: Array.isArray(parsed?.protectedTerms) ? parsed.protectedTerms : DEFAULT_TRANSLATION_CONFIG.protectedTerms,
+            commandPrefixes: Array.isArray(parsed?.commandPrefixes) ? parsed.commandPrefixes : DEFAULT_TRANSLATION_CONFIG.commandPrefixes,
+            skipPatterns: Array.isArray(parsed?.skipPatterns) ? parsed.skipPatterns : DEFAULT_TRANSLATION_CONFIG.skipPatterns
+        }
+    } catch {
+        return DEFAULT_TRANSLATION_CONFIG
+    }
+}
+
+function saveTranslationConfig(config) {
+    fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true })
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2))
+}
+
+function compileSkipMatchers(config) {
+    return (config.skipPatterns || [])
+        .map((pattern) => {
+            try {
+                return new RegExp(pattern, 'i')
+            } catch {
+                return null
+            }
+        })
+        .filter(Boolean)
+}
+
+function escapeReplacement(text) {
+    return text.replace(/\$/g, '$$$$')
+}
+
+function maskProtectedTerms(text, protectedTerms) {
+    let masked = String(text || '')
+    const tokens = []
+
+    for (const term of protectedTerms || []) {
+        if (!term) continue
+        const token = `__PROTECTED_TERM_${tokens.length}__`
+        const regex = new RegExp(escapeRegExp(term), 'g')
+        if (!regex.test(masked)) continue
+        masked = masked.replace(regex, escapeReplacement(token))
+        tokens.push({ token, term })
+    }
+
+    return { masked, tokens }
+}
+
+function unmaskProtectedTerms(text, tokens) {
+    let result = String(text || '')
+    for (const item of tokens || []) {
+        const regex = new RegExp(escapeRegExp(item.token), 'g')
+        result = result.replace(regex, item.term)
+    }
+    return result
 }
 
 function applyDictionary(text, phraseMap) {
@@ -195,32 +342,37 @@ function applyWordMap(text) {
     return output
 }
 
-function shouldTranslateString(content) {
+function shouldTranslateString(content, runtimeConfig) {
     const trimmed = content.trim()
     if (!trimmed) return false
     if (trimmed.length < 3) return false
-    if (/^(https?:\/\/|\.{0,2}\/|[A-Za-z]:\\|@|#)/.test(trimmed)) return false
     if (/\.(js|json|jpg|jpeg|png|webp|mp3|mp4|pdf)$/i.test(trimmed)) return false
     if (/^[a-z0-9._/-]+$/i.test(trimmed)) return false
     if (/^[-_a-z0-9]+$/i.test(trimmed)) return false
     if (trimmed.includes('require(') || trimmed.includes('module.exports')) return false
+    if (looksAlreadySpanish(trimmed)) return false
+    if ((runtimeConfig.commandPrefixes || []).some((prefix) => trimmed.startsWith(prefix))) return false
+    if ((runtimeConfig.skipMatchers || []).some((regex) => regex.test(trimmed))) return false
     return /[A-Za-z]/.test(trimmed)
 }
 
-function translateQuotedString(rawContent, phraseMap) {
-    if (!shouldTranslateString(rawContent)) {
+function translateQuotedString(rawContent, phraseMap, runtimeConfig) {
+    if (!shouldTranslateString(rawContent, runtimeConfig)) {
         return { text: rawContent, changed: false }
     }
 
-    let translated = applyDictionary(rawContent, phraseMap)
+    const { masked, tokens } = maskProtectedTerms(rawContent, runtimeConfig.protectedTerms)
+    let translated = applyDictionary(masked, phraseMap)
     translated = applyWordMap(translated)
+    translated = unmaskProtectedTerms(translated, tokens)
+
     return {
         text: translated,
         changed: translated !== rawContent
     }
 }
 
-function translateTemplateLiteral(rawContent, phraseMap) {
+function translateTemplateLiteral(rawContent, phraseMap, runtimeConfig) {
     let result = ''
     let changed = false
     let segment = ''
@@ -232,7 +384,7 @@ function translateTemplateLiteral(rawContent, phraseMap) {
         const prev = rawContent[i - 1]
 
         if (exprDepth === 0 && char === '$' && next === '{' && prev !== '\\') {
-            const translated = translateQuotedString(segment, phraseMap)
+            const translated = translateQuotedString(segment, phraseMap, runtimeConfig)
             result += translated.text
             changed = changed || translated.changed
             segment = ''
@@ -252,14 +404,14 @@ function translateTemplateLiteral(rawContent, phraseMap) {
         segment += char
     }
 
-    const translated = translateQuotedString(segment, phraseMap)
+    const translated = translateQuotedString(segment, phraseMap, runtimeConfig)
     result += translated.text
     changed = changed || translated.changed
 
     return { text: result, changed }
 }
 
-function translateJavaScriptStrings(code, phraseMap) {
+function translateJavaScriptStrings(code, phraseMap, runtimeConfig) {
     let result = ''
     let changes = 0
 
@@ -296,8 +448,8 @@ function translateJavaScriptStrings(code, phraseMap) {
             }
 
             const translated = quote === '`'
-                ? translateTemplateLiteral(buffer, phraseMap)
-                : translateQuotedString(buffer, phraseMap)
+                ? translateTemplateLiteral(buffer, phraseMap, runtimeConfig)
+                : translateQuotedString(buffer, phraseMap, runtimeConfig)
 
             if (translated.changed) changes++
 
@@ -308,13 +460,10 @@ function translateJavaScriptStrings(code, phraseMap) {
         result += char
     }
 
-    return {
-        code: result,
-        changes
-    }
+    return { code: result, changes }
 }
 
-function extractQuotedStrings(code) {
+function extractQuotedStrings(code, runtimeConfig) {
     const results = new Set()
 
     for (let i = 0; i < code.length; i++) {
@@ -350,8 +499,8 @@ function extractQuotedStrings(code) {
 
         if (quote === '`') {
             const clean = buffer.replace(/\$\{[\s\S]*?\}/g, ' ')
-            if (shouldTranslateString(clean)) results.add(clean.trim())
-        } else if (shouldTranslateString(buffer)) {
+            if (shouldTranslateString(clean, runtimeConfig)) results.add(clean.trim())
+        } else if (shouldTranslateString(buffer, runtimeConfig)) {
             results.add(buffer.trim())
         }
     }
@@ -396,13 +545,11 @@ function resolveTargets(pluginsDir, args) {
     const allFiles = collectPluginFiles(pluginsDir)
     const lower = normalized.toLowerCase()
 
-    const matched = allFiles.filter((filePath) => {
+    return allFiles.filter((filePath) => {
         const relative = path.relative(pluginsDir, filePath).replace(/\\/g, '/').replace(/\.js$/i, '').toLowerCase()
         const base = path.basename(filePath, '.js').toLowerCase()
         return relative === lower || base === lower
     })
-
-    return matched
 }
 
 function ensureBackup(filePath, backupRoot, projectRoot) {
@@ -434,37 +581,50 @@ async function translateTextOnline(text) {
         .trim()
 }
 
-async function fillMissingTranslations(targets, phraseMap) {
-    const existing = new Map(phraseMap)
-    const pending = new Set()
+async function translateTextOnlineProtected(text, runtimeConfig) {
+    const { masked, tokens } = maskProtectedTerms(text, runtimeConfig.protectedTerms)
+    const translated = await translateTextOnline(masked)
+    return unmaskProtectedTerms(translated, tokens)
+}
+
+async function fillMissingTranslations(targets, phraseMap, runtimeConfig) {
+    const existing = new Map(phraseMap.map(([from, to]) => [normalizeText(from), [from, to]]))
+    const pending = new Map()
 
     for (const filePath of targets) {
         const original = fs.readFileSync(filePath, 'utf8')
-        extractQuotedStrings(original).forEach((text) => {
-            const saved = existing.get(text)
-            if (!saved || saved.trim() === text.trim()) {
-                pending.add(text)
-            }
-        })
+        for (const text of extractQuotedStrings(original, runtimeConfig)) {
+            const key = normalizeText(text)
+            const saved = existing.get(key)
+            if (saved) continue
+            if (looksAlreadySpanish(text)) continue
+            pending.set(key, text)
+        }
     }
 
     let translatedCount = 0
 
-    for (const text of pending) {
+    for (const text of pending.values()) {
         try {
-            const translated = await translateTextOnline(text)
-            if (translated) {
-                existing.set(text, translated)
+            const translated = looksLikeSourceLanguage(text)
+                ? await translateTextOnlineProtected(text, runtimeConfig)
+                : applyWordMap(text)
+
+            if (translated && normalizeText(translated) !== normalizeText(text)) {
+                existing.set(normalizeText(text), [text, translated])
                 translatedCount++
             }
         } catch {
             const fallback = applyWordMap(text)
-            existing.set(text, fallback || text)
+            if (fallback && normalizeText(fallback) !== normalizeText(text)) {
+                existing.set(normalizeText(text), [text, fallback])
+                translatedCount++
+            }
         }
     }
 
     return {
-        phraseMap: [...existing.entries()],
+        phraseMap: [...existing.values()],
         translatedCount
     }
 }
@@ -473,17 +633,25 @@ async function handler(m) {
     const pluginsDir = path.join(process.cwd(), 'plugins')
     const args = m.args || []
     let phraseMap = loadPhraseMap()
+    const rawConfig = loadTranslationConfig()
+    const runtimeConfig = {
+        ...rawConfig,
+        skipMatchers: compileSkipMatchers(rawConfig)
+    }
+    const translationState = loadTranslationState()
+
+    saveTranslationConfig(rawConfig)
 
     if (!args.length) {
         return m.reply(
             `*Traducir plugins*\n\n` +
-            `Usa este comando para pasar textos visibles de plugins al espanol.\n\n` +
+            `Usa este comando para pasar textos visibles de plugins al espanol y recordar el estado.\n\n` +
             `Ejemplos:\n` +
             `> ${m.prefix}traducir-plugins owner\n` +
             `> ${m.prefix}traducir-plugins main/menu\n` +
             `> ${m.prefix}traducir-plugins menu\n` +
             `> ${m.prefix}traducir-plugins all\n\n` +
-            `Nota: completa el diccionario automaticamente y crea backup antes de cambiar archivos.`
+            `Nota: guarda diccionario, guarda estado por archivo y crea backup antes de cambiar archivos.`
         )
     }
 
@@ -494,58 +662,78 @@ async function handler(m) {
             return m.reply(`No encontre archivos para traducir con: \`${args.join(' ')}\``)
         }
 
-        await m.reply(`🧠 Estoy completando el diccionario y preparando la traduccion de ${targets.length} archivo(s). Esto puede tardar si faltan muchas frases.`)
+        await m.reply(`Estoy completando el diccionario y revisando el estado persistente de ${targets.length} archivo(s).`)
 
-        const completed = await fillMissingTranslations(targets, phraseMap)
+        const completed = await fillMissingTranslations(targets, phraseMap, runtimeConfig)
         phraseMap = completed.phraseMap
         savePhraseMap(phraseMap)
-
-        await m.reply(
-            `✅ Diccionario actualizado.\n\n` +
-            `> Frases nuevas agregadas: ${completed.translatedCount}\n` +
-            `> Ahora voy a aplicar la traduccion en los plugins...`
-        )
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
         const backupRoot = path.join(process.cwd(), 'backup', 'translate-plugins', timestamp)
         let changedFiles = 0
         let totalStringChanges = 0
+        let skippedAlreadyTranslated = 0
         const changedNames = []
 
         for (const filePath of targets) {
             const original = fs.readFileSync(filePath, 'utf8')
-            const translated = translateJavaScriptStrings(original, phraseMap)
+            const relativeName = path.relative(process.cwd(), filePath).replace(/\\/g, '/')
+            const currentHash = hashText(original)
+            const fileState = translationState.files[relativeName]
 
-            if (!translated.changes || translated.code === original) continue
+            if (fileState?.translatedHash === currentHash) {
+                skippedAlreadyTranslated++
+                continue
+            }
+
+            const translated = translateJavaScriptStrings(original, phraseMap, runtimeConfig)
+
+            if (!translated.changes || translated.code === original) {
+                translationState.files[relativeName] = {
+                    sourceHash: currentHash,
+                    translatedHash: currentHash,
+                    translatedAt: new Date().toISOString()
+                }
+                continue
+            }
 
             ensureBackup(filePath, backupRoot, process.cwd())
             fs.writeFileSync(filePath, translated.code)
 
             changedFiles++
             totalStringChanges += translated.changes
-            changedNames.push(path.relative(process.cwd(), filePath).replace(/\\/g, '/'))
+            changedNames.push(relativeName)
+            translationState.files[relativeName] = {
+                sourceHash: currentHash,
+                translatedHash: hashText(translated.code),
+                translatedAt: new Date().toISOString()
+            }
 
             try {
                 hotReloadPlugin(filePath)
             } catch {}
         }
 
+        saveTranslationState(translationState)
+
         if (!changedFiles) {
             return m.reply(
                 `No hice cambios en ${targets.length} archivo(s).\n\n` +
-                `Posibles motivos:\n` +
-                `> - ya estaban en espanol\n` +
-                `> - no habia textos detectables para traducir\n` +
-                `> - eran cadenas tecnicas que el plugin ignora por seguridad`
+                `> Ya traducidos y conservados: ${skippedAlreadyTranslated}\n` +
+                `> Frases nuevas agregadas al diccionario: ${completed.translatedCount}\n` +
+                `> Estado guardado en: assets/json/translation-es-state.json`
             )
         }
 
         let replyText =
-            `🎉 Traduccion completada.\n\n` +
+            `Traduccion completada.\n\n` +
             `> Frases agregadas al diccionario: ${completed.translatedCount}\n` +
             `> Archivos cambiados: ${changedFiles}\n` +
+            `> Archivos ya traducidos que no se tocaron: ${skippedAlreadyTranslated}\n` +
             `> Cadenas ajustadas: ${totalStringChanges}\n` +
-            `> Backup: ${path.relative(process.cwd(), backupRoot).replace(/\\/g, '/')}\n\n`
+            `> Backup: ${path.relative(process.cwd(), backupRoot).replace(/\\/g, '/')}\n` +
+            `> Estado: assets/json/translation-es-state.json\n` +
+            `> Config: assets/json/translation-es-config.json\n\n`
 
         replyText += `Primeros archivos tocados:\n`
         changedNames.slice(0, 10).forEach((name) => {
@@ -555,8 +743,6 @@ async function handler(m) {
         if (changedNames.length > 10) {
             replyText += `> ...y ${changedNames.length - 10} mas`
         }
-
-        replyText += `\n\nConsejo: prueba primero con una carpeta como \`owner\` antes de usar \`all\`.`
 
         return m.reply(replyText)
     } catch (error) {
