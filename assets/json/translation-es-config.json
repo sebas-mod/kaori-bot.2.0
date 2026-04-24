@@ -1,0 +1,45 @@
+{
+  "targetLanguage": "es",
+  "copyOnlyDirectories": [
+    ".git",
+    "node_modules",
+    "assets",
+    "database"
+  ],
+  "copyOnlyFiles": [
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml"
+  ],
+  "textExtensions": [
+    ".js",
+    ".json",
+    ".md",
+    ".txt"
+  ],
+  "protectedTerms": [
+    "WhatsApp",
+    "Baileys",
+    "Node.js",
+    "API",
+    "AI",
+    ".menu",
+    ".owner",
+    ".play",
+    ".help"
+  ],
+  "commandPrefixes": [
+    ".",
+    "#",
+    "!",
+    "/",
+    "\\"
+  ],
+  "skipPatterns": [
+    "^https?://",
+    "^www\\.",
+    "^[A-Za-z]:\\\\",
+    "^[./~\\\\]",
+    "^[A-Za-z0-9_.-]+$"
+  ]
+}
