@@ -2,6 +2,54 @@
 
 require('./src/lib/ourin-agent').initializeAgent()
 
+const Module = require('module');
+const originalRequire = Module.prototype.require;
+let isSharpFailed = false;
+
+Module.prototype.require = function(request) {
+  if (request === 'sharp') {
+    try {
+      return originalRequire.call(this, request);
+    } catch (e) {
+      if (!isSharpFailed) {
+        console.warn("\\n⚠️ [OURIN-WARN] Modul 'sharp' tidak didukung di system ini (Termux/Android).");
+        console.warn("⚠️ Fitur yang butuh 'sharp' akan menggunakan JIMP/FFmpeg sebagai fallback.\\n");
+        isSharpFailed = true;
+      }
+      const dummySharp = function(input) {
+        let _w = null, _h = null, _fmt = null;
+        const chain = {
+          resize: (w, h) => { _w = w; _h = h; return chain; },
+          webp: () => { throw new Error("WebP tidak didukung JIMP fallback. Menggunakan FFmpeg."); },
+          jpeg: () => { _fmt = 'jpeg'; return chain; },
+          png: () => { _fmt = 'png'; return chain; },
+          toBuffer: async () => {
+            try {
+              const jimp = originalRequire.call(this, 'jimp');
+              if (Buffer.isBuffer(input) || typeof input === 'string') {
+                const img = await jimp.read(input);
+                if (_w || _h) img.resize(_w || jimp.AUTO, _h || jimp.AUTO);
+                if (_fmt === 'png') return await img.getBufferAsync(jimp.MIME_PNG);
+                if (_fmt === 'jpeg') return await img.getBufferAsync(jimp.MIME_JPEG);
+                return await img.getBufferAsync(jimp.MIME_JPEG); // Default JIMP fallback to JPEG
+              }
+            } catch (err) {}
+            return Buffer.isBuffer(input) ? input : Buffer.from([]);
+          }
+        };
+        return chain;
+      };
+      dummySharp.cache = () => {};
+      dummySharp.concurrency = () => {};
+      dummySharp.counters = () => {};
+      dummySharp.disableCache = () => {};
+      dummySharp.format = { webp: 'webp', jpeg: 'jpeg', png: 'png' };
+      return dummySharp;
+    }
+  }
+  return originalRequire.call(this, request);
+};
+
 const LOG_NOISE = new Set([
   'Closing', 'prekey', '_chains', 'registrationId',
   'chainKey', 'ephemeralKeyPair', 'rootKey', 'indexInfo',
@@ -37,7 +85,6 @@ const {
 const { startAutoBackup } = require("./src/lib/ourin-backup");
 const { handleAntiTagSW } = require("./src/lib/ourin-group-protection");
 const { initSholatScheduler } = require("./src/lib/ourin-sholat-scheduler");
-const { initAutoJpmScheduler } = require("./src/lib/ourin-auto-jpm");
 const { startMemoryMonitor } = require("./src/lib/ourin-memory-monitor");
 const { startTempCleaner } = require("./src/lib/ourin-temp-cleaner");
 const { startDailyPruner } = require("./src/lib/ourin-data-pruner");
@@ -368,8 +415,8 @@ async function main() {
         startGroupScheduleChecker(sock);
         startSewaChecker(sock);
         initScheduler(config, sock);
-        initAutoJpmScheduler(sock);
-        initSholatScheduler(sock);
+        //initAutoJpmScheduler(sock);
+        //initSholatScheduler(sock);
         try {
           const { initSahurCron } = require('./plugins/religi/autosahur');
           initSahurCron(sock);
